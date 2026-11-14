@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "_note": "PLACEHOLDER polygons. Prasham: redraw DPS + Fryft from official USC maps on geojson.io and update last_verified.",
+  "features": [
+    { "type": "Feature", "properties": { "name": "DPS", "last_verified": null },
+      "geometry": { "type": "Polygon", "coordinates": [[[-118.300, 34.012], [-118.272, 34.012], [-118.272, 34.035], [-118.300, 34.035], [-118.300, 34.012]]] } },
+    { "type": "Feature", "properties": { "name": "Fryft", "last_verified": null },
+      "geometry": { "type": "Polygon", "coordinates": [[[-118.305, 34.008], [-118.268, 34.008], [-118.268, 34.040], [-118.305, 34.040], [-118.305, 34.008]]] } }
+  ]
+}

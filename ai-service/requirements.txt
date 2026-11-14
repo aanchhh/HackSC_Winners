@@ -1,0 +1,36 @@
+# --- Web / API ---
+fastapi
+uvicorn[standard]
+sse-starlette
+httpx                 # calls Node /internal/* tools
+pydantic
+pydantic-settings
+python-dotenv
+
+# --- Agent ---
+langgraph
+langchain
+langchain-core
+langchain-anthropic   # LLM client (swap provider in app/llm.py if needed)
+langsmith             # optional tracing
+
+# --- RAG / embeddings ---
+sentence-transformers # bge-small-en-v1.5, 384-dim, local
+numpy
+
+# --- Database (Supabase Postgres + pgvector + PostGIS) ---
+psycopg[binary]
+pgvector
+supabase
+
+# --- Ingest (offline) ---
+praw                  # official Reddit API
+pandas
+geopy                 # Nominatim geocoding (cache results!)
+beautifulsoup4        # Daily Trojan article text
+tiktoken              # ~300-token chunking (token estimate only)
+
+# --- Dev ---
+pytest
+pytest-asyncio
+ruff

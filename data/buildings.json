@@ -1,0 +1,12 @@
+[
+  { "id": 1, "name": "Viterbi (SAL)", "code": "SAL", "lat": 34.0195, "lng": -118.2895 },
+  { "id": 2, "name": "Viterbi (RTH)", "code": "RTH", "lat": 34.0201, "lng": -118.2899 },
+  { "id": 3, "name": "Marshall (JKP)", "code": "JKP", "lat": 34.0189, "lng": -118.2856 },
+  { "id": 4, "name": "Leavey Library", "code": "LVL", "lat": 34.0216, "lng": -118.2829 },
+  { "id": 5, "name": "Doheny Library", "code": "DML", "lat": 34.0201, "lng": -118.2837 },
+  { "id": 6, "name": "Von KleinSmid Center", "code": "VKC", "lat": 34.0213, "lng": -118.2840 },
+  { "id": 7, "name": "Annenberg (ANN)", "code": "ANN", "lat": 34.0226, "lng": -118.2864 },
+  { "id": 8, "name": "Lyon Center", "code": "PED", "lat": 34.0242, "lng": -118.2884 },
+  { "id": 9, "name": "Tommy Trojan", "code": "TT", "lat": 34.0206, "lng": -118.2854 },
+  { "id": 10, "name": "USC Village", "code": "VIL", "lat": 34.0256, "lng": -118.2856 }
+]
