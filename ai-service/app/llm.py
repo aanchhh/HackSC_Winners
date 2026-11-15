@@ -8,11 +8,11 @@ Pick the provider with LLM_PROVIDER in ai-service/.env:
 All four support structured output (filter extraction) and streaming (the chat answer)."""
 from app.config import settings
 
-DEFAULT_MODELS = {"ollama": "qwen2.5:7b", "google": "gemini-2.5-flash", "anthropic": "claude-opus-5-5", "groq": "openai/gpt-oss-120b"}
+DEFAULT_MODELS = {"ollama": "qwen2.5:7b", "google": "gemini-2.5-flash", "anthropic": "claude-opus-5-5", "groq": "qwen/qwen3.8-27b"}
 
 # Groq retires models (llama-3.3-70b-versatile was shut down for free keys on 2026-08-16), so with no
 # LLM_MODEL set we ask Groq which models this key can use and take the first of these that is offered.
-GROQ_PREFERRED = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile"]
+GROQ_PREFERRED = ["qwen/qwen3.8-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b"]  # all free on Groq's free plan
 _groq_pick: str | None = None
 
 
