@@ -1,27 +1,14 @@
-"""Geo-filtered vector search via Supabase RPC match_chunks (see supabase/schema.sql)."""
-from functools import lru_cache
-
-import psycopg
-from pgvector.psycopg import register_vector_async
-
+"""Geo-filtered vector search via Supabase RPC match_chunks (see supabase/schema.sql).
+psycopg/pgvector are imported only when DATABASE_URL is set, so the hosted service runs without them."""
 from app.config import settings
-
-EMBED_MODEL = "BAAI/bge-small-en-v1.5"  # 384-dim
-
-
-@lru_cache
-def embedder():
-    from sentence_transformers import SentenceTransformer  # heavy import; load lazily
-    return SentenceTransformer(EMBED_MODEL)
-
-
-def embed(texts: list[str]):
-    return embedder().encode(texts, normalize_embeddings=True)
+from app.embeddings import EMBED_MODEL, embed  # noqa: F401  (re-exported)
 
 
 async def match_chunks(query: str, lat: float, lng: float, radius_m: int = 150, k: int = 8) -> list[dict]:
     if not settings.database_url:
         return []
+    import psycopg
+    from pgvector.psycopg import register_vector_async
     q = embed([query])[0]
     async with await psycopg.AsyncConnection.connect(settings.database_url) as conn:
         await register_vector_async(conn)
@@ -34,6 +21,7 @@ async def incident_counts(lat: float, lng: float, radius_m: int = 150) -> dict[s
     """Exact counts from SQL — never from the LLM."""
     if not settings.database_url:
         return {}
+    import psycopg
     async with await psycopg.AsyncConnection.connect(settings.database_url) as conn:
         cur = await conn.execute(
             """select category, count(*) from incidents

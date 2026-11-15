@@ -1,6 +1,7 @@
-# Render Blueprint: the Node API (Express gateway). Render → New → Blueprint → pick this repo.
-# The frontend goes on Vercel; the AI service runs on a free Hugging Face Space (see DEPLOY.md).
+# Render Blueprint: the Node API and the AI service, both on the free plan.
+# Render → New → Blueprint → pick this repo. The frontend goes on Vercel (see DEPLOY.md).
 services:
+  # ---------- Node API (Express gateway) ----------
   - type: web
     name: trojanscout-api
     runtime: node
@@ -14,17 +15,49 @@ services:
         value: "24"
       - key: CORS_ORIGIN          # your Vercel URL, e.g. https://trojanscout.vercel.app
         sync: false
-      - key: PUBLIC_API_URL       # this service's own URL, e.g. https://trojanscout-api.onrender.com
+      - key: AI_SERVICE_URL       # the AI service's URL below, e.g. https://trojanscout-ai.onrender.com
         sync: false
-      - key: AI_SERVICE_URL       # your Hugging Face Space URL, e.g. https://<user>-trojanscout-ai.hf.space
-        sync: false
-      - key: INTERNAL_KEY         # shared secret with the AI service: copy this value into the Space's secrets
+      - key: INTERNAL_KEY         # shared secret; the AI service copies it automatically
         generateValue: true
       - key: SESSION_SECRET
         generateValue: true
       - key: ALLOWED_EMAIL_DOMAINS
         value: usc.edu
-      - key: BREVO_API_KEY        # optional: email sign-in codes (otherwise they appear in Render logs)
+      - key: BREVO_API_KEY        # optional: email sign-in codes (otherwise they appear in this service's Logs)
         sync: false
       - key: MAIL_FROM
         sync: false
+
+  # ---------- AI service (FastAPI: search, Scout, report checks) ----------
+  # Runs without PyTorch (ONNX models via fastembed) to fit the free plan's 512 MB.
+  - type: web
+    name: trojanscout-ai
+    runtime: python
+    plan: free
+    rootDir: .
+    # the embedding model is downloaded at build time, so a cold start doesn't re-download it
+    buildCommand: cd ai-service && pip install -r requirements-deploy.txt && python -c "from app.embeddings import embed; embed(['warm up'])"
+    startCommand: cd ai-service && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: FASTEMBED_CACHE_PATH
+        value: /opt/render/project/src/ai-service/.models
+      - key: LLM_PROVIDER
+        value: groq
+      - key: LLM_API_KEY          # your Groq key (console.groq.com → API Keys)
+        sync: false
+      - key: NODE_INTERNAL_URL    # the Node API's URL above, e.g. https://trojanscout-api.onrender.com
+        sync: false
+      - key: INTERNAL_KEY
+        fromService:
+          type: web
+          name: trojanscout-api
+          envVarKey: INTERNAL_KEY
+      - key: REFRESH_MINUTES      # listings come from the committed data/listings.json
+        value: "0"
+      - key: RERANKER_MODEL       # off on the free plan: the reranker needs ~140 MB more than 512 MB allows under load
+        value: "off"
+      - key: ONNX_THREADS
+        value: "1"

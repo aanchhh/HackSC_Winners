@@ -15,3 +15,4 @@ ai-service/.index/
 # runtime user data (accounts, reports)
 data/users.json
 data/reports.json
+ai-service/.models/

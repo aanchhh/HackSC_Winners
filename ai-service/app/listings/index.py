@@ -8,7 +8,6 @@
 import json
 import threading
 import time
-from functools import lru_cache
 from pathlib import Path
 
 import bm25s
@@ -16,11 +15,12 @@ import faiss
 import numpy as np
 import Stemmer
 
+from app import embeddings
 from app.config import settings
 from app.listings.models import Listing, doc_text
 from app.listings.query import SmartQuery, parse_rules, walk_minutes
 
-EMBED_MODEL = "BAAI/bge-small-en-v1.5"
+EMBED_MODEL = embeddings.EMBED_MODEL
 BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 RRF_K = 60
 CANDIDATES = 50
@@ -29,22 +29,10 @@ RERANK_TOP = 20
 _stemmer = Stemmer.Stemmer("english")
 
 
-@lru_cache
-def _embedder():
-    from sentence_transformers import SentenceTransformer
-    return SentenceTransformer(EMBED_MODEL)
-
-
-@lru_cache
-def _reranker():
-    from sentence_transformers import CrossEncoder
-    return CrossEncoder(settings.reranker_model)
-
-
 def _embed(texts: list[str], query: bool = False) -> np.ndarray:
     if query:
         texts = [BGE_QUERY_PREFIX + t for t in texts]
-    return np.asarray(_embedder().encode(texts, normalize_embeddings=True, batch_size=32), dtype="float32")
+    return embeddings.embed(texts)
 
 
 # Back-compat for callers that build filters directly (agent tools, tests)
@@ -165,7 +153,7 @@ class HybridIndex:
         scores = {i: fused[i] for i in order}
         if rerank and settings.reranker_model and len(order) > 1:
             top = order[:RERANK_TOP]
-            ce = _reranker().predict([(query, doc_text(listings[i])) for i in top], show_progress_bar=False)
+            ce = embeddings.rerank(settings.reranker_model, query, [doc_text(listings[i]) for i in top])
             top = [i for _, i in sorted(zip(ce, top), key=lambda x: -x[0])]
             scores.update({i: float(s) for i, s in zip(top, sorted(ce, reverse=True))})
             order = top + order[RERANK_TOP:]
@@ -180,4 +168,4 @@ def warm():
     """Load models once at startup so the first real query isn't a 10 s cold start."""
     _embed(["warm up"], query=True)
     if settings.reranker_model:
-        _reranker().predict([("warm", "up")], show_progress_bar=False)
+        embeddings.rerank(settings.reranker_model, "warm", ["up"])

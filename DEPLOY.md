@@ -1,55 +1,58 @@
 # Deploying TrojanScout
 
-| Part | Host | Cost | Why |
-|---|---|---|---|
-| Frontend (React/Vite) | **Vercel** | Free | Static site + CDN |
-| Node API (Express) | **Render** web service | Free | Always-on server: SSE live rides, background DPS-alert refresh, file storage. Uses ~290 MB RAM. |
-| AI service (FastAPI, embeddings, Scout) | **Hugging Face Space** (Docker) | Free | Needs ~2 GB RAM for PyTorch + models; Spaces give 16 GB on the free CPU tier |
-| LLM | **Groq** | Free tier | Ollama can't run on Vercel/Render/Spaces' free tiers. One key is enough: most searches use the built-in rules and never call the LLM |
+| Part | Host | Cost |
+|---|---|---|
+| Frontend (React/Vite) | **Vercel** | Free |
+| Node API (Express) | **Render** web service `trojanscout-api` | Free, no card |
+| AI service (FastAPI: search, Scout, report checks) | **Render** web service `trojanscout-ai` | Free, no card |
+| LLM | **Groq** (replaces Ollama, which can't run on free hosts) | Free tier |
 
-Order: **1 Groq → 2 Hugging Face → 3 Render → 4 Vercel → 5 connect the URLs.** About 20 minutes.
+Both Render services come from one file, `render.yaml`. Vercel and Render watch GitHub, so every push to `main` redeploys.
 
-## 1. Groq key
-console.groq.com → API Keys → Create. Keep it for step 2.
+Order: **1 Groq → 2 Render → 3 Vercel → 4 connect the URLs.** About 20 minutes plus build time.
 
-## 2. AI service on Hugging Face
-1. huggingface.co → New Space → name `trojanscout-ai`, SDK **Docker** (Blank), hardware **CPU basic (free)**, Public.
-2. huggingface.co/settings/tokens → New token, type **Write**.
-3. GitHub repo → Settings → Secrets and variables → Actions → add:
-   - `HF_TOKEN` = the write token
-   - `HF_SPACE` = `<your-hf-username>/trojanscout-ai`
-4. In the Space → Settings → **Variables and secrets** add:
-   - `LLM_PROVIDER` = `groq`
-   - `LLM_API_KEY` = your Groq key (secret)
-   - `LLM_MODEL` = leave empty for the default, or a smaller model from console.groq.com/docs/models if you hit limits
-   - `INTERNAL_KEY` = the same value Render generates in step 3 (secret)
-   - `NODE_INTERNAL_URL` = your Render URL from step 3
-   - `REFRESH_MINUTES` = `0` (keeps the AI service's listings identical to the Node API's)
-5. GitHub → Actions → "Deploy AI service to Hugging Face" → **Run workflow** (it also runs on every push to `main`).
-   The first build takes ~10 min. Your URL: `https://<your-hf-username>-trojanscout-ai.hf.space` (check `/health`).
+## 1. Groq key (2 min)
+console.groq.com → sign in → **API Keys → Create API Key** → copy it (shown once).
 
-## 3. Node API on Render
-1. render.com → New → **Blueprint** → connect the GitHub repo → it reads `render.yaml`.
-2. Fill the prompted values:
-   - `CORS_ORIGIN` = your Vercel URL (you can enter a placeholder now and update it after step 4)
-   - `PUBLIC_API_URL` = `https://trojanscout-api.onrender.com` (the service's own URL)
-   - `AI_SERVICE_URL` = the Hugging Face URL from step 2
-   - `BREVO_API_KEY` / `MAIL_FROM` = optional (email sign-in codes; without them the codes appear in Render → Logs)
-3. After it deploys, open the service → Environment → copy `INTERNAL_KEY` into the Space secret (step 2.4) and restart the Space.
+## 2. Both backends on Render (5 min + ~10 min build)
+1. render.com → sign up **with GitHub** → allow access to the `HackSC_Winners` repo.
+2. **New + → Blueprint** → pick `HackSC_Winners` → Render reads `render.yaml` and lists two services.
+3. Fill the prompted values. The URLs follow the pattern `https://<service-name>.onrender.com`:
 
-## 4. Frontend on Vercel
-1. vercel.com → Add New → Project → import the GitHub repo.
-2. **Root Directory: `frontend`** (framework Vite is detected; `vercel.json` handles page routing).
-3. Environment variable: `VITE_API_URL` = your Render URL (no trailing slash).
-4. Deploy. Then put the Vercel URL into Render's `CORS_ORIGIN` and redeploy Render.
+   | Service | Key | Value |
+   |---|---|---|
+   | trojanscout-api | `CORS_ORIGIN` | `https://placeholder.vercel.app` (fixed in step 4) |
+   | trojanscout-api | `AI_SERVICE_URL` | `https://trojanscout-ai.onrender.com` |
+   | trojanscout-api | `BREVO_API_KEY`, `MAIL_FROM` | leave blank |
+   | trojanscout-ai | `LLM_API_KEY` | your Groq key |
+   | trojanscout-ai | `NODE_INTERNAL_URL` | `https://trojanscout-api.onrender.com` |
+
+4. **Apply.** Wait until both show **Live**; the AI service's first build takes about 10 minutes.
+5. Open each service and check the URL at the top. If Render added a suffix (name taken), fix `AI_SERVICE_URL` / `NODE_INTERNAL_URL` to the real URLs.
+6. Check: `https://trojanscout-api.onrender.com/health` → `{"ok":true,...}` and
+   `https://trojanscout-ai.onrender.com/health` → `"llm": true, "provider": "groq"`.
+
+`INTERNAL_KEY` (the secret the two services share) is generated and copied between them automatically.
+
+## 3. Frontend on Vercel (5 min)
+1. vercel.com → sign up **with GitHub** → **Add New… → Project** → import `HackSC_Winners`.
+2. **Root Directory → Edit → `frontend`** (framework: Vite).
+3. **Environment Variables:** `VITE_API_URL` = `https://trojanscout-api.onrender.com` (no trailing slash).
+4. **Deploy** and copy the site URL.
+
+## 4. Connect the site to the API (2 min)
+Render → trojanscout-api → **Environment** → set `CORS_ORIGIN` to the Vercel URL (no trailing slash) → **Save, rebuild, and deploy**.
+Without this the site loads but shows no data.
 
 ## 5. Check it
-- `https://<render>/health` → `{"ok":true}`
-- `https://<space>.hf.space/health` → shows `"llm": true, "provider": "groq"`
-- Open the Vercel URL: search, map, safe route, Book Ride, sign in.
+Open the Vercel URL: Search shows matches, Map draws a safe route, Scout answers, Free & Safe loads, sign-in works
+(the 6-digit code appears in Render → trojanscout-api → **Logs** unless Brevo is set up).
 
 ## Free-tier limits to know
-- **Render free sleeps after 15 min idle**; the first visit then takes ~50 s. Open it a minute before a demo (or use the $7 plan).
-- **Files written at runtime reset on restart** on Render free (accounts, reports). Fine for a demo; for real use, attach a disk or move them to Supabase (schema in `supabase/`).
-- **Spaces sleep after 48 h without visits.**
-- Groq free tier has per-minute and per-day limits; the app falls back to rules-only answers when the LLM is unavailable.
+- **Render free services sleep after 15 min idle**; the first visit then takes ~1 min while both wake. Open the site and run one search a couple of minutes before a demo.
+- The free plan has **512 MB RAM** per service. To fit, the AI service runs its models on ONNX instead of PyTorch (identical vectors)
+  and turns the cross-encoder re-ranker off (`RERANKER_MODEL=off`): search is hybrid meaning + keyword ranking without the final re-sort.
+  On a paid instance (1 GB+), delete that variable to turn re-ranking back on.
+- **Files written at runtime reset on restart** (accounts, reports, friends). Fine for a demo; for real use, move them to Supabase (schema in `supabase/`).
+- 750 free instance-hours a month are shared across your Render services; sleeping services don't use them.
+- Groq's free tier has per-minute and per-day limits; when it's unavailable the app falls back to rules-only answers.

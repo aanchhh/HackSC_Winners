@@ -18,7 +18,7 @@ langchain-ollama        # local models via Ollama (default)
 langsmith             # optional tracing
 
 # --- RAG / embeddings ---
-sentence-transformers # bge-small-en-v1.5, 384-dim, local
+fastembed             # bge-small-en-v1.5 + MiniLM reranker on ONNX Runtime (no PyTorch)
 numpy
 
 # --- Database (Supabase Postgres + pgvector + PostGIS) ---

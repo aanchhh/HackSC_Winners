@@ -115,13 +115,13 @@ Fill in `LLM_API_KEY`, `ORS_API_KEY`, `DATABASE_URL` to go real. `INTERNAL_KEY` 
 
 ## Deploy
 
-| Service  | Host   | Build / start | Env vars |
-|----------|--------|---------------|----------|
-| frontend | Vercel | root `frontend`, `npm run build` → `dist` | `VITE_API_URL` |
-| node-api | Render | `npm install && npm run build` / `npm start` | `DATABASE_URL ORS_API_KEY AI_SERVICE_URL INTERNAL_KEY CORS_ORIGIN` |
-| ai-service | Render | `pip install -r requirements.txt` / `uvicorn app.main:app --host 0.0.0.0 --port $PORT` | `DATABASE_URL LLM_API_KEY NODE_INTERNAL_URL INTERNAL_KEY` |
+| Service  | Host   | How |
+|----------|--------|-----|
+| frontend | Vercel | root `frontend`, env `VITE_API_URL` |
+| node-api | Render (free) | `render.yaml` Blueprint |
+| ai-service | Render (free) | `render.yaml` Blueprint; installs `requirements-deploy.txt` (no PyTorch: ONNX models fit 512 MB), LLM via Groq |
 
-Render free instances sleep: hit both `/health` endpoints 5 min before the demo.
+Step-by-step: [DEPLOY.md](DEPLOY.md). Render free instances sleep: hit both `/health` endpoints 5 min before the demo.
 
 ## Sign-in, friends and ride sharing
 

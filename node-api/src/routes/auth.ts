@@ -14,7 +14,8 @@ import { config } from '../config.js'
 import { signSession, upsertFromIdToken } from '../services/users.js'
 import { mailConfigured, sendLoginCode } from '../services/mailer.js'
 
-const API = process.env.PUBLIC_API_URL ?? `http://localhost:${config.port}`
+// Render sets RENDER_EXTERNAL_URL to the service's own https URL, so PUBLIC_API_URL is optional there
+const API = process.env.PUBLIC_API_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${config.port}`
 const FRONT = config.corsOrigin[0]
 const LOCAL_ISSUER = `${API}/idp`
 const OIDC = {
