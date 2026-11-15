@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { motion } from 'motion/react'
+import { Check, Loader2 } from 'lucide-react'
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { api, streamChat } from '../api/client'
@@ -69,7 +71,7 @@ function WhyCard({ l, reasons, fit, rank }: { l: ListingV2; reasons: string[]; f
   )
 }
 
-export default function ChatPage() {
+export default function ChatPage({ embedded = false }: { embedded?: boolean } = {}) {
   const { profile, highlight } = useAppStore()
   const listings = useQuery({ queryKey: ['listings'], queryFn: () => api.listings() })
   const [messages, setMessages] = useState<Msg[]>([])
@@ -105,32 +107,37 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="mx-auto flex h-full max-w-4xl flex-col px-4">
-      <div className="flex-1 space-y-6 overflow-y-auto py-8">
+    <div className={`mx-auto flex h-full flex-col ${embedded ? 'px-3' : 'max-w-4xl px-4'}`}>
+      <div className={`flex-1 overflow-y-auto ${embedded ? 'space-y-4 py-3' : 'space-y-6 py-8'}`}>
         {!messages.length && (
-          <div className="pt-10 text-center">
-            <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-cardinal text-3xl">🐴</div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Ask Scout</h1>
-            <p className="mx-auto mt-2 max-w-lg text-stone-500">
+          <div className={embedded ? 'pt-2 text-center' : 'pt-10 text-center'}>
+            {!embedded && <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-cardinal text-3xl">🐴</div>}
+            {!embedded && <h1 className="text-3xl font-extrabold tracking-tight">Ask Scout</h1>}
+            <p className={`mx-auto mt-2 max-w-lg text-stone-500 ${embedded ? 'text-sm' : ''}`}>
               Describe what you want in your own words. Scout shows what it understood, searches live listings, checks zones, walks, cost and
               LAPD data, and explains why each place made the list. It runs on a local model, so nothing leaves your machine.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
-              {SUGGESTIONS.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full bg-white px-4 py-2 text-sm ring-1 ring-stone-200 hover:ring-cardinal">{s}</button>)}
+              {SUGGESTIONS.slice(0, embedded ? 3 : 4).map((s) => <button key={s} onClick={() => send(s)} className={`rounded-full bg-white ring-1 ring-stone-200 hover:ring-cardinal ${embedded ? 'px-3 py-1.5 text-left text-xs' : 'px-4 py-2 text-sm'}`}>{s}</button>)}
             </div>
           </div>
         )}
         {messages.map((m, i) => m.role === 'user' ? (
-          <div key={i} className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-cardinal px-4 py-2.5 text-white">{m.content}</div>
+          <motion.div key={i} initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-gradient-to-br from-cardinal to-cardinal-dark px-4 py-2.5 text-white shadow-md shadow-cardinal/20">{m.content}</motion.div>
         ) : (
           <div key={i} className="space-y-3">
             {!!m.steps?.length && (
-              <ul className="w-fit space-y-1 rounded-xl bg-white p-3 text-xs text-stone-600 ring-1 ring-stone-200">
-                {m.steps.map((s) => <li key={s.label}>{s.status === 'done' ? '✅' : <span className="inline-block animate-spin">⏳</span>} {s.label}</li>)}
+              <ul className="w-fit space-y-1.5 rounded-2xl bg-white/80 p-3 text-xs text-stone-600 shadow-sm ring-1 ring-stone-200 backdrop-blur">
+                {m.steps.map((s) => (
+                  <motion.li key={s.label} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
+                    {s.status === 'done' ? <span className="grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-white"><Check size={11} strokeWidth={3} /></span> : <Loader2 size={15} className="animate-spin text-cardinal" />}
+                    <span className={s.status === 'done' ? '' : 'shimmer rounded bg-clip-text text-transparent [background-image:linear-gradient(90deg,#78716c,#1c1917,#78716c)]'}>{s.label}</span>
+                  </motion.li>
+                ))}
               </ul>
             )}
             {m.understood && <UnderstoodCard u={m.understood} />}
-            {m.content && <div className="max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-stone-200">{m.content}</div>}
+            {m.content && <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-stone-200">{m.content}</motion.div>}
             {!!m.ids?.length && (
               <div className="space-y-2">
                 {m.ids.slice(0, showAll[i] ? 8 : 3).map((id, k) => {
@@ -147,10 +154,10 @@ export default function ChatPage() {
         ))}
         <div ref={end} />
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); send() }} className="sticky bottom-0 flex gap-2 bg-stone-50 py-4">
+      <form onSubmit={(e) => { e.preventDefault(); send() }} className={`sticky bottom-0 flex gap-2 ${embedded ? 'py-3' : 'bg-paper py-4'}`}>
         <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. a quiet room near Leavey, own bathroom, under $1,300…"
           className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-cardinal focus:ring-2 focus:ring-cardinal/20" />
-        <button disabled={busy} className="rounded-xl bg-cardinal px-6 font-semibold text-white disabled:opacity-50">{busy ? '…' : 'Ask'}</button>
+        <button disabled={busy} className="btn-glow rounded-xl bg-cardinal px-6 font-semibold text-white disabled:opacity-50">{busy ? <Loader2 size={18} className="animate-spin" /> : 'Ask'}</button>
       </form>
     </div>
   )

@@ -4,7 +4,7 @@ export interface FreeStatus { state: 'open' | 'closed' | 'upcoming' | 'info'; la
 export interface FreeProgram {
   id: string; name: string; provider: string; category: string; cost: string; eligibility: string[]; area: string
   summary: string; how: { phone?: string; url?: string; app?: string }; tags: string; caveats: string
-  sources: string[]; verified: string; confidence: 'confirmed' | 'check'
+  sources: string[]; verified: string; confidence: 'confirmed' | 'check' | 'closed'
   points?: { label: string; lat: number; lng: number }[]
   status: FreeStatus; areaOk: boolean | null; eligible: boolean; score: number
 }

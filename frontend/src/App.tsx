@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router'
+import { Route, Routes, useLocation } from 'react-router'
+import PageTransition from './components/layout/PageTransition'
 import Navbar from './components/layout/Navbar'
 import { AlertBanner } from './components/free/Alerts'
 import HomePage from './pages/HomePage'
@@ -11,14 +12,23 @@ import RidesPage from './pages/RidesPage'
 import FreePage from './pages/FreePage'
 import ProfilePage from './pages/ProfilePage'
 import AuthDonePage from './pages/AuthDonePage'
+import WelcomeToast from './components/layout/WelcomeToast'
+import ScoutWidget from './components/chat/ScoutWidget'
+import Splash from './components/layout/Splash'
+import ReportPage from './pages/ReportPage'
+import EmergencyPage from './pages/EmergencyPage'
 
 export default function App() {
+  const location = useLocation()
+  const { pathname } = location
   return (
     <div className="flex h-full flex-col">
       <Navbar />
       <AlertBanner />
+      <WelcomeToast />
       <main className="min-h-0 flex-1 overflow-y-auto">
-        <Routes>
+        <PageTransition k={pathname}>
+        <Routes location={location}>
           <Route path="/" element={<HomePage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/search" element={<SearchPage />} />
@@ -29,9 +39,14 @@ export default function App() {
           <Route path="/free" element={<FreePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/auth/done" element={<AuthDonePage />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/emergency" element={<EmergencyPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
+        </PageTransition>
       </main>
+      <ScoutWidget />
+      <Splash />
     </div>
   )
 }

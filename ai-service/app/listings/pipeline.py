@@ -71,10 +71,18 @@ async def refresh() -> dict:
 
         report, merged, seen = {}, [], set()
         stamp = time.strftime("%Y-%m-%dT%H:%M:%S")
+        prev_file = Path(settings.data_dir) / "listings.json"
+        previous = json.loads(prev_file.read_text()).get("listings", []) if prev_file.exists() else []
         for name, res in zip(enabled, results):
             if isinstance(res, Exception):
-                report[name] = f"error: {type(res).__name__}: {res}"
-                log.warning("source %s failed: %s", name, res)
+                # a site being down shouldn't make its listings vanish: keep the last good copy from that source
+                old = [Listing(**x) for x in previous if str(x.get("id", "")).startswith(f"{name}:")]
+                report[name] = f"error: {type(res).__name__}; kept {len(old)} from the last successful scrape"
+                log.warning("source %s failed: %s (keeping %d previous listings)", name, res, len(old))
+                for l in old:
+                    key = _addr_key(l.address)
+                    if key not in seen:
+                        seen.add(key); merged.append(l)
                 continue
             kept = 0
             for l in res:

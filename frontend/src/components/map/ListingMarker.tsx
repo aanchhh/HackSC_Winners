@@ -14,7 +14,7 @@ export default function ListingMarker({ listing, highlighted, comparing, focused
   const resize = useCallback(() => popupRef.current?.update(), [])
   useEffect(() => { if (focused) setTimeout(() => markerRef.current?.openPopup(), 300) }, [focused])
 
-  // Inside the DPS/Fryft zone → green. Outside → violet (red is reserved for DPS units).
+  // Inside the DPS patrol zone → green. Outside → violet (red is reserved for DPS units).
   const color = listing.inDps === false ? COLORS.outside : COLORS.inside
   return (
     <CircleMarker ref={markerRef} center={[listing.lat, listing.lng]} radius={highlighted || comparing ? 10 : 7}

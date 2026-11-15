@@ -32,8 +32,12 @@ ridesRouter.get('/quote', (req, res) => {
 })
 
 ridesRouter.post('/', async (req, res) => {
-  const b = z.object({ userId: User, name: z.string().max(30), pickup: Place, drop: Place, departAt: z.number().optional(), seats: z.number().int().min(1).max(2).optional() }).parse(req.body)
-  const u = await sessionUser(req)  // signed in: ride as your account, so friends can see it
+  const b = z.object({ userId: User, name: z.string().max(30), pickup: Place, drop: Place, departAt: z.number().optional(), seats: z.number().int().min(1).max(2).optional(),
+    share: z.object({ mode: z.enum(['everyone', 'friends', 'lists']), lists: z.array(z.string()).max(20).default([]) }).optional() }).parse(req.body)
+  const u = await sessionUser(req)  // signed in: ride as your account, so friends / lists can see it
+  if (!u && b.share && b.share.mode !== 'everyone') return res.status(401).json({ error: 'Sign in to share only with friends' })
+  if (u && b.share?.mode === 'lists') b.share.lists = b.share.lists.filter((id) => u.lists.some((l) => l.id === id))
+  if (b.share?.mode === 'lists' && !b.share.lists.length) return res.status(400).json({ error: 'Pick at least one list' })
   res.json(createRequest(u ? { ...b, userId: u.id, name: u.name } : b))
 })
 

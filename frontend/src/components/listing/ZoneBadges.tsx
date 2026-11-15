@@ -4,7 +4,7 @@ export default function ZoneBadges({ inDps, inFryft }: { inDps?: boolean; inFryf
   return (
     <div className="flex flex-wrap gap-1.5">
       {inDps !== undefined && <Badge tone={inDps ? 'green' : 'red'}>{inDps ? '🛡 Inside DPS' : '⚠ Outside DPS'}</Badge>}
-      {inFryft !== undefined && <Badge tone={inFryft ? 'green' : 'amber'}>{inFryft ? '🚗 Fryft zone' : 'No Fryft'}</Badge>}
+      {inFryft !== undefined && <Badge tone={inFryft ? 'green' : 'amber'}>{inFryft ? '🚗 Free USC Lyft' : 'No free USC Lyft'}</Badge>}
     </div>
   )
 }

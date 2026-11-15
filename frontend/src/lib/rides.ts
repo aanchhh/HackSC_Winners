@@ -18,17 +18,18 @@ export interface Place { lat: number; lng: number; label: string }
 export interface Quote { miles: number; minutes: number; fare: number }
 export interface RiderCost { requestId: string; solo: Quote; share: number; saves: number; savesPct: number; detourMin: number }
 export interface Plan { stops: { kind: 'pickup' | 'drop'; requestId: string; name: string; lat: number; lng: number; label: string }[]; miles: number; minutes: number; totalFare: number; riders: RiderCost[] }
-export interface Match { requestId: string; name: string; demo: boolean; friend: boolean; groupSize: number; departAt: number; pickupArea: string; dropArea: string; tags: string[]; pickupM: number; dropM: number; you: RiderCost; plan: Plan; pendingJoin: boolean }
+/** Before both riders accept, a match says only who (if they shared with you), that they're on your route, when, and what you'd save. */
+export interface Match { requestId: string; name: string; demo: boolean; friend: boolean; groupSize: number; departAt: number; you: RiderCost; pendingJoin: boolean }
+export interface Share { mode: 'everyone' | 'friends' | 'lists'; lists: string[] }
 export interface MyRide {
   id: string; userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number; createdAt: number
-  status: 'open' | 'matched'; demo: boolean; solo: Quote; matches: Match[]
+  status: 'open' | 'matched'; demo: boolean; share: Share; solo: Quote; matches: Match[]
   group: null | { id: string; plan: Plan; members: { requestId: string; name: string; demo: boolean; pickup: Place; drop: Place; departAt: number }[] }
 }
-export interface BoardItem { id: string; name: string; demo: boolean; friend: boolean; status: string; departAt: number; pickup: Place; drop: Place; seats: number }
 export interface RidesState {
-  now: number; stats: { live: number; real: number; sharing: number }; board: BoardItem[]
+  now: number; stats: { live: number; real: number; sharing: number }
   activity: { at: number; text: string; demo: boolean }[]; mine: MyRide[]
-  incoming: { joinId: string; from: { name: string; demo: boolean; pickup: Place; drop: Place; departAt: number }; toRequestId: string; you: RiderCost }[]
+  incoming: { joinId: string; from: { name: string; demo: boolean; friend: boolean; departAt: number }; toRequestId: string; you: RiderCost }[]
 }
 
 export function subscribeRides(userId: string, onState: (s: RidesState) => void, onStatus: (live: boolean) => void) {
@@ -46,7 +47,7 @@ async function call<T>(method: string, path: string, body?: unknown): Promise<T>
 }
 export const rides = {
   quote: (p: Place, d: Place) => call<Quote>('GET', `/quote?pickup=${p.lat},${p.lng}&drop=${d.lat},${d.lng}`),
-  book: (b: { userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number }) => call<{ id: string }>('POST', '', b),
+  book: (b: { userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number; share: Share }) => call<{ id: string }>('POST', '', b),
   cancel: (id: string, userId: string) => call('DELETE', `/${id}?userId=${encodeURIComponent(userId)}`),
   join: (targetId: string, userId: string, myRequestId: string) => call('POST', `/${targetId}/join`, { userId, myRequestId }),
   respond: (joinId: string, userId: string, accept: boolean) => call('POST', `/joins/${joinId}`, { userId, accept }),

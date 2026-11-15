@@ -3,9 +3,10 @@
  "phones": {
   "dpsEmergency": "213-740-4321",
   "dpsNonEmergency": "213-740-6000",
-  "campusCruiser": "213-740-4911",
   "lapd": "911",
-  "lapdNonEmergency": "1-877-275-5273"
+  "lapdNonEmergency": "1-877-275-5273",
+  "dpsHscEmergency": "323-442-1000",
+  "dpsHscNonEmergency": "323-442-1200"
  },
  "resources": [
   {
@@ -439,6 +440,164 @@
    "lng": -118.28842,
    "precision": "exact",
    "source": "OpenStreetMap / USC Student Health"
+  },
+  {
+   "type": "police",
+   "name": "Los Angeles Regional Crime Lab",
+   "operator": "",
+   "address": "",
+   "phone": "",
+   "lat": 34.062056,
+   "lng": -118.173533,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "USC Roski Eye Institute",
+   "kind": "clinic",
+   "address": "1450 San Pablo Street",
+   "lat": 34.061741,
+   "lng": -118.202409,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "police",
+   "name": "FSB Warehouse",
+   "operator": "",
+   "address": "",
+   "phone": "",
+   "lat": 34.055894,
+   "lng": -118.168435,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "Los Angeles General Medical Center",
+   "kind": "hospital",
+   "address": "2051 Marengo Street",
+   "lat": 34.059376,
+   "lng": -118.209667,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "White Memorial Medical Center",
+   "kind": "hospital",
+   "address": "1720 East Cesar E Chavez Avenue",
+   "lat": 34.049682,
+   "lng": -118.21724,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "police",
+   "name": "East Los Angeles County Sheriff's Patrol Station",
+   "operator": "Los Angeles County Sheriff's Department",
+   "address": "5019 East 3rd Street",
+   "phone": "+1-323-264-4151",
+   "lat": 34.034385,
+   "lng": -118.157782,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "LA-USC Health Care Consultation Center II",
+   "kind": "clinic",
+   "address": "",
+   "lat": 34.062579,
+   "lng": -118.202685,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "Outpatient Clinic",
+   "kind": "clinic",
+   "address": "",
+   "lat": 34.058533,
+   "lng": -118.206894,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "USC Norris Cancer Hospital",
+   "kind": "hospital",
+   "address": "1441 Eastlake Avenue",
+   "lat": 34.061431,
+   "lng": -118.205122,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "USC Kidney Center",
+   "kind": "clinic",
+   "address": "",
+   "lat": 34.062295,
+   "lng": -118.198897,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "Rand Shrader Clinic (C)",
+   "kind": "clinic",
+   "address": "",
+   "lat": 34.062694,
+   "lng": -118.210688,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "police",
+   "name": "Sherman Block Sheriff's Headquarters Building",
+   "operator": "",
+   "address": "4700 Ramona Boulevard",
+   "phone": "",
+   "lat": 34.059606,
+   "lng": -118.168307,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "medical",
+   "name": "Keck Hospital of USC",
+   "kind": "hospital",
+   "address": "1500 San Pablo Street",
+   "lat": 34.062221,
+   "lng": -118.201955,
+   "precision": "exact",
+   "source": "OpenStreetMap",
+   "campus": "HSC"
+  },
+  {
+   "type": "dps_station",
+   "name": "USC DPS Health Sciences Campus station (24/7)",
+   "address": "2001 N Soto St",
+   "lat": 34.06178,
+   "lng": -118.19934,
+   "phone": "323-442-1000",
+   "precision": "approximate",
+   "source": "https://dps.usc.edu/contact/ (address); position approximate",
+   "campus": "HSC"
   }
  ]
 }

@@ -14,7 +14,7 @@ const y = (lat: number) => (BOX.n - lat) * K
 const inv = (px: number, py: number): [number, number] => [BOX.n - py / K, BOX.w + px / (Math.cos((34.025 * Math.PI) / 180) * K)]
 const pathOf = (pts: [number, number][]) => pts.map(([la, lo], i) => `${i ? 'L' : 'M'}${x(lo).toFixed(1)},${y(la).toFixed(1)}`).join('')
 
-export interface Pin { lat: number; lng: number; inDps: boolean; label?: string }
+export interface Pin { lat: number; lng: number; inDps: boolean; inFryft?: boolean; label?: string }
 
 export default function ZoneArt({ pin, onPick }: { pin: Pin | null; onPick: (lat: number, lng: number) => void }) {
   const streets = useQuery({ queryKey: ['street-art'], queryFn: () => fetch(`${API_URL}/api/streets/art`).then((r) => r.json()) as Promise<{ major: [number, number][][]; minor: [number, number][][] }>, staleTime: Infinity })

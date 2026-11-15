@@ -1,14 +1,14 @@
 import { zoneCheck } from './zones.js'
+import { FARE, fareFor } from './rides.js'
 import type { Listing } from '../data.js'
 
 export interface Profile { budget: number; buildingIds: number[]; lateNights: number; priorities: Record<string, number> }
 
 export const COST_DEFAULTS = {
-  metroPass: 43,          // LA Metro reduced-fare student pass, monthly (U-Pass pricing varies — check USC Transportation)
-  baseFare: 3.5,          // typical rideshare base fare
-  perMile: 1.5,           // typical per-mile rate
+  metroPass: 0,           // USC students already have a Metro U-Pass through their mandatory transportation fee
   avgMiles: 2,            // average late-night trip home from campus
   weeksPerMonth: 4.3,
+  fare: FARE,             // same ride-fare model as Book Ride (UberX-style estimate)
 }
 
 export interface CostInput {
@@ -21,7 +21,7 @@ export interface CostInput {
 export function costLines(i: CostInput) {
   const d = COST_DEFAULTS
   const people = Math.max(1, i.roommates ?? 1)
-  const fare = d.baseFare + d.perMile * d.avgMiles
+  const fare = Math.round(fareFor(d.avgMiles) * 100) / 100
   const ridesPerMonth = i.lateNights * d.weeksPerMonth
   const rentShare = i.rent / people
   const utilShare = i.utilities / people
@@ -34,14 +34,14 @@ export function costLines(i: CostInput) {
     { key: 'utilities', label: 'Utilities', amount: Math.round(utilShare),
       formula: people > 1 ? `$${i.utilities} ÷ ${people} people` : `$${i.utilities} estimate`,
       why: 'Electric, gas, internet and water/trash. Estimated at $60 + $30 per bedroom for a whole unit, or ~$75 for a room. Many listings exclude these.' },
-    { key: 'transit', label: 'Metro pass', amount: transit,
-      formula: i.needsMetro ? `$${d.metroPass}/month student pass` : 'not needed',
-      why: i.needsMetro ? 'You said you’ll ride Metro (E Line / buses) regularly.' : 'Turn on if you’ll commute by Metro or bus.' },
+    { key: 'transit', label: 'Metro & DASH', amount: transit,
+      formula: '$0: your U-Pass is included in USC fees',
+      why: 'USC students get a Metro U-Pass through the mandatory transportation fee, so Metro buses and trains (and LADOT DASH) cost nothing extra.' },
     { key: 'rideshare', label: 'Late-night rides', amount: Math.round(rideshare),
-      formula: i.inFryft ? `0 — Fryft covers rides inside the zone` : `${i.lateNights}/week × ${d.weeksPerMonth} weeks × $${fare.toFixed(2)}/ride`,
+      formula: i.inFryft ? `$0: USC Lyft covers rides inside its boundary` : `${i.lateNights}/week × ${d.weeksPerMonth} weeks × $${fare.toFixed(2)}/ride`,
       why: i.inFryft
-        ? 'Inside the Fryft area, USC pays for your late-night Lyft home.'
-        : `Outside Fryft you pay for rides home after dark. A ride ≈ $${d.baseFare} base + $${d.perMile}/mile × ${d.avgMiles} miles.` },
+        ? 'Inside USC’s free Lyft boundary, a shared Lyft home is free 7 PM–2 AM (up to $1,000 a month).'
+        : `Outside USC’s free Lyft boundary you pay for rides home after dark. A ${d.avgMiles}-mile ride ≈ $${FARE.base} base + $${FARE.bookingFee} booking fee + $${FARE.perMile}/mile + $${FARE.perMin}/min (min $${FARE.minFare}), the same estimate Book Ride uses.` },
   ]
   const total = lines.reduce((s, l) => s + l.amount, 0)
   return {

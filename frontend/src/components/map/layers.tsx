@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { CircleMarker, Marker, Polyline, Tooltip, useMap, useMapEvents } from 'react-leaflet'
+import { CircleMarker, GeoJSON, Marker, Polyline, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { useQuery } from '@tanstack/react-query'
 import { API_URL, api, subscribeDpsUnits } from '../../api/client'
 import type { DpsUnit, RouteResult } from '../../api/types'
 
-export const COLORS = { inside: '#059669', outside: '#7c3aed', dps: '#dc2626', safest: '#059669', fastest: '#57534e', incident: '#f97316' }
+export const COLORS = { inside: '#059669', outside: '#7c3aed', dps: '#dc2626', safest: '#059669', fastest: '#2563eb', incident: '#f97316' }
 
 // ---- LAPD incidents, aggregated to hundred-block points ----
 export function IncidentLayer({ days }: { days: number }) {
@@ -62,7 +62,8 @@ export function SafetyLayer({ show }: { show: Record<Kind, boolean> }) {
   )
 }
 
-// ---- Recent DPS alerts (last 30 days, older ones fade) + student reports (72 h) ----
+// ---- Recent DPS alerts (last 30 days, older ones fade; last 7 days pulse) + student reports (72 h) ----
+const pulseIcon = L.divIcon({ className: '', iconSize: [36, 36], iconAnchor: [18, 18], html: '<span style="position:absolute;inset:0;border-radius:9999px;background:rgb(220 38 38 / .45)" class="ts-pulse"></span>' })
 export function RecentAlertsLayer() {
   const dps = useQuery({ queryKey: ['dps-alerts'], queryFn: async () => (await fetch(`${API_URL}/api/dps-alerts`)).json() as Promise<{ alerts: { id: string; title: string; occurredAt: string | null; postedAt: string; location: string; lat: number; lng: number; precision: string; url: string }[] }>, refetchInterval: 10 * 60_000 })
   const reps = useQuery({ queryKey: ['reports'], queryFn: async () => (await fetch(`${API_URL}/api/reports?hours=72`)).json() as Promise<{ id: string; category: string; description: string; createdAt: string; lat: number; lng: number }[]>, refetchInterval: 60_000 })
@@ -71,6 +72,9 @@ export function RecentAlertsLayer() {
   const hoursAgo = (iso: string) => { const h = Math.round((Date.now() - Date.parse(iso)) / 3600e3); return h < 48 ? `${h} h ago` : `${Math.round(h / 24)} days ago` }
   return (
     <>
+      {dps.data?.alerts.filter((a) => Date.parse(a.occurredAt ?? a.postedAt) >= Date.now() - 7 * 864e5 && a.precision !== 'campus').map((a) => (
+        <Marker key={`p${a.id}`} position={[a.lat, a.lng]} icon={pulseIcon} interactive={false} zIndexOffset={-100} />
+      ))}
       {dps.data?.alerts.filter((a) => Date.parse(a.occurredAt ?? a.postedAt) >= since && a.precision !== 'campus').map((a) => (
         <CircleMarker key={a.id} center={[a.lat, a.lng]} radius={9} pathOptions={{ color: '#fff', weight: 2, fillColor: '#b91c1c', fillOpacity: fade(a.occurredAt ?? a.postedAt), opacity: fade(a.occurredAt ?? a.postedAt) }}>
           <Tooltip direction="top"><b>⚠ {a.title}</b> · {hoursAgo(a.occurredAt ?? a.postedAt)}<br />{a.location}<br /><span style={{ opacity: 0.7, fontSize: 10 }}>USC DPS alert{a.precision === 'street' ? ' · street-level location' : ''}</span></Tooltip>
@@ -83,6 +87,30 @@ export function RecentAlertsLayer() {
       ))}
     </>
   )
+}
+
+// ---- Official USC Lyft Rides ("Fryft") boundaries: UPC, HSC, Union Station ----
+const RIDE_ZONE_STYLE: Record<string, L.PathOptions> = {
+  usc_lyft_upc: { color: '#db2777', weight: 2, fillColor: '#f472b6', fillOpacity: 0.08, dashArray: '6 4' },
+  usc_lyft_hsc: { color: '#db2777', weight: 2, fillColor: '#f472b6', fillOpacity: 0.25 },
+  usc_lyft_union_station: { color: '#db2777', weight: 2, fillColor: '#f472b6', fillOpacity: 0.25, dashArray: '3 3' },
+}
+const RIDE_ZONE_INFO: Record<string, string> = {
+  usc_lyft_upc: 'USC Lyft Rides, UPC: free shared Lyft 7 PM–2 AM daily when pickup and drop-off are both inside.',
+  usc_lyft_hsc: 'USC Lyft Rides, HSC: free shared Lyft 5 PM–2 AM Mon–Fri inside this boundary (needs the HSC Lyft Invite form). Traced from USC’s official HSC map.',
+  usc_lyft_union_station: 'Union Station is part of the HSC Lyft program (rides to/from the HSC zone).',
+}
+export function RideZonesLayer({ focus }: { focus: 'hsc' | 'upc' | null }) {
+  const q = useQuery({ queryKey: ['ride-zones'], queryFn: async () => (await fetch(`${API_URL}/api/ride-zones`)).json() as Promise<GeoJSON.FeatureCollection>, staleTime: Infinity })
+  const map = useMap()
+  useEffect(() => {
+    if (!focus || !q.data) return
+    const f = q.data.features.find((x) => x.properties?.name === `usc_lyft_${focus}`)
+    if (f) map.flyToBounds(L.geoJSON(f).getBounds(), { paddingTopLeft: [310, 40], paddingBottomRight: [40, 40], duration: 0.8 })
+  }, [focus, q.data, map])
+  if (!q.data) return null
+  return <GeoJSON data={q.data} style={(f) => RIDE_ZONE_STYLE[f?.properties?.name] ?? {}}
+    onEachFeature={(f, layer) => layer.bindTooltip(RIDE_ZONE_INFO[f.properties?.name] ?? f.properties?.label, { sticky: true })} />
 }
 
 // ---- Live DPS units (simulated feed, server-sent events) ----
@@ -116,9 +144,20 @@ export function RouteLayer({ result, start, end }: { result: RouteResult | undef
   }, [result, map])
   return (
     <>
-      {result && !result.sameRoute && <Polyline positions={result.fastest.coords} pathOptions={{ color: COLORS.fastest, weight: 5, opacity: 0.7, dashArray: '8 8' }} />}
+      {result && !result.sameRoute && <Polyline positions={result.fastest.coords} pathOptions={{ color: '#ffffff', weight: 8, opacity: 0.8 }} />}
+      {result && !result.sameRoute && <Polyline positions={result.fastest.coords} pathOptions={{ color: COLORS.fastest, weight: 5, opacity: 0.85, dashArray: '10 7', className: 'route-fast' }}><Tooltip sticky>Fastest · {result.fastest.minutes} min</Tooltip></Polyline>}
       {result && <Polyline positions={result.safest.coords} pathOptions={{ color: '#ffffff', weight: 9, opacity: 0.9 }} />}
-      {result && <Polyline positions={result.safest.coords} pathOptions={{ color: COLORS.safest, weight: 6, opacity: 1 }} />}
+      {result && <Polyline key={`safe${result.safest.coords.length}${result.safest.coords[1]?.join()}`} positions={result.safest.coords} pathOptions={{ color: COLORS.safest, weight: 6, opacity: 1, className: 'route-safe' }}><Tooltip sticky>Safest · {result.safest.minutes} min</Tooltip></Polyline>}
+      {result && [...result.fastest.darkStreetlights, ...result.safest.darkStreetlights].filter((o, i, a) => a.findIndex((x) => x.lat === o.lat && x.lng === o.lng) === i).map((o) => (
+        <CircleMarker key={`dk${o.lat}${o.lng}`} center={[o.lat, o.lng]} radius={6} pathOptions={{ color: '#facc15', weight: 2, fillColor: '#1c1917', fillOpacity: 1 }}>
+          <Tooltip direction="top">💡 Streetlight out · {o.address}<br /><span style={{ fontSize: 10, opacity: 0.7 }}>reported {o.reported} to LA 311 · {o.status}</span></Tooltip>
+        </CircleMarker>
+      ))}
+      {result?.safest.openNow.map((o) => (
+        <CircleMarker key={`op${o.lat}${o.lng}`} center={[o.lat, o.lng]} radius={5} pathOptions={{ color: '#fff', weight: 1.5, fillColor: '#f59e0b', fillOpacity: 1 }}>
+          <Tooltip direction="top">🟡 Open: {o.name}<br /><span style={{ fontSize: 10, opacity: 0.7 }}>{o.hours}</span></Tooltip>
+        </CircleMarker>
+      ))}
       {start && <CircleMarker center={start} radius={8} pathOptions={{ color: '#fff', weight: 3, fillColor: '#111827', fillOpacity: 1 }}><Tooltip permanent direction="left">Start</Tooltip></CircleMarker>}
       {end && <CircleMarker center={end} radius={8} pathOptions={{ color: '#fff', weight: 3, fillColor: '#990000', fillOpacity: 1 }}><Tooltip permanent direction="right">Destination</Tooltip></CircleMarker>}
     </>

@@ -1,5 +1,5 @@
 {
- "about": "Free & low-cost safety and mobility programs for USC students. Researched 2026-11-14; USC transport details confirmed from transnet.usc.edu and dps.usc.edu. Every entry lists an official source; confidence='check' means sources disagreed or the current details weren't confirmed. Times are America/Los_Angeles.",
+ "about": "Free & low-cost safety and mobility programs for USC students. Researched 2026-11-14, audited 2026-11-15; USC transport details confirmed from transnet.usc.edu and dps.usc.edu. Every entry lists an official source; confidence='check' means sources disagreed or the current details weren't confirmed. Times are America/Los_Angeles.",
  "programs": [
   {
    "id": "fryft",
@@ -22,12 +22,12 @@
     "url": "https://transnet.usc.edu/index.php/how-to-use-lyft/"
    },
    "tags": "free lyft uber ride home night late safe ride car taxi campus zone",
-   "caveats": "You must pick the Shared ride type. Not covered: tips, cancellation fees, PrimeTime, scheduled rides, added stops, rides between campuses. On home football days it starts 5 hours after kickoff. Monthly benefit is capped.",
+   "caveats": "You must pick the Shared ride type. Not covered: tips, cancellation fees, PrimeTime, scheduled rides, added stops, rides between campuses. On home football days it starts 5 hours after kickoff. Monthly benefit is capped. The maximum benefit is $1,000 a month.",
    "sources": [
     "https://transnet.usc.edu/index.php/how-to-use-lyft/",
     "https://dailytrojan.com/2025/08/29/fryft-hours-reduced-starting-at-7-p-m/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true,
    "tips": [
@@ -36,36 +36,8 @@
    ]
   },
   {
-   "id": "campus-cruiser",
-   "name": "Campus Cruiser: free evening safe ride",
-   "provider": "USC Transportation",
-   "category": "night ride",
-   "cost": "Free",
-   "eligibility": [
-    "usc"
-   ],
-   "area": "dps",
-   "schedule": {
-    "type": "daily",
-    "start": "18:00",
-    "end": "00:00"
-   },
-   "summary": "Free evening rides that start and end inside the Campus Cruiser boundary. Call to request a pickup.",
-   "how": {
-    "phone": "213-740-4911",
-    "url": "https://transnet.usc.edu/?p=125"
-   },
-   "tags": "free ride escort night shuttle van call pickup campus home late",
-   "caveats": "USC lists 6 PM–12 AM daily; older pages show other hours. Confirm before relying on it.",
-   "sources": [
-    "https://transnet.usc.edu/?p=125"
-   ],
-   "verified": "2026-11-14",
-   "confidence": "check"
-  },
-  {
    "id": "dps-escort",
-   "name": "DPS safety escort & blue-light phones",
+   "name": "DPS help & blue-light phones (ask for an escort)",
    "provider": "USC Department of Public Safety",
    "category": "escort",
    "cost": "Free",
@@ -76,17 +48,18 @@
    "schedule": {
     "type": "always"
    },
-   "summary": "Call DPS or use any blue-light emergency phone to request an escort, report something suspicious, or get help. 24/7 communications center.",
+   "summary": "USC DPS answers 24/7. Use any blue-light emergency phone or call DPS to report something, get help, or ask for someone to accompany you. UPC: 213-740-4321 (emergency), 213-740-6000 (non-emergency). HSC: 323-442-1000 (emergency), 323-442-1200 (non-emergency).",
    "how": {
     "phone": "213-740-4321",
     "url": "https://dps.usc.edu/safety-tips/getting-around/"
    },
    "tags": "escort walk with me followed scared emergency police security blue light phone help walk home",
-   "caveats": "",
+   "caveats": "DPS no longer lists a separate escort service with its own hours; ask through a blue-light phone or the DPS line. For rides, use USC Lyft.",
    "sources": [
-    "https://dps.usc.edu/safety-tips/getting-around/"
+    "https://dps.usc.edu/safety-tips/getting-around/",
+    "https://dps.usc.edu/services/safety-app/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -112,7 +85,7 @@
    "sources": [
     "https://dps.usc.edu/services/safety-app/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -128,16 +101,16 @@
    "schedule": {
     "type": "varies"
    },
-   "summary": "Contracted, unarmed patrollers in bright yellow jackets posted on street corners in the neighborhoods around campus. Flag one down if you need help or feel unsafe.",
+   "summary": "Contracted, unarmed patrollers in bright yellow jackets, stationed near USC-owned housing in the neighborhoods around campus. Flag one down if you need help or feel unsafe.",
    "how": {
     "url": "https://safety.usc.edu/services/"
    },
    "tags": "yellow jacket patrol corner neighborhood off campus help walk night guard",
    "caveats": "Posts and hours vary.",
    "sources": [
-    "https://safety.usc.edu/services/"
+    "https://dps.usc.edu/safety-tips/getting-around/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
@@ -164,7 +137,7 @@
     "https://dps.usc.edu/services/bikes/",
     "https://safety.usc.edu/tips/bikes/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
@@ -199,7 +172,7 @@
     "https://campushealth.usc.edu/national-recovery-month",
     "https://sites.usc.edu/naloxonesc/video"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
@@ -226,7 +199,7 @@
     "https://www.metro.net/fares/u-pass-program/",
     "https://dailytrojan.com/2023/06/28/usc-to-provide-free-metro-passes-to-all-students/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -242,18 +215,18 @@
    "schedule": {
     "type": "varies"
    },
-   "summary": "Care coordination for distressing situations: critical-incident response, DPS incident follow-up, professor notifications and referrals. Also runs an emergency loan of up to $1,000 (repayable in 90 days).",
+   "summary": "Care coordination when something distressing happens: critical-incident response, DPS incident follow-up, notifying professors, and referrals. Call 213-740-0411 or email uscsupport@usc.edu (replies within one business day).",
    "how": {
     "phone": "213-740-0411",
     "url": "https://ois.usc.edu/getting-started/living-in-united-states-students/safety-support-resources/"
    },
    "tags": "crisis help unsafe housing emergency money loan support incident stalking harassment",
-   "caveats": "The loan must be repaid; it's not a grant. Free relocation isn't offered; Student Basic Needs helps with housing next steps.",
+   "caveats": "The emergency loan (up to $1,000, repaid within 90 days) is only for F-1 or J-1 students with a Social Security number, and needs documentation.",
    "sources": [
     "https://ois.usc.edu/getting-started/living-in-united-states-students/safety-support-resources/",
     "https://studentbasicneeds.usc.edu/programs-and-services/housing-support/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
@@ -284,11 +257,11 @@
     "url": "https://thesource.metro.net/go-metro-to-unwrap-l-a-this-holiday-season/"
    },
    "tags": "christmas holiday free bus train ride home party",
-   "caveats": "Confirm the 2026 announcement.",
+   "caveats": "Expected, based on Metro’s 2025 run (Dec 24, 4 AM to 3 AM next day); Metro hasn’t announced 2026 yet.",
    "sources": [
-    "https://www.timeout.com/los-angeles/news/you-can-ride-the-la-metro-for-free-tonight-123125"
+    "https://secretlosangeles.com/ride-the-l-a-metro-for-free-on-christmas-eve-here-are-the-hours/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "check",
    "hidden": true
   },
@@ -319,17 +292,17 @@
     "url": "https://www.timeout.com/los-angeles/news/you-can-ride-the-la-metro-for-free-tonight-123125"
    },
    "tags": "new years eve nye holiday free bus train party drinking ride home",
-   "caveats": "Metro says it does this every year; confirm 2026 hours.",
+   "caveats": "Expected, based on Metro’s 2025 run (Dec 31, 4 AM to 3 AM next day); Metro hasn’t announced 2026 yet.",
    "sources": [
     "https://www.timeout.com/los-angeles/news/you-can-ride-the-la-metro-for-free-tonight-123125"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "check",
    "hidden": true
   },
   {
    "id": "tipsy-tow",
-   "name": "AAA Tipsy Tow (free tow home if you've been drinking)",
+   "name": "AAA Tow to Go (formerly Tipsy Tow): free tow home if you’ve been drinking",
    "provider": "Automobile Club of Southern California",
    "category": "holiday ride",
    "cost": "Free",
@@ -356,17 +329,17 @@
      }
     ]
    },
-   "summary": "If you (or a friend) drove and have been drinking, call and say \"I need a Tipsy Tow\": a free one-way tow of the car and the driver home, up to 7 miles. Non-members can use it.",
+   "summary": "If you drove and have been drinking, AAA’s holiday program tows your car and gives you a ride home for free (historically up to 7–10 miles), member or not. It has run around New Year’s Eve and the Fourth of July.",
    "how": {
-    "phone": "1-800-400-4222"
+    "phone": "800-400-4222"
    },
    "tags": "drunk drinking can't drive tow car home sober designated driver holiday",
-   "caveats": "Offered on select holidays only (historically NYE and July 4); no reservations; driver only. Confirm the 2026 window.",
+   "caveats": "Southern California dates for 2026–27 aren’t announced yet, and AAA’s national 2025 list didn’t include California. Call AAA (800-400-4222 in Southern California) before relying on it.",
    "sources": [
-    "https://news.aaa-calif.com/news/auto-club-offers-last-resort-option-for-a-safe-start-to-the-new-year-6786399",
-    "https://abc7.com/archive/7868562/"
+    "https://foxla.com/news/aaa-offering-free-tow-to-go-service-in-southern-california-during-new-years-celebrations",
+    "https://www.acg.aaa.com/drivers-safety/tow-to-go.html"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "check",
    "hidden": true
   },
@@ -392,17 +365,17 @@
      }
     ]
    },
-   "summary": "LADOT runs fare-free days. In 2026: Transit Equity Day (Feb 4) and Primary Election Day (June 2). Election days usually qualify.",
+   "summary": "LADOT runs fare-free days on DASH, Commuter Express and LAnow. In 2026 they were Transit Equity Day (Feb 4) and Primary Election Day (June 2); both have passed. Transit Equity Day (early February) is the next one to expect.",
    "how": {
     "url": "https://www.ladottransit.com/2026/02"
    },
    "tags": "free bus dash election vote transit equity day",
-   "caveats": "Dates are announced each time; only Feb 4 repeats yearly.",
+   "caveats": "No upcoming 2026 date. 2027 dates aren’t announced yet.",
    "sources": [
     "https://www.ladottransit.com/2026/02",
     "https://www.ladottransit.com/?p=6578"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "check"
   },
   {
@@ -430,13 +403,13 @@
     "https://www.metro.net/fares/life/",
     "https://lacounty.gov/2026/10/23/jcod-and-la-metro-partner-to-help-residents-access-free-rides-through-life-program/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
   {
    "id": "mobility-wallet",
-   "name": "Mobility Wallet: $150/month for transport (South LA pilot)",
+   "name": "LA Mobility Wallet ($1,800 over 12 months for transport): applications closed",
    "provider": "LADOT & LA Metro",
    "category": "money help",
    "cost": "Free",
@@ -448,23 +421,22 @@
    "schedule": {
     "type": "varies"
    },
-   "summary": "A prepaid card with $150 a month for transit, bike share, scooters and rideshare, for low-income residents of the South LA pilot area (10 Fwy to Florence, Crenshaw to Alameda), which includes the neighborhoods around USC.",
+   "summary": "A prepaid card with $1,800 over 12 months for buses, trains, bike share, scooters, taxis and Uber/Lyft, for low-income LA County residents who meet Metro LIFE criteria. Phase II applications closed in August 2024 and participants were chosen at random; there is no open enrollment right now.",
    "how": {
     "url": "https://ladot.lacity.gov/ubm"
    },
    "tags": "money transport subsidy card rides south la low income lyft uber bus bike",
-   "caveats": "Enrollment happens in phases; Phase III was planned for 2026. Uses Metro LIFE eligibility.",
+   "caveats": "Not open to new applicants. Watch LADOT / Metro for a future phase; use Metro LIFE in the meantime.",
    "sources": [
-    "https://ladot.lacity.gov/ubm",
-    "https://ladot.lacity.gov/dotnews/weekly-update-april-16-2026"
+    "https://ladot.lacity.gov/ubm"
    ],
-   "verified": "2026-11-14",
-   "confidence": "check",
+   "verified": "2026-11-15",
+   "confidence": "closed",
    "hidden": true
   },
   {
    "id": "power-up",
-   "name": "South Central Power Up: free e-bike loan",
+   "name": "South Central Power Up: e-bike rentals for South LA residents",
    "provider": "LADOT (Universal Basic Mobility)",
    "category": "bike",
    "cost": "Free",
@@ -475,22 +447,22 @@
    "schedule": {
     "type": "varies"
    },
-   "summary": "Long-term e-bike loans at no cost for South LA participants. Participants can also get up to $1,800 toward buying a bike, e-bike or scooter through the 2026 Bike Wallet pilot.",
+   "summary": "An e-bike lending library in South LA: 250 e-bikes you can check out a month at a time from 7 community hubs (Ride On! Bike Shop, Mercado La Paloma, T.R.U.S.T. South LA and others), with training included. For residents of South LA.",
    "how": {
     "url": "https://ladot.lacity.gov/ubm"
    },
    "tags": "free e-bike electric bike loan scooter commute south la",
-   "caveats": "Limited slots; the Bike Wallet credit is for existing participants.",
+   "caveats": "The LADOT page doesn’t state the cost; apply on the South Central Power Up website to check eligibility and fees.",
    "sources": [
-    "https://ladot.lacity.gov/dotnews/weekly-update-april-16-2026"
+    "https://ladot.lacity.gov/ubm"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "check",
    "hidden": true
   },
   {
    "id": "bike-share-reduced",
-   "name": "Metro Bike Share reduced fare ($5 / 30 days)",
+   "name": "Metro Bike Share reduced fare: $5 / 30 days, rides under 30 min free",
    "provider": "LA Metro",
    "category": "bike",
    "cost": "Discount",
@@ -501,21 +473,23 @@
    "schedule": {
     "type": "always"
    },
-   "summary": "With a Reduced Fare TAP card (college students qualify), a 30-day bike share pass is $5 and a year is $50.",
+   "summary": "Students qualify for Metro Bike Share’s Reduced Fare pass: $5 for 30 days (or $50 a year), every ride of 30 minutes or less is free, and e-bikes unlock free. Sign up with the “Student” option using a valid email, or enter a Student/GoPass TAP card number.",
    "how": {
-    "url": "https://www.metro.net/fares/"
+    "url": "https://bikeshare.metro.net/reduced-fares/",
+    "app": "Metro Bike Share app → sign up → Reduced Fare → Student"
    },
    "tags": "bike share cheap bike ride rent bicycle student discount",
-   "caveats": "Prices from Metro's TAP site; confirm on the Bike Share site.",
+   "caveats": "Not fully free: $1.75 per extra 30 minutes after the first 30. Needs a bike and an open dock at both ends; you need a credit/debit card on file.",
    "sources": [
-    "https://transportation.ucla.edu/getting-to-ucla/bike/bicycle-resources"
+    "https://bikeshare.metro.net/reduced-fares/"
    ],
-   "verified": "2026-11-14",
-   "confidence": "check"
+   "verified": "2026-11-15",
+   "confidence": "confirmed",
+   "hidden": true
   },
   {
    "id": "dash-students",
-   "name": "DASH buses free with student reduced fare",
+   "name": "DASH buses free with your U-Pass",
    "provider": "LADOT Transit",
    "category": "transit",
    "cost": "Free",
@@ -526,16 +500,16 @@
    "schedule": {
     "type": "always"
    },
-   "summary": "Students with a Metro Student Reduced Fare TAP or GoPass ride LADOT DASH free. Otherwise $0.50.",
+   "summary": "LADOT’s DASH buses are free for anyone with a Metro U-Pass on their TAP card (USC students have one through their transportation fee), and free with a Student Reduced Fare TAP card through DASH to Class. Otherwise 50¢.",
    "how": {
-    "url": "https://ladottransit.com/fares.html"
+    "url": "https://www.ladottransit.com/fares/"
    },
    "tags": "dash bus free student local shuttle",
    "caveats": "",
    "sources": [
-    "https://ladottransit.com/fares.html"
+    "https://www.ladottransit.com/fares/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -562,7 +536,7 @@
     "https://www.metro.net/riding/safety-security/",
     "https://www.metro.net/safety-support/report-issue/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
@@ -617,7 +591,7 @@
     "https://www.abc.ca.gov/type-48-licenses-drug-testing-device-and-drink-lid-availability-requirements-extended-indefinitely/",
     "https://www.nbclosangeles.com/news/local/california-bars-restaurants-required-to-provide-drink-lids-drug-testing-kits-under-new-law/3735430/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed",
    "hidden": true
   },
@@ -725,8 +699,8 @@
   },
   {
    "id": "check-in",
-   "name": "Apple Check In / Kitestring (auto check-in)",
-   "provider": "Apple / Kitestring",
+   "name": "Apple Check In (automatic “I got home” message)",
+   "provider": "Apple / Google",
    "category": "app",
    "cost": "Free",
    "eligibility": [
@@ -736,16 +710,17 @@
    "schedule": {
     "type": "always"
    },
-   "summary": "Tell a friend when you expect to be home; if you don't arrive or reply in time, they get your location automatically. Apple Check In is built into iMessage (iOS 17+); Kitestring works by text on any phone.",
+   "summary": "Tell a friend when you expect to be home. If you don’t arrive or reply in time, they automatically get your location, battery and route. Built into Messages on iPhone (iOS 17+); on Android, Google’s Personal Safety app has a similar Safety Check.",
    "how": {
-    "app": "Messages > + > Check In (iPhone) · kitestring.io"
+    "app": "iPhone: Messages > + > Check In · Android: Personal Safety app > Safety Check",
+    "url": "https://support.apple.com/guide/iphone/use-check-in-for-safety-iphc143bb7e9/ios"
    },
    "tags": "check in arrive home friend alert timer walk alone eta",
    "caveats": "",
    "sources": [
-    "https://www.techlicious.com/tip/free-personal-safety-apps/"
+    "https://support.apple.com/guide/iphone/use-check-in-for-safety-iphc143bb7e9/ios"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -777,11 +752,11 @@
    },
    "tags": "hsc health sciences keck free lyft union station night ride",
    "hidden": true,
-   "caveats": "Rides between UPC and HSC are not covered. HSC access needs the Lyft Invite form.",
+   "caveats": "Rides between UPC and HSC are not covered. HSC access needs the Lyft Invite form. The maximum benefit is $1,000 a month.",
    "sources": [
     "https://transnet.usc.edu/index.php/how-to-use-lyft/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -851,12 +826,12 @@
     "https://dps.usc.edu/services/shuttles/",
     "https://dps.usc.edu/2023/10/27/gift-parking-lax-shuttles-for-the-breaks/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "check"
   },
   {
    "id": "union-station-shuttle",
-   "name": "USC shuttle: UPC ↔ Union Station (weekdays)",
+   "name": "USC Intercampus shuttle: UPC ↔ Union Station ↔ HSC (weekdays)",
    "provider": "USC Transportation",
    "category": "transit",
    "cost": "USC ID",
@@ -915,7 +890,7 @@
     "21:20",
     "22:05"
    ],
-   "summary": "USC-run shuttle from the Jefferson bus turnout (just east of Hoover) to Union Station Berth #6, 37 departures 7:00 AM–10:05 PM on weekdays. Union Station connects to Metrolink, Amtrak and the FlyAway bus to LAX.",
+   "summary": "USC-run weekday shuttle between the University Park Campus (Jefferson bus turnout, just east of Hoover), Union Station (Patsaouras Plaza, Berth 6) and the Health Sciences Campus (Eastlake Ave just south of Biggy St). 7:00 AM–about 9:20 PM. Union Station connects to Metrolink, Amtrak and the FlyAway bus to LAX.",
    "how": {
     "url": "https://transnet.usc.edu/index.php/tramroutes/upc-to-union-station/"
    },
@@ -932,14 +907,69 @@
     "lng": -118.2365,
     "radiusM": 600
    },
-   "tags": "union station shuttle bus metrolink amtrak train downtown commute free intercampus",
+   "tags": "union station shuttle bus metrolink amtrak train downtown commute free intercampus hsc health sciences keck intercampus upc",
    "hidden": true,
-   "caveats": "The route page doesn't list a fare; it's a USC service for the USC community.",
+   "caveats": "No service on USC home football game days. The HSC stop is on Eastlake (it does not stop on Soto). Times listed are for the UPC departures; check the printable schedule for HSC departures.",
    "sources": [
-    "https://transnet.usc.edu/index.php/tramroutes/upc-to-union-station/"
+    "https://transnet.usc.edu/index.php/tramroutes/upc-to-union-station/",
+    "https://transnet.usc.edu/?p=100"
    ],
-   "verified": "2026-11-14",
-   "confidence": "check"
+   "verified": "2026-11-15",
+   "confidence": "check",
+   "legs": [
+    {
+     "from": {
+      "label": "Jefferson bus turnout, east of Hoover (UPC stop)",
+      "lat": 34.0237,
+      "lng": -118.2836
+     },
+     "to": {
+      "label": "Union Station (Patsaouras Plaza, Berth 6)",
+      "lat": 34.0562,
+      "lng": -118.2365,
+      "radiusM": 600
+     }
+    },
+    {
+     "from": {
+      "label": "Jefferson bus turnout, east of Hoover (UPC stop)",
+      "lat": 34.0237,
+      "lng": -118.2836
+     },
+     "to": {
+      "label": "Health Sciences Campus",
+      "lat": 34.062,
+      "lng": -118.205,
+      "radiusM": 1200
+     }
+    },
+    {
+     "from": {
+      "label": "Eastlake Ave just south of Biggy St (HSC stop)",
+      "lat": 34.062,
+      "lng": -118.205
+     },
+     "to": {
+      "label": "University Park Campus",
+      "lat": 34.0237,
+      "lng": -118.2836,
+      "radiusM": 1500
+     }
+    },
+    {
+     "from": {
+      "label": "Eastlake Ave just south of Biggy St (HSC stop)",
+      "lat": 34.062,
+      "lng": -118.205
+     },
+     "to": {
+      "label": "Union Station (Patsaouras Plaza, Berth 6)",
+      "lat": 34.0562,
+      "lng": -118.2365,
+      "radiusM": 600
+     }
+    }
+   ]
   },
   {
    "id": "weekend-shuttle",
@@ -993,7 +1023,7 @@
    "sources": [
     "https://transnet.usc.edu/index.php/tramroutes/weekend-intercampus-shuttle/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
   },
   {
@@ -1019,8 +1049,104 @@
    "sources": [
     "https://transnet.usc.edu/index.php/zipcar/"
    ],
-   "verified": "2026-11-14",
+   "verified": "2026-11-15",
    "confidence": "confirmed"
+  },
+  {
+   "id": "lanow-south-la",
+   "name": "LAnow South LA: on-demand shuttle, first 2 rides free, then $0.75 for students",
+   "provider": "LADOT Transit",
+   "category": "shuttle",
+   "cost": "Free (first 2 rides), then $0.75",
+   "eligibility": [
+    "students"
+   ],
+   "area": "lanow_south_la",
+   "schedule": {
+    "type": "weekly",
+    "days": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "start": "06:00",
+    "end": "19:00"
+   },
+   "summary": "A shared city shuttle you book in the LAnow app, inside Figueroa St, Slauson Ave, Long Beach Ave and Washington Blvd. That’s the area just east of Figueroa, so it covers students living near The Lorenzo, Flower St or Exposition Park-adjacent blocks heading east or south. Your first 2 rides are free; after that students pay $0.75 (adults $1.50). Pick-up points are never more than about 1/4 mile away.",
+   "how": {
+    "app": "LAnow app (iOS / Android), or call (818) 493-6211",
+    "url": "https://www.ladottransit.com/lanow/",
+    "phone": "818-493-6211"
+   },
+   "tags": "free shuttle on demand microtransit south la east of figueroa ride cheap daytime bus alternative",
+   "caveats": "Weekdays 6 AM–7 PM only, not holidays, so it is not a late-night option. Both ends must be inside the zone (USC’s main campus is just west of Figueroa, outside it). Pay by card in the app or cash on board.",
+   "sources": [
+    "https://www.ladottransit.com/lanow/",
+    "https://www.metro-magazine.com/news/ladot-expands-lanow-on-demand-ride-service"
+   ],
+   "verified": "2026-11-15",
+   "confidence": "confirmed",
+   "hidden": true,
+   "tips": [
+    "Your first two rides are free; buy ride credit in the app ($23 gets 4 extra rides) if you use it a lot."
+   ]
+  },
+  {
+   "id": "circuit-leimert",
+   "name": "Circuit Leimert Park: free on-demand electric shuttle (to Expo/Western)",
+   "provider": "Circuit (Clean Mobility Options pilot)",
+   "category": "shuttle",
+   "cost": "Free",
+   "eligibility": [
+    "everyone"
+   ],
+   "area": "leimert",
+   "schedule": {
+    "type": "varies"
+   },
+   "summary": "Free rides in small electric shuttles around Leimert Park and Baldwin Hills Crenshaw, booked in the Circuit app. Its listed destinations include the Expo/Western station, so students living in Leimert Park can get to the E Line and on to USC without walking to the station after dark.",
+   "how": {
+    "app": "Circuit app → choose Leimert Park",
+    "url": "https://www.ridecircuit.com/leimert-park"
+   },
+   "tags": "free shuttle electric leimert park crenshaw expo western station e line metro last mile",
+   "caveats": "On demand only (no advance booking). Published hours differ between sources (e.g. weekdays 8 AM–8 PM vs. Wed–Sat daytime), so check the app. It is a state-funded pilot and may end.",
+   "sources": [
+    "https://www.ridecircuit.com/leimert-park",
+    "https://ww2.arb.ca.gov/lcti-sankofacity-zero-emissions-multimodal-transportation-ecosystem"
+   ],
+   "verified": "2026-11-15",
+   "confidence": "check",
+   "hidden": true
+  },
+  {
+   "id": "usc-grh",
+   "name": "USC Guaranteed Ride Home (employees in USC transit programs only)",
+   "provider": "USC Transportation",
+   "category": "emergency ride",
+   "cost": "Reimbursed",
+   "eligibility": [
+    "usc_employee"
+   ],
+   "area": "socal",
+   "schedule": {
+    "type": "always"
+   },
+   "summary": "If you’re a USC employee enrolled in a USC Transit Subsidy Program (including student workers who are), USC reimburses an Uber/Lyft, taxi or transit ride home for an emergency: your or a family member’s illness, your carpool driver’s emergency, or required unscheduled overtime. Up to twice per fiscal year (July–June).",
+   "how": {
+    "url": "https://transnet.usc.edu/index.php/guaranteed-ride-home/",
+    "phone": "213-740-8529"
+   },
+   "tags": "emergency ride home reimbursement uber lyft taxi employee staff student worker transit subsidy overtime",
+   "caveats": "Being a student is not enough: only employees in USC’s Transit Subsidy Programs qualify. Voluntary overtime, coursework and transit delays don’t count. Submit the claim form and receipt within 60 days; tips are capped at 15%.",
+   "sources": [
+    "https://transnet.usc.edu/index.php/guaranteed-ride-home/"
+   ],
+   "verified": "2026-11-15",
+   "confidence": "confirmed",
+   "hidden": true
   }
  ]
 }

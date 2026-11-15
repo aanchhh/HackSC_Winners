@@ -49,7 +49,7 @@ FULL = [
 
 BUILDINGS = [
     dict(key="lorenzo", name="The Lorenzo", address="325 W Adams Blvd, Los Angeles, CA 90007", lat=34.02868, lng=-118.27262,
-         url="https://www.thelorenzo.com/", amenities=["Furnished", "Gym", "Pool", "Shuttle to USC", "Study rooms", "Parking", "In-unit laundry"],
+         url="", amenities=["Furnished", "Gym", "Pool", "Shuttle to USC", "Study rooms", "Parking", "In-unit laundry"],
          plans=FULL, desc="Large furnished student community with a free shuttle to campus."),
     dict(key="menlo", name="Menlo (2678 Menlo Ave)", address="2678 Menlo Ave, Los Angeles, CA 90007", lat=34.03046, lng=-118.29003,
          url="", amenities=["Furnished", "Laundry", "AC"],
@@ -80,9 +80,10 @@ async def fetch(client: PoliteClient) -> list[Listing]:
         except Exception:
             pass
         out.append(Listing(
-            id=f"featured:{b['key']}", source="Featured (sample data)", url=b["url"], name=b["name"], address=b["address"],
+            id=f"featured:{b['key']}", source="Featured", url=b["url"], name=b["name"].replace(" (sample)", ""), address=b["address"],
             lat=b["lat"], lng=b["lng"], units=units, priceUnit="per unit / per person",
-            amenities=b["amenities"], propertyTypes=["Apartments", "Student Housing"], description=b["desc"],
+            amenities=b["amenities"], propertyTypes=["Apartments", "Student Housing"],
+            description=b["desc"] + " (Floorplans and prices are illustrative.)",
             availability="Fall 2027", sampleData=True, photos=photos, photoCredit=credit,
         ).finalize())
     return out

@@ -2,7 +2,7 @@ import { GeoJSON } from 'react-leaflet'
 
 export const ZONE_STYLE: Record<string, { color: string; fill: number; dash?: string }> = {
   DPS: { color: '#990000', fill: 0.1 },
-  Fryft: { color: '#d4a106', fill: 0.04, dash: '6 6' },
+  DPS_HSC: { color: '#990000', fill: 0.1 },
 }
 
 export default function ZoneLayer({ data, visible }: { data: GeoJSON.FeatureCollection; visible: Record<string, boolean> }) {
@@ -13,7 +13,7 @@ export default function ZoneLayer({ data, visible }: { data: GeoJSON.FeatureColl
       data={{ ...data, features } as GeoJSON.FeatureCollection}
       style={(f) => {
         const s = ZONE_STYLE[f?.properties?.name] ?? { color: '#666', fill: 0.05 }
-        return { color: s.color, weight: 2.5, fillOpacity: s.fill, dashArray: s.dash }
+        return { color: s.color, weight: 2.5, fillOpacity: s.fill, dashArray: s.dash, className: 'zone-glow' }
       }}
       interactive={false}
     />

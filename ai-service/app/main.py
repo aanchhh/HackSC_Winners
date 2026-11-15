@@ -80,7 +80,7 @@ async def listings_search(
         "query": q, "parser": parser, "understood": sq.chips(), "semanticText": sq.text, "filters": sq.as_dict(),
         "count": len(hits), "tookMs": round((time.perf_counter() - t0) * 1000),
         "results": [{**h["listing"].model_dump(), "matchedUnits": [u.model_dump() for u in h["matchedUnits"]],
-                     "walkMin": h["walkMin"], "score": h["score"], "denseRank": h["denseRank"], "bm25Rank": h["bm25Rank"]} for h in hits],
+                     "walkMin": h["walkMin"], "score": h["score"], "denseRank": h["denseRank"], "bm25Rank": h["bm25Rank"], "cosine": h.get("cosine")} for h in hits],
     }
 
 
@@ -121,6 +121,13 @@ async def free_trip(fromLat: float, fromLng: float, toLat: float, toLng: float, 
 async def free_upcoming(days: int = Query(120, le=366)):
     from app.free.search import upcoming
     return await asyncio.to_thread(upcoming, days)
+
+
+@app.post("/ai/report/check")
+async def report_check(body: dict, x_internal_key: str | None = Header(None)):
+    _check_key(x_internal_key)
+    from app.safety.report_check import check_report
+    return await check_report(str(body.get("description", "")), str(body.get("category", "")), str(body.get("where", "")), str(body.get("when", "")))
 
 
 @app.get("/ai/neighborhood", response_model=BlockSummary)

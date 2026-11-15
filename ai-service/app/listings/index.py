@@ -123,8 +123,8 @@ class HybridIndex:
         def walk(i):
             return filters.walk_to(listings[i])
 
-        def hit(i, score=None, d=None, b=None):
-            return {"listing": listings[i], "matchedUnits": matched[i], "score": score, "denseRank": d, "bm25Rank": b,
+        def hit(i, score=None, d=None, b=None, c=None):
+            return {"listing": listings[i], "matchedUnits": matched[i], "score": score, "denseRank": d, "bm25Rank": b, "cosine": c,
                     "walkMin": round(walk(i)) if (filters.nearBuildingId is not None or filters.nearLat is not None) else None}
 
         query = query.strip()
@@ -134,15 +134,17 @@ class HybridIndex:
                 idx = [h["_i"] for h in self._ranked(query, allowed, listings, fi, bm, rerank=False)] or idx
             key = walk if filters.sort == "walk" else price
             return [hit(i) for i in sorted(idx, key=key)[:k]]
-        return [hit(h["_i"], h["score"], h["d"], h["b"]) for h in self._ranked(query, allowed, listings, fi, bm, rerank)[:k]]
+        return [hit(h["_i"], h["score"], h["d"], h["b"], h["c"]) for h in self._ranked(query, allowed, listings, fi, bm, rerank)[:k]]
 
     def _ranked(self, query, allowed, listings, fi, bm, rerank=True) -> list[dict]:
 
         n = min(CANDIDATES, len(allowed))
         # Dense: FAISS restricted to the pre-filtered ids
         params = faiss.SearchParameters(sel=faiss.IDSelectorBatch(allowed))
-        _, d_ids = fi.search(_embed([query], query=True), n, params=params)
+        d_sims, d_ids = fi.search(_embed([query], query=True), n, params=params)
         dense = [int(i) for i in d_ids[0] if i >= 0]
+        # vectors are L2-normalized, so the inner product IS the cosine similarity between query and listing
+        cos = {int(i): round(float(s), 4) for i, s in zip(d_ids[0], d_sims[0]) if i >= 0}
         # Sparse: BM25 over everything, then keep allowed ids
         q_tokens = bm25s.tokenize([query], stopwords="en", stemmer=_stemmer, show_progress=False)
         allowed_set = set(allowed.tolist())
@@ -168,7 +170,7 @@ class HybridIndex:
             scores.update({i: float(s) for i, s in zip(top, sorted(ce, reverse=True))})
             order = top + order[RERANK_TOP:]
 
-        return [{"_i": i, "score": round(scores[i], 4), "d": d_rank.get(i), "b": s_rank.get(i)} for i in order]
+        return [{"_i": i, "score": round(scores[i], 4), "d": d_rank.get(i), "b": s_rank.get(i), "c": cos.get(i)} for i in order]
 
 
 INDEX = HybridIndex(Path(settings.index_dir))

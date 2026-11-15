@@ -34,8 +34,12 @@ export const api = {
     get<ReportV2>(`/api/listings/${encodeURIComponent(id)}/report`, { buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, ...weights(p) }),
   trueCost: (b: { listingId?: string; unitLabel?: string; rent?: number; utilities?: number; inFryft?: boolean; lateNights: number; needsMetro: boolean; roommates: number }) =>
     post<CostBreakdown>('/api/true-cost', b),
-  route: (from: [number, number], to: [number, number], night: boolean) =>
-    get<RouteResult>('/api/route', { from: from.join(','), to: to.join(','), night }),
+  /** Recommendation: cosine(preference vector, listing feature vector) blended with fit. `sims` = embedding cosine to the search text. */
+  fitRank: (ids: string[], p: Profile, sims: (number | null)[] = []) =>
+    get<Record<string, { match: number; cosine: number; fit: number; perPerson: number | null; longestWalkMin: number; parts: Record<string, number>; why: string[] }>>('/api/fit-rank', {
+      ids: ids.join(','), sim: sims.map((s) => (s == null ? '' : s)).join(','), buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, ...weights(p) }),
+  route: (from: [number, number], to: [number, number], at: Date, w: { incidents: number; dps: number; light: number; people: number }) =>
+    get<RouteResult>('/api/route', { from: from.join(','), to: to.join(','), at: at.toISOString(), w: [w.incidents, w.dps, w.light, w.people].join(',') }),
   incidents: (days = 180) => get<IncidentsResponse>('/api/incidents', { days }),
   safetyResources: () => get<{ note: string; phones: Record<string, string>; resources: SafetyResource[] }>('/api/safety-resources'),
   dpsUnits: () => get<{ simulated: boolean; units: DpsUnit[] }>('/api/dps-units'),

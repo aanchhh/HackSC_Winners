@@ -17,6 +17,8 @@ interface AppState {
   highlight: (ids: string[]) => void
   setCompareWidth: (w: number) => void
   toggleCompareRow: (r: CompareRow) => void
+  costListingId: string | null
+  openCost: (id: string | null) => void
 }
 
 export const MAX_COMPARE = 3
@@ -35,6 +37,8 @@ export const useAppStore = create<AppState>()(
       clearCompare: () => set({ compareIds: [] }),
       highlight: (ids) => set({ highlightedIds: ids }),
       setCompareWidth: (w) => set({ compareWidth: Math.round(Math.min(760, Math.max(300, w))) }),
+      costListingId: null,
+      openCost: (id) => set({ costListingId: id }),
       toggleCompareRow: (r) => set((s) => ({ compareRows: s.compareRows.includes(r) ? s.compareRows.filter((x) => x !== r) : COMPARE_ROWS.filter((x) => x === r || s.compareRows.includes(x)) })),
     }),
     { name: 'trojanscout', partialize: (s) => ({ profile: s.profile, compareIds: s.compareIds, compareWidth: s.compareWidth, compareRows: s.compareRows }) },

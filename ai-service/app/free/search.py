@@ -1,8 +1,8 @@
 """Free & Safe directory search: data/free_programs.json → hybrid search (meaning + keywords) + time and place awareness.
 
-  "I've been drinking and can't drive"  → AAA Tipsy Tow (meaning), with "Next: Dec 31, 6 PM" (time)
-  "free ride home tonight" at 1 AM       → Fryft "Available now, until 2 AM" ranked first; Campus Cruiser "Opens 6 PM"
-Statuses are computed in America/Los_Angeles. Area checks use the DPS/Fryft polygons and the South LA pilot bounds."""
+  "I've been drinking and can't drive"  → AAA Tow to Go (meaning), with "Next: Dec 31, 6 PM" (time)
+  "free ride home tonight" at 1 AM       → USC Lyft "Available now, until 2 AM" ranked first
+Statuses are computed in America/Los_Angeles. Area checks use the DPS patrol areas, USC's official Lyft boundaries and the South LA pilot bounds."""
 import datetime as dt
 import json
 import re
@@ -79,10 +79,22 @@ def area_ok(area: str, lat: float | None, lng: float | None) -> bool | None:
         return None
     if area in ("usc_lyft_upc", "usc_lyft_hsc"):
         ring = _ride_zone(area)
+        if area == "usc_lyft_hsc":  # the HSC program also covers Union Station
+            u = _ride_zone("usc_lyft_union_station")
+            if u and _inside(u, lat, lng):
+                return True
         return _inside(ring, lat, lng) if ring else None
-    if area in ("fryft", "dps"):
-        ring = _zone("Fryft" if area == "fryft" else "DPS")
+    if area == "fryft":  # official USC Lyft boundaries (UPC, or HSC incl. Union Station)
+        return bool(area_ok("usc_lyft_upc", lat, lng) or area_ok("usc_lyft_hsc", lat, lng))
+    if area == "dps":
+        ring = _zone("DPS")
+        if area == "dps" and (hsc := _zone("DPS_HSC")) and _inside(hsc, lat, lng):
+            return True
         return _inside(ring, lat, lng) if ring else None
+    if area == "lanow_south_la":  # Figueroa St / Slauson Ave / Long Beach Ave / Washington Blvd
+        return 33.9890 <= lat <= 34.0335 and -118.2830 <= lng <= -118.2425
+    if area == "leimert":  # Leimert Park / Baldwin Hills Crenshaw (approximate; the official map isn't published as data)
+        return 33.990 <= lat <= 34.020 and -118.350 <= lng <= -118.300
     if area == "ubm":
         s, w, n, e = UBM_BOX
         return s <= lat <= n and w <= lng <= e
@@ -169,7 +181,7 @@ TONIGHT = re.compile(r"\b(tonight|this evening|later today|after class)\b", re.I
 
 # Situations people actually type → the programs that help, most useful first (deterministic, explainable)
 SITUATIONS: list[tuple[str, str, list[str]]] = [
-    (r"drunk|drinking|been drinking|tipsy|can'?t drive|cannot drive|sober|buzzed|designated", "You've been drinking", ["tipsy-tow", "fryft", "campus-cruiser", "metro-nye", "share-trip"]),
+    (r"drunk|drinking|been drinking|tipsy|can'?t drive|cannot drive|sober|buzzed|designated", "You've been drinking", ["fryft", "tipsy-tow", "metro-nye", "share-trip"]),
     (r"follow(ed|ing)|scared|unsafe|creep|being watched|someone behind|harass(ed|ing)? (me|on the street)", "You feel unsafe right now", ["dps-escort", "livesafe", "security-ambassadors", "check-in", "transit-watch"]),
     (r"spiked|roofie|drugged|my drink", "Your drink may be spiked", ["drink-test-kits", "dps-escort", "share-trip", "988"]),
     (r"overdos|narcan|naloxone|fentanyl|opioid", "Overdose risk", ["narcan", "dps-escort", "988"]),
@@ -182,7 +194,7 @@ SITUATIONS: list[tuple[str, str, list[str]]] = [
     (r"christmas|dec(ember)? 24|holiday", "Holidays", ["metro-christmas-eve", "metro-nye", "tipsy-tow"]),
     (r"july 4|fourth of july|4th of july|independence", "Fourth of July", ["tipsy-tow"]),
     (r"vote|election", "Election day", ["ladot-free-days"]),
-    (r"ride home|get home|late night|walk home|way home|night|late", "Getting home at night", ["fryft", "campus-cruiser", "dps-escort", "livesafe", "check-in"]),
+    (r"ride home|get home|late night|walk home|way home|night|late", "Getting home at night", ["fryft", "lyft-hsc", "dps-escort", "livesafe", "check-in"]),
     (r"crisis|panic|anxious|anxiety|depress|suicid|talk to someone", "You need to talk to someone", ["988", "csi"]),
     (r"women|female|woman driver", "Women riders", ["uber-women", "share-trip"]),
 ]
@@ -227,7 +239,7 @@ def search(q: str = "", *, lat: float | None = None, lng: float | None = None, u
         p = ps[i]
         st = status(p, now)
         ok = area_ok(p["area"], lat, lng)
-        eligible = usc or "usc" not in p["eligibility"]
+        eligible = (usc or "usc" not in p["eligibility"]) and "usc_employee" not in p["eligibility"]
         if category and p["category"] != category:
             continue
         if available_now and st["state"] not in ("open",):
@@ -366,19 +378,18 @@ def trip_options(frm: tuple[float, float], to: tuple[float, float], now: dt.date
             steps=["Open Lyft, choose SHARED", "Needs the HSC Lyft Invite form once"], cost="Free", minutes=ride_min, rank=1)
 
     # USC shuttles with real departure times
-    for pid in ("union-station-shuttle", "weekend-shuttle", "lax-shuttle"):
-        p = ps.get(pid)
-        if not p or not p.get("destination") or not p.get("points"):
-            continue
-        dest, stop = p["destination"], p["points"][0]
-        if _meters(to, (dest["lat"], dest["lng"])) > dest["radiusM"]:
+    legs_of = lambda p: p.get("legs") or ([{"from": p["points"][0], "to": p["destination"]}] if p.get("destination") and p.get("points") else [])
+    for pid, leg in [(pid, leg) for pid in ("union-station-shuttle", "weekend-shuttle", "lax-shuttle") if ps.get(pid) for leg in legs_of(ps[pid])]:
+        p = ps[pid]
+        dest, stop = leg["to"], leg["from"]
+        if _meters(to, (dest["lat"], dest["lng"])) > dest["radiusM"] or _meters(frm, (dest["lat"], dest["lng"])) < dest["radiusM"]:
             continue
         walk_m = _meters(frm, (stop["lat"], stop["lng"])) * 1.3
         walk_min = round(walk_m / 80)
         if walk_min > 25:
             continue
         stop_name = stop['label'].split('(')[0].strip()
-        if p.get("departures"):
+        if p.get("departures") and stop is (p.get("legs") or [{}])[0].get("from", stop):  # published times are for the first stop
             dep = next_departure(p, now, after_min=walk_min + 2)
             when = f"Next shuttle {dep.strftime('%a %-I:%M %p') if dep.date() != now.date() else _fmt(dep)} from {stop_name}" if dep else "No departures in the next week"
         else:  # runs continuously in its window (no published timetable)
@@ -388,16 +399,16 @@ def trip_options(frm: tuple[float, float], to: tuple[float, float], now: dt.date
         steps = [f"Walk {walk_min} min to {stop['label']}", f"Ride to {dest['label']}"]
         if pid == "lax-shuttle":
             steps.insert(0, "Reserve a seat first (deadline Nov 20, 11:59 PM)")
+        if any(o["id"] == pid for o in out):
+            continue
         add(pid, f"USC runs a shuttle to {dest['label']}, and most students don't know it.", steps=steps,
             cost=p["cost"], minutes=walk_min + 25, when=when, walk_to=(stop["lat"], stop["lng"]), rank=5 if dep and dep.date() == now.date() else 30)
 
-    # Campus Cruiser (evening, inside its boundary ≈ DPS zone)
-    if area_ok("dps", *frm) and area_ok("dps", *to):
-        add("campus-cruiser", "Both ends are inside the Campus Cruiser boundary.", steps=["Call 213-740-4911", "Wait inside; they'll call when close"],
-            cost="Free", minutes=ride_min + 8, rank=10)
+    upc_ring = _zone("DPS")
     # DPS escort is always an option on foot inside the patrol zone
     if area_ok("dps", *frm) and trip_m < 2500:  # escorts are for walks near campus, not cross-town trips
-        add("dps-escort", "You're inside the DPS patrol zone; an escort is available 24/7.", steps=["Call DPS 213-740-4321 and ask for an escort", "Or use any blue-light phone"],
+        at_hsc = not (upc_ring and _inside(upc_ring, *frm))
+        add("dps-escort", "You're inside the DPS patrol zone; an escort is available 24/7.", steps=[f"Call DPS {'323-442-1000 (HSC)' if at_hsc else '213-740-4321'} and ask for an escort", "Or use any blue-light phone"],
             cost="Free", rank=20)
     # Holiday free transit happening now
     for pid in ("metro-nye", "metro-christmas-eve"):

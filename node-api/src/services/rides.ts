@@ -1,6 +1,6 @@
 // Shared rides: real-time ride requests, route matching, fare splitting, and a demo-demand simulator.
 // State is in memory (fine for a demo; move to Supabase for production). Every browser subscribes over SSE.
-import { friendIds, PERSONAS } from './users.js'
+import { friendIds, listMembers } from './users.js'
 import { EventEmitter } from 'node:events'
 import { randomUUID } from 'node:crypto'
 import { meters, type LatLng } from './geo.js'
@@ -22,6 +22,16 @@ export interface Place { lat: number; lng: number; label: string }
 export interface RideRequest {
   id: string; userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number
   createdAt: number; status: 'open' | 'matched' | 'cancelled' | 'expired'; demo: boolean; groupId?: string
+  share: Share
+}
+/** Who may see that you're riding their way: everyone, all your friends, or only people in chosen friend lists. */
+export interface Share { mode: 'everyone' | 'friends' | 'lists'; lists: string[] }
+
+/** Can `viewerId` be told that `r` is travelling on their route? (Never where exactly: only after both accept.) */
+export function canSee(viewerId: string, r: RideRequest) {
+  if (r.demo || r.share.mode === 'everyone') return true
+  if (r.share.mode === 'friends') return friendIds(r.userId).has(viewerId)
+  return listMembers(r.userId, r.share.lists).has(viewerId)
 }
 export interface JoinRequest { id: string; fromRequestId: string; toRequestId: string; createdAt: number; status: 'pending' | 'accepted' | 'declined' }
 export interface Group { id: string; requestIds: string[]; createdAt: number }
@@ -117,6 +127,8 @@ export function matchesFor(me: RideRequest) {
   const out = []
   for (const other of requests.values()) {
     if (other.userId === me.userId || !['open', 'matched'].includes(other.status)) continue
+    // both sides must have chosen to share with each other (and with everyone already in their car)
+    if (!ridersOf(other).every((x) => canSee(me.userId, x) && canSee(x.userId, me))) continue
     if (Math.abs(other.departAt - me.departAt) > MAX_TIME_GAP_MS) continue
     const riders = [...ridersOf(other), me]
     if (riders.length > 3 || riders.reduce((s, r) => s + r.seats, 0) > MAX_SEATS) continue
@@ -135,13 +147,14 @@ export function matchesFor(me: RideRequest) {
 }
 
 // ---------- mutations ----------
-export function createRequest(b: { userId: string; name: string; pickup: Place; drop: Place; departAt?: number; seats?: number }, demo = false) {
+export function createRequest(b: { userId: string; name: string; pickup: Place; drop: Place; departAt?: number; seats?: number; share?: Share }, demo = false) {
   const r: RideRequest = {
     id: randomUUID().slice(0, 8), userId: b.userId, name: b.name.slice(0, 30) || 'Trojan', pickup: b.pickup, drop: b.drop,
     departAt: b.departAt ?? Date.now(), seats: Math.min(2, Math.max(1, b.seats ?? 1)), createdAt: Date.now(), status: 'open', demo,
+    share: demo ? { mode: 'everyone', lists: [] } : b.share ?? { mode: 'everyone', lists: [] },
   }
   requests.set(r.id, r)
-  log(`${r.name} booked ${short(r.pickup.label)} → ${short(r.drop.label)}`, demo)
+  log('A student booked a ride', demo)  // the public feed never says who or where
   if (!demo) scheduleDemoNear(r)
   changed()
   return r
@@ -170,7 +183,7 @@ export function requestJoin(fromRequestId: string, toRequestId: string, userId: 
   if (!matchesFor(from).some((m) => m.requestId === to.id)) throw new Error('No longer a compatible match')
   const j: JoinRequest = { id: randomUUID().slice(0, 8), fromRequestId, toRequestId, createdAt: Date.now(), status: 'pending' }
   joins.set(j.id, j)
-  log(`${from.name} asked to share with ${to.name}`, from.demo && to.demo)
+  log('Two students are talking about sharing a ride', from.demo && to.demo)
   if (to.demo) setTimeout(() => respondJoin(j.id, true, to.userId), 2500 + Math.random() * 4000)  // demo riders accept
   changed()
   return j
@@ -189,14 +202,17 @@ export function respondJoin(joinId: string, accept: boolean, userId: string) {
     groups.set(g.id, g)
     g.requestIds.push(from.id)
     for (const id of g.requestIds) { const r = requests.get(id)!; r.groupId = g.id; r.status = 'matched' }
-    log(`${from.name} and ${to.name} are sharing a ride 🎉`, from.demo && to.demo)
+    log('Students just started sharing a ride 🎉', from.demo && to.demo)
   }
   changed()
   return true
 }
 
 // ---------- views ----------
-const approx = (p: Place) => ({ lat: +p.lat.toFixed(3), lng: +p.lng.toFixed(3), label: short(p.label) })  // ~100 m: don't expose exact pickups
+// Privacy: until both riders accept, the other person only learns WHO (if you shared with them) and that you're on the
+// same route, when you leave and what they'd save. Pickups, drops, areas and the stop order are revealed only to a formed group.
+type Match = ReturnType<typeof matchesFor>[number]
+const publicMatch = (m: Match) => ({ requestId: m.requestId, name: m.name, demo: m.demo, friend: m.friend, groupSize: m.groupSize, departAt: m.departAt, you: m.you, pendingJoin: m.pendingJoin })
 
 export const liveRides = () => [...requests.values()].filter((r) => r.status === 'open' || r.status === 'matched')
 
@@ -208,17 +224,16 @@ export function stateFor(userId: string) {
   return {
     now: Date.now(),
     stats: { live: live.length, real: live.filter((r) => !r.demo).length, sharing: groups.size },
-    board: live.filter((r) => r.userId !== userId).map((r) => ({ id: r.id, name: r.name, demo: r.demo, friend: friends.has(r.userId), status: r.status, departAt: r.departAt, pickup: approx(r.pickup), drop: approx(r.drop), seats: r.seats })),
     activity: activity.slice(0, 12),
     mine: mine.map((r) => ({
       ...r, solo: soloQuote([r.pickup.lat, r.pickup.lng], [r.drop.lat, r.drop.lng]),
-      matches: matchesFor(r),
+      matches: matchesFor(r).map(publicMatch),
       group: r.groupId ? (() => { const g = groups.get(r.groupId!)!; const riders = g.requestIds.map((id) => requests.get(id)!); return { id: g.id, plan: planGroup(riders), members: riders.map((x) => ({ requestId: x.id, name: x.name, demo: x.demo, pickup: x.pickup, drop: x.drop, departAt: x.departAt })) } })() : null,
     })),
     incoming: [...joins.values()].filter((j) => j.status === 'pending' && myIds.has(j.toRequestId)).map((j) => {
       const from = requests.get(j.fromRequestId)!, to = requests.get(j.toRequestId)!
       const plan = planGroup([...ridersOf(to), from])
-      return { joinId: j.id, from: { name: from.name, demo: from.demo, pickup: approx(from.pickup), drop: approx(from.drop), departAt: from.departAt }, toRequestId: to.id, you: plan.riders.find((x) => x.requestId === to.id) }
+      return { joinId: j.id, from: { name: from.name, demo: from.demo, friend: friends.has(from.userId), departAt: from.departAt }, toRequestId: to.id, you: plan.riders.find((x) => x.requestId === to.id) }
     }),
   }
 }
@@ -242,15 +257,8 @@ const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
 const jitter = (p: Place, m: number): Place => ({ ...p, lat: p.lat + ((Math.random() - 0.5) * 2 * m) / 111000, lng: p.lng + ((Math.random() - 0.5) * 2 * m) / 92000 })
 let demoN = 0
 
-function demoRide(pickup: Place, drop: Place, departAt: number, persona?: { id: string; name: string }) {
-  return createRequest({ userId: persona?.id ?? `demo-${++demoN}`, name: persona?.name ?? pick(NAMES), pickup, drop, departAt, seats: Math.random() < 0.8 ? 1 : 2 }, true)
-}
-/** A demo persona (befriendable in the demo) who isn't already riding. */
-function freePersona(prefer?: Set<string>) {
-  const busy = new Set(liveRides().map((r) => r.userId))
-  const pool = PERSONAS.filter((p) => !busy.has(p.id))
-  const pref = pool.filter((p) => prefer?.has(p.id))
-  return pref.length ? pick(pref) : pool.length ? pick(pool) : undefined
+function demoRide(pickup: Place, drop: Place, departAt: number) {
+  return createRequest({ userId: `demo-${++demoN}`, name: pick(NAMES), pickup, drop, departAt, seats: Math.random() < 0.8 ? 1 : 2 }, true)
 }
 
 /** Someone just booked: within ~1–3 min, 1–2 demo riders book similar trips (near the pickup / on the way / near the drop). */
@@ -264,10 +272,7 @@ function scheduleDemoNear(r: RideRequest) {
       const mid: Place = { lat: r.pickup.lat + (r.drop.lat - r.pickup.lat) * t * 0.5, lng: r.pickup.lng + (r.drop.lng - r.pickup.lng) * t * 0.5, label: 'on the way' }
       const pickup = Math.random() < 0.6 ? jitter({ ...r.pickup, label: short(r.pickup.label) }, 350) : jitter({ ...mid, label: `${short(r.pickup.label)} area` }, 250)
       const drop = Math.random() < 0.7 ? jitter({ ...r.drop, label: short(r.drop.label) }, 450) : jitter({ lat: r.pickup.lat + (r.drop.lat - r.pickup.lat) * 0.8, lng: r.pickup.lng + (r.drop.lng - r.pickup.lng) * 0.8, label: `near ${short(r.drop.label)}` }, 300)
-      // first rider on your route is often one of your friends (if you have demo friends), so the friends view has something to show
-      const friends = friendIds(r.userId)
-      const persona = k === 0 && friends.size && Math.random() < 0.7 ? freePersona(friends) : undefined
-      demoRide(pickup, drop, r.departAt + (Math.random() - 0.5) * 10 * 60e3, persona)
+      demoRide(pickup, drop, r.departAt + (Math.random() - 0.5) * 10 * 60e3)
     }, (40 + Math.random() * 130) * 1000 * (k + 1) * 0.8)
   }
 }
@@ -283,7 +288,7 @@ export function startRides() {
     if (dirty) changed()
   }, 15_000)
   if (!SIM) return
-  const spawn = () => demoRide(jitter(pick(HOTSPOTS), 250), jitter(pick(DESTINATIONS), 400), Date.now() + (3 + Math.random() * 25) * 60e3, Math.random() < 0.3 ? freePersona() : undefined)
+  const spawn = () => demoRide(jitter(pick(HOTSPOTS), 250), jitter(pick(DESTINATIONS), 400), Date.now() + (3 + Math.random() * 25) * 60e3)
   for (let i = 0; i < 7; i++) spawn()
   const loop = () => { if ([...requests.values()].filter((r) => r.demo && r.status === 'open').length < 14) spawn(); setTimeout(loop, (20 + Math.random() * 20) * 1000) }
   setTimeout(loop, 15_000)

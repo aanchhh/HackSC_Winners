@@ -1,6 +1,6 @@
 # TrojanScout — HackSC 2026
 
-Map + chat housing copilot for USC students: DPS/Fryft zones, door-to-desk commute, cited block summaries, True Trojan Cost, fit score.
+Map + chat housing copilot for USC students: DPS patrol zones, USC's free Lyft boundaries, door-to-desk commute, cited block summaries, True Trojan Cost, fit score.
 
 ```
 React (Vite) :5173 ──REST+SSE──► Node+Express :4000 ──► OpenRouteService
@@ -18,7 +18,7 @@ React (Vite) :5173 ──REST+SSE──► Node+Express :4000 ──► OpenRout
 | `frontend/`   | Aanchal            | Vite + React + TS, Tailwind v4, react-leaflet, TanStack Query, Zustand, fetch-event-source |
 | `node-api/`   | Prasham            | Express, zod, Turf.js, pg / supabase-js, axios, node-cache, http-proxy-middleware |
 | `ai-service/` | Yash (agent), Dhruv (`app/rag`) | FastAPI, LangGraph, LangChain, langchain-anthropic, sentence-transformers (bge-small), psycopg + pgvector |
-| `data/`       | Prasham / Dhruv    | `zones.geojson` (DPS traced from the DPS map; Fryft = same boundary), `incidents.json`, `streets.json`, `safety_resources.json`, `buildings.json`, `listings.json` (live, scraped), `listings.csv` (seed fallback) |
+| `data/`       | Prasham / Dhruv    | `zones.geojson` (DPS patrol zones, UPC + HSC), `usc_ride_zones.geojson` (official USC Lyft boundaries), `incidents.json`, `streets.json`, `safety_resources.json`, `buildings.json`, `listings.json` (live, scraped), `listings.csv` (seed fallback) |
 | `contracts/`  | Yash               | Report JSON example, SSE events, internal API |
 | `supabase/`   | Prasham / Dhruv    | `schema.sql` — tables + `match_chunks` RPC |
 
@@ -78,7 +78,7 @@ Alternatives via `LLM_PROVIDER`: `google` (free AI Studio key), `anthropic`, `gr
 
 - `python -m app.safety.ingest` (in ai-service) writes `data/incidents.json` (LAPD NIBRS offenses, data.lacity.org `k7nn-b2ep`,
   last 6 months, block-level), `data/streets.json` (OpenStreetMap walk network via Overpass) and `data/safety_resources.json`
-  (DPS HQ/substation, approximate emergency-phone spots, Campus Cruiser). Falls back to labelled synthetic incidents if LAPD is down.
+  Falls back to labelled synthetic incidents if LAPD is down. Safety places (police, blue-light phones, clinics, DPS stations) come from OpenStreetMap; see `ingest_extra.py`.
 - `GET /api/route?from=lat,lng&to=lat,lng&night=true` → fastest vs safest walk. Safest = shortest path where each street costs
   length × (1 + 2·√(nearby incident severity × recency / p90)), ×1.6 outside DPS, −10% if lit, small bonus for busy streets;
   never returned if it's riskier than the fastest.
@@ -123,18 +123,50 @@ Fill in `LLM_API_KEY`, `ORS_API_KEY`, `DATABASE_URL` to go real. `INTERNAL_KEY` 
 
 Render free instances sleep: hit both `/health` endpoints 5 min before the demo.
 
-## Sign-in (OIDC) and friends
+## Sign-in, friends and ride sharing
 
-TrojanScout signs users in with OpenID Connect (authorization code + PKCE, id_token verified against the provider's JWKS).
+**Flow:** Sign in → TrojanScout sign-in page → enter your @usc.edu email → 6-digit code by email → verified and registered →
+Preferences (save, or skip) → landing page. Returning users go straight back to where they were.
 
-- **Demo (default):** `/auth/login` redirects to a built-in identity provider at `/demo-idp`, which is clearly labelled
-  "Demo identity provider · not USC" and never asks for a password. You can pick a demo student or type a name and email.
-- **Production:** set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` (and `PUBLIC_API_URL`, `SESSION_SECRET`) in `node-api/.env` to point at the university IdP. The same code path is used.
-- The profile (`/profile`) holds your home (for DPS alerts within 600 m), emergency contacts (one tap texts them your safe route), and friends.
-- In Book Ride, friends' rides rank first, are shown in pink, and can be filtered with "Friends only". Accounts live in `data/users.json`, which is git-ignored.
+- It is OpenID Connect (authorization code + PKCE, id_token verified against JWKS). The built-in identity provider at `/idp`
+  proves you own a university email with a one-time code (10-minute expiry, 5 tries, 30 s resend cooldown). It never asks for a password.
+- **Email delivery:** set `BREVO_API_KEY` (free, 300/day; verify a sender address) or `RESEND_API_KEY`, plus `MAIL_FROM`, in `node-api/.env`.
+  Without them (local dev) the code is printed in the node-api terminal.
+- **Real USC SSO:** USC's NetID login can only be used after TrojanScout is registered with USC ITS as an application. Then set
+  `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` and the same flow redirects to USC's real sign-in page. We don't copy USC's login page.
+- `ALLOWED_EMAIL_DOMAINS` (default `usc.edu`) limits who can register.
+- **Friends:** send a request by email; the other person must accept (profile page or alerts). Requests to emails without an account wait until they sign up.
+- **Lists:** group friends (e.g. Roommates). When booking a ride you choose Everyone / All friends / chosen lists.
+  Matching is mutual: two rides match only if each rider shared with the other.
+- **Privacy:** until both riders accept, a match shows only the name, "travelling on your route", departure time and savings.
+  Pickups, drop-offs and stop order are sent only to a formed group; the live feed never names people or places.
+- Uber's link fills one destination, so the booker gets pickup → final destination and a list of middle stops to add.
+  Google Maps gets every stop by name.
 
 ## Recent-incident check and safety places
 
 - `GET /api/recent?lat&lng&hours=24` returns USC DPS crime alerts (from the dps.usc.edu feed, refreshed every 20 min, placed by intersection, block or building, with honest precision) plus student reports. LAPD data lags about 2 weeks, so it is shown separately.
 - `GET /api/alerts` is one feed for the bell: DPS alerts near home or campus, student reports, friend requests, friends' rides and ride-share requests. Free-program alerts are merged in by the frontend.
-- The map shows police stations (LAPD and others), DPS stations, blue-light phones, clinics and USC health vending machines (OpenStreetMap plus USC pages; vending positions are approximate).
+- The map shows USC Lyft zones (UPC official boundary; HSC traced from USC's official map; Union Station), police stations (LAPD and others), DPS stations, blue-light phones, clinics and USC health vending machines (OpenStreetMap plus USC pages; vending positions are approximate).
+
+## Lit & Alive routing, and HSC
+
+The safest route minimizes **meters × multipliers**, and the route panel shows every multiplier, its data source and its value for both routes.
+You can change how much each one counts:
+
+| Factor | Effect on a block | Data |
+|---|---|---|
+| Reported crime | × (1 + 2 × √risk) | LAPD NIBRS, last 6 months, severity × recency, night ×1.5 |
+| Outside DPS patrol | × 1.6 | USC DPS patrol areas, UPC and HSC |
+| Dark streets | × (1 + 0.35 per broken streetlight, up to 3) after dark; OSM `lit=yes` −10% | Open "Streetlight Repair Services" cases, MyLA311 Cases 2026 (data.lacity.org `2cy6-i7zn`, updated daily) |
+| People around | −6% per place open at your departure time (up to 5), busy streets −15% (smaller effect in daytime) | OpenStreetMap `opening_hours` |
+
+Safest is drawn in green, fastest in blue (dashed). Broken streetlights and open places on the route are marked on the map.
+
+**Health Sciences Campus:** the same street graph, LAPD incidents, places, police / blue phones / clinics, DPS patrol area (from DPS's written boundary),
+DPS HSC station (2001 N Soto St), Lyft zone, HSC buildings as destinations, DPS alerts placed at HSC, and the intercampus shuttle stop.
+Refresh this data with:
+
+```bash
+cd ai-service && .venv/bin/python -m app.safety.ingest_extra
+```

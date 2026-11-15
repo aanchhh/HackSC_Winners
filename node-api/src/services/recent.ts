@@ -17,12 +17,17 @@ import { zoneCheck } from './zones.js'
 const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../data')
 const UA = { 'User-Agent': 'TrojanScout/0.1 (USC student hackathon project)' }
 const CAMPUS: LatLng = [34.0206, -118.2854]
+const HSC: LatLng = [34.0622, -118.2035]
+const HSC_WORDS = /Health Sciences Campus|\bHSC\b|Keck|Norris|Zonal|Soto Street|Valley Boulevard|LAC\+USC|Lincoln Park/i
 
 export interface DpsAlert {
   id: string; title: string; url: string; postedAt: string; occurredAt: string | null
-  location: string; lat: number; lng: number; precision: 'exact' | 'street' | 'campus'; summary: string
+  location: string; lat: number; lng: number; precision: 'exact' | 'street' | 'campus'; summary: string; campus: 'UPC' | 'HSC'
 }
-export interface StudentReport { id: string; lat: number; lng: number; category: string; description: string; createdAt: string; userId: string }
+export interface StudentReport {
+  id: string; lat: number; lng: number; category: string; description: string; createdAt: string; userId: string
+  severity?: 'low' | 'caution' | 'danger'; where?: string; occurredAt?: string; checkedBy?: string
+}
 
 let dps: DpsAlert[] = []
 let dpsFetchedAt: string | null = null
@@ -60,11 +65,13 @@ async function geocodeAddress(q: string): Promise<LatLng | null> {
 }
 
 const STREET = '(?:\\d+(?:st|nd|rd|th)|[A-Z][a-z]+)(?: [A-Z][a-z]+){0,2} (?:Street|St|Avenue|Ave|Boulevard|Blvd|Way|Drive|Dr|Place|Pl|Walk)'
-const near = (p: LatLng | null) => p && meters(p, CAMPUS) < 4000 ? p : null
+const near = (p: LatLng | null) => p && (meters(p, CAMPUS) < 4000 || meters(p, HSC) < 2500) ? p : null
 
-async function locate(text: string): Promise<{ location: string; lat: number; lng: number; precision: DpsAlert['precision'] }> {
+async function locate(text: string): Promise<{ location: string; lat: number; lng: number; precision: DpsAlert['precision']; campus: DpsAlert['campus'] }> {
   const field = text.match(/Location:?\s*(.+?)(?=\s+(?:Report Number|Date|Incident|Description|Suspect|Case|Vehicle)\b|$)/i)?.[1]?.trim() ?? ''
-  const done = (p: LatLng, precision: DpsAlert['precision'], label = field) => ({ location: label || 'University Park Campus', lat: p[0], lng: p[1], precision })
+  const atHsc = HSC_WORDS.test(`${field} ${text.slice(0, 400)}`)
+  const home = atHsc ? HSC : CAMPUS
+  const done = (p: LatLng, precision: DpsAlert['precision'], label = field) => ({ location: label || (atHsc ? 'Health Sciences Campus' : 'University Park Campus'), lat: p[0], lng: p[1], precision, campus: (meters(p, HSC) < meters(p, CAMPUS) ? 'HSC' : 'UPC') as DpsAlert['campus'] })
   // 1) "intersection of X and Y" → the real street intersection
   const inter = field.match(new RegExp(`intersection of (${STREET}) and (${STREET})`, 'i')) ?? text.match(new RegExp(`intersection of (${STREET}) and (${STREET})`))
   if (inter) { const p = near(intersection(inter[1], inter[2])); if (p) return done(p, 'exact') }
@@ -80,7 +87,7 @@ async function locate(text: string): Promise<{ location: string; lat: number; ln
     ...[...text.matchAll(/\b(?:into|inside|at|near|outside|in front of)\s+((?:[A-Z][\w'.&-]+ ){0,5}(?:Hall|Center|Library|Building|Structure|Village|Plaza|Garage|House|Gallery|Field))/g)].map((m) => m[1]),
   ].filter((s) => s && s.length > 3)
   for (const q of names) {
-    const hit = (await searchPlaces(q, CAMPUS, false, true))[0]
+    const hit = (await searchPlaces(q, home, false, true))[0]
     if (hit && near([hit.lat, hit.lng])) return done([hit.lat, hit.lng], 'exact')
   }
   // 4) a street named in the location + another in the narrative → their intersection; else nearest point of that street
@@ -91,7 +98,7 @@ async function locate(text: string): Promise<{ location: string; lat: number; ln
     const p = near(streetPoint(fieldStreet)); if (p) return done(p, 'street')
   }
   for (const s of streets) { const p = near(streetPoint(s)); if (p) return done(p, 'street', field ? `${field} (near ${s})` : s) }
-  return done(CAMPUS, 'campus')
+  return done(home, 'campus')
 }
 
 export async function refreshDps() {
@@ -136,7 +143,7 @@ export function recentNear(p: LatLng, radiusM = 500, hours = 24) {
   const since = Date.now() - hours * 3600e3
   const inZone = zoneCheck(p[0], p[1]).inDps
   const dpsHits = dps.filter((a) => Date.parse(a.occurredAt ?? a.postedAt) >= since &&
-    (a.precision === 'campus' ? inZone && meters(p, CAMPUS) < 1500 : meters(p, [a.lat, a.lng]) <= radiusM))
+    (a.precision === 'campus' ? inZone && meters(p, [a.lat, a.lng]) < 1500 : meters(p, [a.lat, a.lng]) <= radiusM))
     .map((a) => ({ source: 'USC DPS alert', verified: true, title: a.title, when: ago(a.occurredAt ?? a.postedAt), at: a.occurredAt ?? a.postedAt,
       where: a.location, precision: a.precision, distanceM: Math.round(meters(p, [a.lat, a.lng])), url: a.url, lat: a.lat, lng: a.lng }))
   const repHits = reports.filter((r) => Date.parse(r.createdAt) >= since && meters(p, [r.lat, r.lng]) <= radiusM)

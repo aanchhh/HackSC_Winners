@@ -8,7 +8,7 @@ import { startDpsSimulation } from './services/dpsUnits.js'
 import { ridesRouter } from './routes/rides.js'
 import { startRides } from './services/rides.js'
 import { startRecent } from './services/recent.js'
-import { authRouter, demoIdpRouter } from './routes/auth.js'
+import { authRouter, idpRouter } from './routes/auth.js'
 import { meRouter } from './routes/me.js'
 
 const app = express()
@@ -29,7 +29,7 @@ app.use('/api/chat', createProxyMiddleware({
 
 app.use(express.json())
 app.use('/auth', authRouter)
-app.use('/demo-idp', demoIdpRouter)
+app.use('/idp', idpRouter)
 app.use('/api/rides', ridesRouter)
 app.use('/api', meRouter)
 app.use('/api', publicRouter)

@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { meApi, saveSession, signIn } from '../lib/auth'
+import { useAppStore } from '../store/useAppStore'
+import type { Profile } from '../api/types'
 
 /** Landing spot after the identity provider: the session token arrives in the URL fragment (never sent to a server log). */
 export default function AuthDonePage() {
   const nav = useNavigate()
   const qc = useQueryClient()
+  const setProfile = useAppStore((s) => s.setProfile)
   const [error, setError] = useState('')
   useEffect(() => {
     const h = new URLSearchParams(window.location.hash.slice(1))
@@ -16,9 +19,10 @@ export default function AuthDonePage() {
     if (!t) { setError('No sign-in token received'); return }
     meApi.get(t).then((me) => {
       saveSession(t, me); qc.setQueryData(['me'], me); qc.invalidateQueries()
-      nav(h.get('return') || '/profile', { replace: true })
+      if (me.preferences) setProfile(me.preferences as unknown as Partial<Profile>)  // your saved preferences, on any device
+      nav(h.get('return') || '/', { replace: true })
     }).catch(() => setError('Could not load your profile'))
-  }, [nav, qc])
+  }, [nav, qc, setProfile])
   return (
     <div className="grid h-full place-items-center p-6 text-center">
       {error ? (

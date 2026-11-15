@@ -11,7 +11,7 @@ export interface SearchHit extends Listing { score: number | null; denseRank: nu
 export interface SearchResponse { query: string; filters: Record<string, unknown>; count: number; tookMs: number; results: SearchHit[] }
 export interface Meta { count: number; scrapedAt: string | null; sources: Record<string, unknown>; inDps: number; inFryft: number; medianRent: number | null }
 
-export interface Building { id: number; name: string; code: string; lat: number; lng: number }
+export interface Building { id: number; name: string; code: string; lat: number; lng: number; campus?: 'UPC' | 'HSC' }
 export interface Zones { inDps: boolean; inFryft: boolean; metersToFryftEdge: number }
 export interface Commute { building: string; walk: number; bike: number; tram: number | null }
 export interface Citation { n: number; source: string; date: string; url: string }
@@ -35,7 +35,7 @@ export type ChatEvent =
 export interface Unit { label: string; roomType: 'entire' | 'private_room' | 'shared_room'; beds: number | null; baths: number | null; privateBath: boolean | null; rent: number | null; count: number }
 export interface ListingV2 extends Listing { units?: Unit[]; roomTypes?: string[]; sampleData?: boolean; photoCredit?: string }
 export interface Chip { key: string; label: string }
-export interface SmartHit extends ListingV2 { matchedUnits: Unit[]; walkMin: number | null; score: number | null; denseRank: number | null; bm25Rank: number | null }
+export interface SmartHit extends ListingV2 { matchedUnits: Unit[]; walkMin: number | null; score: number | null; cosine?: number | null; denseRank: number | null; bm25Rank: number | null }
 export interface SmartSearchResponse {
   query: string; parser: 'rules' | 'rules+llm'; understood: Chip[]; semanticText: string; filters: Record<string, unknown>
   count: number; tookMs: number; results: SmartHit[]
@@ -51,8 +51,15 @@ export interface RouteLeg {
   coords: [number, number][]; distanceM: number; minutes: number; pctInsideDps: number; pctLit: number
   incidents: { total: number; againstPerson: number; byCategory: Record<string, number> }
   severeIncidents: number; nightIncidents: number; riskScore: number; emergencyPhones: string[]; streets: string[]
+  pctBusy: number; safetyCost: number
+  darkStreetlights: { address: string; reported: string; status: string; lat: number; lng: number }[]
+  openNow: { name: string; kind: string; hours: string; lat: number; lng: number }[]
 }
-export interface RouteResult { night: boolean; fastest: RouteLeg; safest: RouteLeg; sameRoute: boolean; summary: string; method: string }
+export interface RouteWeights { incidents: number; dps: number; light: number; people: number }
+export interface RouteResult {
+  night: boolean; at: string; weights: RouteWeights; fastest: RouteLeg; safest: RouteLeg; sameRoute: boolean; summary: string; method: string
+  parameters: { key: string; label: string; weight: number; effect: string; source: string }[]
+}
 export interface IncidentPoint { lat: number; lng: number; block: string; count: number; severe: number; night: number; byCategory: Record<string, number>; latest: string }
 export interface IncidentsResponse { source: string; synthetic: boolean; count: number; days: number; points: IncidentPoint[] }
 export interface SafetyResource { type: 'dps_station' | 'blue_phone' | 'police' | 'medical' | 'vending' | 'service'; name: string; lat: number; lng: number; operator?: string; address?: string; hours?: string; phone?: string; detail?: string; precision?: 'exact' | 'approximate'; source?: string; approximate?: boolean }

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
+import { AnimatePresence, motion } from 'motion/react'
+import { Route as RouteIcon, Users } from 'lucide-react'
 import { signIn, token, useMe } from '../lib/auth'
 import RecentCheck from '../components/safety/RecentCheck'
 import { CircleMarker, MapContainer, Polyline, Tooltip, useMap, useMapEvents } from 'react-leaflet'
@@ -10,20 +12,44 @@ import InfoTip from '../components/ui/InfoTip'
 import PlaceInput from '../components/rides/PlaceInput'
 import FreeNow from '../components/free/FreeNow'
 import TripOptions from '../components/free/TripOptions'
-import { googleMapsDirections, uberLink } from '../lib/directions'
+import { googleMapsStops, uberLink } from '../lib/directions'
 import {
   ago, identity, inMin, QUICK_DROPS, QUICK_PICKUPS, rides, saveName, subscribeRides,
-  type Match, type MyRide, type Place, type Quote, type RidesState,
+  type Match, type MyRide, type Place, type Quote, type RidesState, type Share,
 } from '../lib/rides'
 
 const usd = (n: number) => `$${n.toFixed(2)}`
 const PRICING_NOTE = 'Fares are UberX-style estimates for LA: $1.25 base + $3.10 booking fee + $1.15/mile + $0.30/min (min $8.50), with road distance ≈ 1.35× straight-line at ~18 mph. A shared car takes the best pickup/drop order; the single fare is split in proportion to each rider’s solo fare, so everyone saves. A match is shown only if everyone saves and nobody’s detour is more than ~6 min (or 40% of their trip).'
 
-function MatchCard({ m, now, onJoin, onHover }: { m: Match; now: number; onJoin: () => void; onHover: (on: boolean) => void }) {
+/** Alone vs shared, as two bars. */
+function SavingsBar({ solo, share }: { solo: number; share: number }) {
   return (
-    <div onMouseEnter={() => onHover(true)} onMouseLeave={() => onHover(false)} className={`rounded-xl bg-white p-3 ring-1 transition hover:ring-gold ${m.friend ? 'ring-2 ring-pink-300' : 'ring-stone-200'}`}>
+    <div className="space-y-1 text-[10px] font-semibold text-stone-500">
+      <div className="flex items-center gap-2"><span className="w-12">Alone</span><div className="h-1.5 flex-1 rounded-full bg-stone-300" /><span className="num w-12 text-right">{usd(solo)}</span></div>
+      <div className="flex items-center gap-2"><span className="w-12 text-emerald-700">Shared</span>
+        <div className="h-1.5 flex-1 rounded-full bg-stone-100"><motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" initial={{ width: '100%' }} animate={{ width: `${Math.max(8, (share / Math.max(solo, 0.01)) * 100)}%` }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} /></div>
+        <span className="num w-12 text-right text-emerald-700">{usd(share)}</span></div>
+    </div>
+  )
+}
+
+/** Overlapping avatar circles. */
+function Avatars({ names }: { names: { name: string; friend?: boolean }[] }) {
+  return (
+    <span className="flex -space-x-2">
+      {names.slice(0, 4).map((n, i) => (
+        <span key={i} className={`grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold ring-2 ring-white ${n.friend ? 'bg-pink-600 text-white' : 'bg-gradient-to-br from-cardinal to-cardinal-dark text-gold'}`}>{n.name[0]}</span>
+      ))}
+    </span>
+  )
+}
+
+function MatchCard({ m, now, onJoin }: { m: Match; now: number; onJoin: () => void }) {
+  return (
+    <motion.div layout initial={{ opacity: 0, x: -24, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 24 }} transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+      className={`rounded-2xl bg-white p-3.5 shadow-sm ring-1 transition hover:shadow-md ${m.friend ? 'ring-2 ring-pink-300' : 'ring-stone-200'}`}>
       <div className="flex items-start gap-3">
-        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-bold ${m.friend ? 'bg-pink-600 text-white' : 'bg-cardinal text-gold'}`}>{m.name[0]}</span>
+        <Avatars names={[{ name: m.name, friend: m.friend }, ...Array.from({ length: Math.max(0, m.groupSize - 1) }, () => ({ name: '+' }))]} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span className="font-semibold">{m.name}</span>
@@ -32,23 +58,21 @@ function MatchCard({ m, now, onJoin, onHover }: { m: Match; now: number; onJoin:
             {m.groupSize > 1 && <span className="rounded bg-gold-50 px-1 text-[10px] text-amber-800">+{m.groupSize - 1} already sharing</span>}
             <span className="ml-auto text-xs text-stone-500">leaves {inMin(m.departAt, now)}</span>
           </div>
-          <div className="truncate text-xs text-stone-500">{m.pickupArea} → {m.dropArea}</div>
-          <div className="mt-1.5 flex flex-wrap gap-1">
-            {m.tags.map((t) => <span key={t} className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-800 ring-1 ring-emerald-200">{t}</span>)}
-          </div>
+          <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800 ring-1 ring-emerald-200"><RouteIcon size={11} />Travelling on your route</div>
         </div>
       </div>
+      <div className="mt-3"><SavingsBar solo={m.you.solo.fare} share={m.you.share} /></div>
       <div className="mt-2 flex items-end justify-between gap-2">
         <div className="text-sm">
-          You pay <b className="text-cardinal">{usd(m.you.share)}</b> <span className="text-stone-400 line-through">{usd(m.you.solo.fare)}</span>
-          <div className="text-xs font-semibold text-emerald-700">save {usd(m.you.saves)} ({m.you.savesPct}%){m.you.detourMin > 0 ? ` · +${m.you.detourMin} min detour` : ' · no detour'}</div>
+          You pay <b className="num text-cardinal">{usd(m.you.share)}</b>
+          <div className="text-xs font-semibold text-emerald-700">save <span className="num">{usd(m.you.saves)}</span> ({m.you.savesPct}%){m.you.detourMin > 0 ? ` · +${m.you.detourMin} min detour` : ' · no detour'}</div>
         </div>
         <button onClick={onJoin} disabled={m.pendingJoin}
-          className="shrink-0 rounded-lg bg-cardinal px-3 py-1.5 text-xs font-semibold text-white hover:bg-cardinal-dark disabled:bg-stone-300 disabled:text-stone-600">
+          className="btn-glow shrink-0 rounded-xl bg-gradient-to-r from-cardinal to-cardinal-dark px-3 py-2 text-xs font-semibold text-white disabled:bg-none disabled:bg-stone-300 disabled:text-stone-600 disabled:shadow-none">
           {m.pendingJoin ? 'Request sent…' : 'Request to share'}
         </button>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -57,9 +81,13 @@ function GroupCard({ ride, now, onCancel }: { ride: MyRide; now: number; onCance
   const me = g.plan.riders.find((r) => r.requestId === ride.id)!
   const totalSaved = g.plan.riders.reduce((s, r) => s + r.saves, 0)
   const first = g.plan.stops[0], last = g.plan.stops[g.plan.stops.length - 1]
-  const mid = g.plan.stops.slice(1, -1).map((s) => [s.lat, s.lng] as [number, number])
+  // same place twice in a row (e.g. both riders get off at Union Station) is one stop
+  const stops = g.plan.stops.filter((s, i, a) => i === 0 || s.label !== a[i - 1].label)
+  const middle = stops.slice(1, -1)
+  const iBook = first.requestId === ride.id
+  const booker = iBook ? 'You' : first.name
   return (
-    <div className="space-y-3 rounded-2xl bg-white p-4 ring-2 ring-emerald-400">
+    <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="space-y-3 rounded-3xl bg-white p-4 shadow-[0_0_0_2px_#34d399,0_20px_50px_-20px_rgba(5,150,105,.45)]">
       <div>
         <div className="text-lg font-extrabold">🎉 You’re sharing a ride</div>
         <div className="text-sm text-stone-500">with {g.members.filter((m) => m.requestId !== ride.id).map((m) => m.name + (m.demo ? ' (demo)' : '')).join(', ')} · leaves {inMin(ride.departAt, now)}</div>
@@ -87,15 +115,19 @@ function GroupCard({ ride, now, onCancel }: { ride: MyRide; now: number; onCance
       <div className="rounded-xl bg-emerald-50 p-3 text-sm">
         One car, {g.plan.miles} mi, ~{g.plan.minutes} min, {usd(g.plan.totalFare)} total. You save <b>{usd(me.saves)}</b>; the group saves <b>{usd(totalSaved)}</b> vs everyone riding alone.
       </div>
+      <div className="rounded-xl bg-stone-50 p-3 text-xs text-stone-600">
+        <b className="text-ink">{booker} book{iBook ? '' : 's'} the car</b> (first pickup). Uber opens with <b>{first.label.split(',')[0]} → {last.label.split(',')[0]}</b>
+        {middle.length > 0 && <>; then tap <b>Add stop</b> for: {middle.map((s, i) => <span key={i}>{i ? ', ' : ''}{s.label.split(',')[0]}</span>)}</>}.
+      </div>
       <div className="grid grid-cols-2 gap-2">
-        <a href={uberLink(first, ...g.plan.stops.slice(1))} target="_blank" rel="noreferrer"
+        <a href={uberLink(first, last)} target="_blank" rel="noreferrer"
           className="rounded-lg bg-ink px-3 py-2 text-center text-sm font-semibold !text-white">Book in Uber ↗</a>
-        <a href={googleMapsDirections([first.lat, first.lng], [last.lat, last.lng], 'driving', mid)} target="_blank" rel="noreferrer"
+        <a href={googleMapsStops(stops)} target="_blank" rel="noreferrer"
           className="rounded-lg px-3 py-2 text-center text-sm font-semibold !text-stone-700 ring-1 ring-stone-300">🧭 Route in Maps ↗</a>
       </div>
-      <p className="text-[11px] text-stone-400">“Book in Uber” opens Uber with the first pickup, every stop in order, and the final drop already filled in. One rider books after logging in; split the fare as shown.</p>
+      <p className="text-[11px] text-stone-400">One rider books the whole car and the others pay them back their share as shown. Uber’s link can only fill in one destination, so add the middle stops in the Uber app.</p>
       <button onClick={onCancel} className="text-xs font-medium text-stone-500 hover:text-cardinal">Leave this ride</button>
-    </div>
+    </motion.div>
   )
 }
 
@@ -121,7 +153,6 @@ export default function RidesPage() {
   const account = useMe()
   const signedIn = !!token()
   const me = useMemo(identity, [])
-  const [friendsOnly, setFriendsOnly] = useState(false)
   const [name, setName] = useState(me.name)
   const [state, setState] = useState<RidesState | null>(null)
   const [live, setLive] = useState(false)
@@ -134,7 +165,7 @@ export default function RidesPage() {
   const [leaveIn, setLeaveIn] = useState(0)
   const [seats, setSeats] = useState(1)
   const [quote, setQuote] = useState<Quote | null>(null)
-  const [hover, setHover] = useState<Match | null>(null)
+  const [share, setShare] = useState<Share>({ mode: 'everyone', lists: [] })
   const [preview, setPreview] = useState<Place | null>(null)
   const [err, setErr] = useState('')
 
@@ -143,54 +174,46 @@ export default function RidesPage() {
   useEffect(() => { if (pickup && drop) rides.quote(pickup, drop).then(setQuote).catch(() => setQuote(null)); else setQuote(null) }, [pickup, drop])
 
   useEffect(() => { if (!pickup && account.data?.home) setPickup(account.data.home) }, [account.data?.home]) // eslint-disable-line react-hooks/exhaustive-deps
-  const friendRides = state?.board.filter((b) => b.friend && b.status === 'open') ?? []
+  // signed in with friends: default to sharing with friends only
+  useEffect(() => { if (account.data?.friends.length) setShare((s) => (s.mode === 'everyone' ? { mode: 'friends', lists: [] } : s)) }, [account.data?.friends.length])
   const ride = state?.mine.find((r) => r.status === 'open' || r.status === 'matched') ?? null
   const book = async () => {
     if (!pickup || !drop) return
     setErr(''); saveName(name)
-    try { await rides.book({ userId: me.id, name, pickup, drop, departAt: Date.now() + leaveIn * 60e3, seats }) } catch (e) { setErr((e as Error).message) }
+    try { await rides.book({ userId: me.id, name, pickup, drop, departAt: Date.now() + leaveIn * 60e3, seats, share }) } catch (e) { setErr((e as Error).message) }
   }
   const myPts: [number, number][] = ride ? [[ride.pickup.lat, ride.pickup.lng], [ride.drop.lat, ride.drop.lng]] : [pickup, drop].filter(Boolean).map((p) => [p!.lat, p!.lng])
-  const plan = ride?.group?.plan ?? hover?.plan
+  const plan = ride?.group?.plan  // other riders' stops appear only once you're both in the car
 
   return (
     <div className="flex h-full flex-col">
       {/* live strip */}
-      <div className="flex items-center gap-4 overflow-hidden border-b border-stone-200 bg-ink px-4 py-2 text-xs text-white">
-        <span className="flex shrink-0 items-center gap-1.5 font-semibold">
-          <span className={`h-2 w-2 rounded-full ${live ? 'animate-pulse bg-red-500' : 'bg-stone-500'}`} />{live ? 'LIVE' : 'connecting…'}
+      <div className="flex items-center gap-4 overflow-hidden border-b border-white/10 bg-gradient-to-r from-[#1a0a0a] via-ink to-[#1a0a0a] px-4 py-2 text-xs text-white">
+        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 font-bold tracking-wider">
+          <span className={`h-2 w-2 rounded-full ${live ? 'live-dot bg-red-500' : 'bg-stone-500'}`} />{live ? 'LIVE' : 'connecting…'}
         </span>
-        {state && <span className="shrink-0">{state.stats.live} students booking now · {state.stats.sharing} shared rides formed</span>}
+        {state && <span className="flex shrink-0 items-center gap-1.5"><Users size={13} /><b className="num">{state.stats.live}</b> booking now · <b className="num">{state.stats.sharing}</b> shared rides</span>}
         <div className="flex min-w-0 gap-6 truncate text-white/70">
-          {state?.activity.slice(0, 3).map((a) => <span key={a.at + a.text} className="truncate">{a.text} <span className="text-white/40">{ago(a.at, now)}</span></span>)}
+          <AnimatePresence initial={false}>
+            {state?.activity.slice(0, 3).map((a) => <motion.span key={a.at + a.text} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="truncate">{a.text} <span className="text-white/40">{ago(a.at, now)}</span></motion.span>)}
+          </AnimatePresence>
         </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <aside className="w-full space-y-4 overflow-y-auto border-r border-stone-200 bg-stone-50 p-4 md:w-[420px]">
+        <aside className="w-full space-y-4 overflow-y-auto border-r border-stone-200/70 bg-white/70 p-4 backdrop-blur-xl md:w-[440px]">
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight">Share a ride</h1>
-            <p className="text-sm text-stone-500">Book where you’re going. Students heading the same way, with a pickup near yours, on the way, or near your drop, show up here live. Split the fare and save. <InfoTip>{PRICING_NOTE}</InfoTip></p>
+            <p className="eyebrow">Real-time · private until you both accept</p>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Share a <span className="font-display font-normal italic text-cardinal">ride</span></h1>
+            <p className="text-sm text-stone-500">Book where you’re going. People you chose to share with who are heading the same way show up here live. Split the fare and save. Nobody sees your pickup or drop-off until you both accept. <InfoTip>{PRICING_NOTE}</InfoTip></p>
           </div>
 
-          {!ride && friendRides.length > 0 && (
-            <div className="space-y-2 rounded-2xl bg-pink-50 p-3 ring-1 ring-pink-200">
-              <div className="text-xs font-bold uppercase tracking-wide text-pink-700">👋 Friends riding soon</div>
-              {friendRides.slice(0, 4).map((b) => (
-                <div key={b.id} className="flex items-center gap-2 text-sm">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-pink-600 text-xs font-bold text-white">{b.name[0]}</span>
-                  <div className="min-w-0 flex-1"><b>{b.name}</b>{b.demo ? <span className="text-[10px] text-stone-400"> demo</span> : null}<div className="truncate text-xs text-stone-600">{b.pickup.label} → {b.drop.label} · leaves {inMin(b.departAt, now)}</div></div>
-                  <button onClick={() => { setDrop(b.drop); if (!pickup) setPickup(b.pickup) }} className="shrink-0 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-pink-700 ring-1 ring-pink-300">Go same way</button>
-                </div>
-              ))}
-            </div>
-          )}
           {signedIn && !ride && account.data && account.data.friends.length === 0 && (
-            <a href="/profile" className="block rounded-xl bg-white p-3 text-xs text-stone-600 ring-1 ring-stone-200">Add friends in your profile to see their rides here first →</a>
+            <a href="/profile" className="block rounded-xl bg-white p-3 text-xs text-stone-600 ring-1 ring-stone-200">Add friends and make lists in your profile to choose who sees you’re on their route →</a>
           )}
 
           {!ride && (
-            <div className="space-y-4 rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+            <div className="card space-y-4 p-4">
               {signedIn && account.data ? (
                 <div className="flex items-center gap-2 text-sm"><span className="grid h-7 w-7 place-items-center rounded-full bg-cardinal text-xs font-bold text-gold">{account.data.name[0]}</span>Riding as <b>{account.data.name}</b><span className="ml-auto text-xs text-stone-500">{account.data.friends.length} friends</span></div>
               ) : (
@@ -221,6 +244,30 @@ export default function RidesPage() {
               {drop && <RecentCheck at={[drop.lat, drop.lng]} label={drop.label.split(',')[0]} compact />}
               {pickup && drop && <TripOptions from={[pickup.lat, pickup.lng]} to={[drop.lat, drop.lng]} compact />}
               {pickup && !drop && <FreeNow at={[pickup.lat, pickup.lng]} title="Free rides from here" query="free ride home tonight" />}
+              <div>
+                <div className="mb-1 text-xs font-semibold text-stone-500">Who can see you’re on their route</div>
+                <div className="flex flex-wrap gap-1.5 text-xs font-semibold">
+                  {([['everyone', 'Everyone'], ['friends', 'All friends'], ['lists', 'Chosen lists']] as const).map(([k, l]) => (
+                    <button key={k} disabled={k !== 'everyone' && !signedIn} onClick={() => setShare({ mode: k, lists: k === 'lists' ? share.lists : [] })}
+                      className={`rounded-full px-3 py-1 ring-1 disabled:opacity-40 ${share.mode === k ? 'bg-ink text-white ring-ink' : 'bg-white ring-stone-300'}`}>{l}</button>
+                  ))}
+                </div>
+                {share.mode === 'lists' && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {account.data?.lists.map((l) => (
+                      <button key={l.id} onClick={() => setShare({ mode: 'lists', lists: share.lists.includes(l.id) ? share.lists.filter((x) => x !== l.id) : [...share.lists, l.id] })}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${share.lists.includes(l.id) ? 'bg-pink-600 text-white ring-pink-600' : 'bg-white ring-stone-300'}`}>
+                        {share.lists.includes(l.id) ? '✓ ' : ''}{l.name} ({l.members.length})
+                      </button>
+                    ))}
+                    {!account.data?.lists.length && <a href="/profile" className="text-xs font-semibold text-cardinal">Create a list in your profile →</a>}
+                  </div>
+                )}
+                <p className="mt-1 text-[11px] text-stone-500">
+                  {share.mode === 'everyone' ? 'Any student booking the same route sees your first name and that you’re on their route.' : share.mode === 'friends' ? 'Only your friends booking the same route will see you.' : 'Only people in the lists you pick will see you.'}
+                  {' '}They never see where you’re picked up or dropped off until you both accept.{!signedIn && ' Sign in to share with friends only.'}
+                </p>
+              </div>
               {err && <p className="text-xs text-red-600">{err}</p>}
               <button onClick={book} disabled={!pickup || !drop} className="w-full rounded-xl bg-cardinal py-2.5 font-semibold text-white hover:bg-cardinal-dark disabled:opacity-40">Find riders on my route</button>
             </div>
@@ -231,7 +278,7 @@ export default function RidesPage() {
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-700"><span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />Wants to share with you</div>
               {state.incoming.map((j) => (
                 <div key={j.joinId} className="rounded-xl bg-gold-50 p-3 text-sm ring-1 ring-gold">
-                  <b>{j.from.name}</b>{j.from.demo ? ' (demo)' : ''}: {j.from.pickup.label} → {j.from.drop.label} · leaves {inMin(j.from.departAt, now)}
+                  <b>{j.from.name}</b>{j.from.friend ? ' 👋' : ''}{j.from.demo ? ' (demo)' : ''} is travelling on your route · leaves {inMin(j.from.departAt, now)}
                   <div className="text-xs text-emerald-700">You’d pay {usd(j.you.share)} instead of {usd(j.you.solo.fare)} (save {usd(j.you.saves)}, {j.you.savesPct}%)</div>
                   <div className="mt-2 flex gap-2">
                     <button onClick={() => rides.respond(j.joinId, me.id, true)} className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">Accept</button>
@@ -253,24 +300,24 @@ export default function RidesPage() {
                 </div>
                 <div className="mt-1 truncate text-sm">{ride.pickup.label} → {ride.drop.label}</div>
                 <div className="text-xs text-stone-500">booked {ago(ride.createdAt, now)} · leaves {inMin(ride.departAt, now)} · alone ≈ {usd(ride.solo.fare)}</div>
+                <div className="mt-1 text-xs text-stone-500">Visible to: <b>{ride.share.mode === 'everyone' ? 'everyone on your route' : ride.share.mode === 'friends' ? 'friends on your route' : `lists: ${account.data?.lists.filter((l) => ride.share.lists.includes(l.id)).map((l) => l.name).join(', ') || '…'}`}</b></div>
                 <a href={uberLink(ride.pickup, ride.drop)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-stone-500 hover:text-ink">Or ride alone now in Uber (prefilled) ↗</a>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Riders on your route ({ride.matches.length}{ride.matches.some((m) => m.friend) ? `, ${ride.matches.filter((m) => m.friend).length} friends` : ''})</div>
-                {signedIn && <label className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-pink-700"><input type="checkbox" checked={friendsOnly} onChange={(e) => setFriendsOnly(e.target.checked)} className="accent-pink-600" />Friends only</label>}
               </div>
               {ride.matches.length === 0 && <p className="rounded-xl bg-white p-4 text-sm text-stone-500 ring-1 ring-stone-200">No one on your route yet. New bookings appear here live, usually within a few minutes.</p>}
               <div className="space-y-2">
-                {ride.matches.filter((m) => !friendsOnly || m.friend).map((m) => (
-                  <MatchCard key={m.requestId} m={m} now={now} onHover={(on) => setHover(on ? m : null)}
+                <AnimatePresence>{ride.matches.map((m) => (
+                  <MatchCard key={m.requestId} m={m} now={now}
                     onJoin={() => rides.join(m.requestId, me.id, ride.id).catch((e) => setErr((e as Error).message))} />
-                ))}
+                ))}</AnimatePresence>
               </div>
               {err && <p className="text-xs text-red-600">{err}</p>}
             </>
           )}
-          <p className="text-[11px] text-stone-400">Exact pickups are shared only after you match (others see ~100 m precision). “demo” riders are simulated so the demo has demand; real riders are other people using TrojanScout right now.</p>
+          <p className="text-[11px] text-stone-400">Pickups, drop-offs and the stop order are shared only after both riders accept. “demo” riders are simulated (they share with everyone) so the demo has demand.</p>
         </aside>
 
         <div className={`relative min-h-[320px] flex-1 ${picking ? 'cursor-crosshair' : ''}`}>
@@ -291,18 +338,6 @@ export default function RidesPage() {
               </CircleMarker>
             )}
             {preview && <PanTo p={[preview.lat, preview.lng]} />}
-            {state?.board.map((b) => (
-              <Polyline key={b.id} positions={[[b.pickup.lat, b.pickup.lng], [b.drop.lat, b.drop.lng]]}
-                pathOptions={{ color: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.friend ? '#db2777' : b.demo ? '#a78bfa' : '#2563eb', weight: ride?.matches.some((m) => m.requestId === b.id) ? 4 : 2, opacity: ride?.matches.some((m) => m.requestId === b.id) ? 0.9 : 0.45, dashArray: '6 6' }}>
-                <Tooltip sticky>{b.friend ? '👋 ' : ''}{b.name}{b.demo ? ' (demo)' : ''}: {b.pickup.label} → {b.drop.label} · leaves {inMin(b.departAt, now)}</Tooltip>
-              </Polyline>
-            ))}
-            {state?.board.map((b) => (
-              <CircleMarker key={b.id + 'p'} center={[b.pickup.lat, b.pickup.lng]} radius={ride?.matches.some((m) => m.requestId === b.id) ? 7 : 5}
-                pathOptions={{ color: '#fff', weight: 2, fillColor: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.friend ? '#db2777' : b.demo ? '#7c3aed' : '#2563eb', fillOpacity: 1 }}>
-                <Tooltip direction="top">{b.name}{b.demo ? ' (demo)' : ''} · pickup ~{b.pickup.label}</Tooltip>
-              </CircleMarker>
-            ))}
             {plan && <Polyline positions={plan.stops.map((s) => [s.lat, s.lng] as [number, number])} pathOptions={{ color: '#059669', weight: 5, opacity: 0.9 }} />}
             {plan?.stops.map((s, i) => (
               <CircleMarker key={`s${i}`} center={[s.lat, s.lng]} radius={8} pathOptions={{ color: '#fff', weight: 2, fillColor: s.kind === 'pickup' ? '#059669' : '#990000', fillOpacity: 1 }}>
@@ -316,8 +351,7 @@ export default function RidesPage() {
           {picking && <div className="absolute left-1/2 top-3 z-[500] -translate-x-1/2 rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-white">Click the map to set your {picking}</div>}
           <div className="pointer-events-none absolute bottom-6 right-3 z-[500] space-y-1 rounded-xl bg-white/95 px-3 py-2 text-[11px] shadow ring-1 ring-stone-200">
             <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-emerald-600 align-middle" />Your pickup <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-cardinal align-middle" />Your drop</div>
-            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-amber-600 align-middle" />Matches your route</div>
-            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-blue-600 align-middle" />Real rider <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-violet-600 align-middle" />Demo rider <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-pink-600 align-middle" />Friend</div>
+            <div className="text-stone-500">Other riders’ stops appear after you both accept</div>
           </div>
         </div>
       </div>

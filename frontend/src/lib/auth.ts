@@ -2,11 +2,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { API_URL } from '../api/client'
 import type { Place } from './rides'
 
-export interface PublicUser { id: string; name: string; email: string; demo: boolean; home: { label: string } | null }
+export interface PublicUser { id: string; name: string; email: string }
+export interface FriendList { id: string; name: string; members: string[] }
 export interface Contact { id: string; name: string; phone: string; email?: string; relation: string; emergency: boolean }
 export interface Me {
   id: string; email: string; name: string; issuer: string; home: Place | null; places: Place[]; contacts: Contact[]; onboarded: boolean
-  friends: PublicUser[]; incoming: PublicUser[]; outgoing: PublicUser[]; suggestions: (PublicUser & { viaContacts: boolean })[]
+  preferences: Record<string, unknown> | null; lists: FriendList[]
+  friends: PublicUser[]; incoming: PublicUser[]; outgoing: PublicUser[]; invited: string[]; suggestions: PublicUser[]
 }
 
 const KEY = 'ts-token'
@@ -36,10 +38,13 @@ async function call<T>(method: string, path: string, body?: unknown, t = token()
 }
 export const meApi = {
   get: (t?: string) => call<Me>('GET', '/me', undefined, t ?? token()),
-  patch: (b: Partial<Pick<Me, 'name' | 'home' | 'places' | 'onboarded'>>) => call<Me>('PATCH', '/me', b),
+  patch: (b: Partial<Pick<Me, 'name' | 'home' | 'places' | 'onboarded' | 'preferences'>>) => call<Me>('PATCH', '/me', b),
   addContact: (c: Omit<Contact, 'id'>) => call<Me>('POST', '/me/contacts', c),
   removeContact: (id: string) => call<Me>('DELETE', `/me/contacts/${id}`),
-  addFriend: (email: string) => call<{ status: 'sent' | 'friends' | 'not-found' | 'self'; profile: Me }>('POST', '/me/friends', { email }),
+  addFriend: (email: string) => call<{ status: 'sent' | 'invited' | 'friends' | 'accepted' | 'self'; profile: Me }>('POST', '/me/friends', { email }),
+  cancelRequest: (idOrEmail: string) => call<Me>('DELETE', `/me/requests/${encodeURIComponent(idOrEmail)}`),
+  saveList: (l: { id?: string; name: string; members: string[] }) => l.id ? call<Me>('PUT', `/me/lists/${l.id}`, l) : call<Me>('POST', '/me/lists', l),
+  deleteList: (id: string) => call<Me>('DELETE', `/me/lists/${id}`),
   respond: (id: string, accept: boolean) => call<Me>('POST', `/me/friends/${id}/${accept ? 'accept' : 'decline'}`),
   removeFriend: (id: string) => call<Me>('DELETE', `/me/friends/${id}`),
 }

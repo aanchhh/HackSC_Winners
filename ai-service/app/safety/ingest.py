@@ -4,7 +4,7 @@
                          Block-level (hundred-block) coordinates, as published by LAPD. Falls back to clearly
                          labelled synthetic data if the API is unreachable.
   streets.json           Walkable street network from OpenStreetMap (Overpass API), with `lit` tags.
-  safety_resources.json  DPS HQ + substation, emergency (blue-light) phones, Campus Cruiser — USC public info.
+  (safety_resources.json is not written here: see ingest_extra.py.)
 
 Run:  python -m app.safety.ingest
 """
@@ -118,24 +118,6 @@ out body; >; out skel qt;"""
             "nodes": nodes, "ways": ways}
 
 
-SAFETY_RESOURCES = {
-    "note": "From USC DPS public info (2026 Campus Safety Plan, dps.usc.edu). Emergency-phone positions are APPROXIMATE, for illustration — use the official DPS map for exact locations.",
-    "phones": {"dpsEmergency": "213-740-4321", "dpsNonEmergency": "213-740-6000", "campusCruiser": "213-740-4911", "lapd": "911"},
-    "resources": [
-        {"type": "dps_station", "name": "DPS Headquarters", "address": "3667 McClintock Ave", "lat": 34.02104, "lng": -118.29041, "hours": "24/7"},
-        {"type": "dps_station", "name": "DPS Substation – USC Village", "address": "USC Village", "lat": 34.02560, "lng": -118.28530, "hours": "24/7"},
-        *[{"type": "blue_phone", "name": f"Emergency phone ({n})", "lat": la, "lng": lo, "approximate": True} for n, la, lo in [
-            ("Jefferson & McClintock", 34.02540, -118.29060), ("Jefferson & Hoover", 34.02470, -118.28380), ("Jefferson & Figueroa", 34.02370, -118.27900),
-            ("Exposition & Vermont", 34.01850, -118.29150), ("Exposition & Trousdale", 34.01880, -118.28560), ("Exposition & Figueroa", 34.01930, -118.28100),
-            ("Vermont & 36th", 34.02200, -118.29150), ("Figueroa & 35th", 34.02150, -118.27980), ("McCarthy Quad", 34.02040, -118.28620),
-            ("Trousdale & Childs Way", 34.02110, -118.28500), ("Hoover & 28th", 34.02950, -118.28200), ("Ellendale & 30th", 34.02780, -118.28860),
-            ("Menlo & 28th", 34.03000, -118.29030), ("Adams & Figueroa", 34.03210, -118.27450)]],
-        {"type": "service", "name": "Campus Cruiser (free evening safe ride)", "lat": 34.02040, "lng": -118.28540, "phone": "213-740-4911",
-         "hours": "Evenings (check current hours with DPS)"},
-    ],
-}
-
-
 def main():
     DATA.mkdir(exist_ok=True)
     try:
@@ -153,8 +135,8 @@ def main():
         print(f"streets: {len(st['ways'])} ways, {len(st['nodes'])} nodes")
     except Exception as e:
         print("Overpass fetch failed (keeping previous streets.json if any):", e, file=sys.stderr)
-    (DATA / "safety_resources.json").write_text(json.dumps(SAFETY_RESOURCES, indent=1))
-    print("safety resources written")
+    # safety_resources.json (police, blue-light phones, clinics, DPS stations, vending) is maintained from OpenStreetMap
+    # and USC pages; refresh the HSC part with `python -m app.safety.ingest_extra hsc_resources`. Not overwritten here.
     try:
         campus_places_only()
     except Exception as e:

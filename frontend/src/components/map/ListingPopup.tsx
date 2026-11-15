@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../api/client'
 import type { ListingV2 } from '../../api/types'
@@ -31,7 +32,7 @@ export default function ListingPopup({ listing, onResize, onSafeRoute }: { listi
       )}
       <div className="max-h-[52vh] space-y-3 overflow-y-auto p-4">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-stone-400">{listing.source}</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-stone-400">{listing.sampleData ? '⭐ Featured' : listing.source}</div>
           <div className="text-base font-bold leading-tight">{listing.name}</div>
           <div className="text-xs text-stone-500">{listing.address}</div>
         </div>
@@ -59,12 +60,12 @@ export default function ListingPopup({ listing, onResize, onSafeRoute }: { listi
                 })}
               </ul>
             </div>
-            <div className="rounded-xl bg-stone-50 p-2.5">
-              <div className="flex justify-between text-xs"><span className="font-semibold text-stone-500">💸 True Trojan Cost</span><span className="font-bold">{r.cost.total == null ? 'Price not published' : `${money(r.cost.total)}/mo`}</span></div>
+            <Link to={`/search?cost=${encodeURIComponent(listing.id)}`} className="block w-full rounded-xl bg-stone-50 p-2.5 text-left !text-ink ring-1 ring-transparent hover:ring-cardinal" title="Check the full True Cost in Search">
+              <div className="flex justify-between text-xs"><span className="font-semibold text-stone-500">💸 True Trojan Cost →</span><span className="font-bold">{r.cost.total == null ? 'Price not published' : `${money(r.cost.total)}/mo`}</span></div>
               <div className="mt-1 text-[11px] text-stone-500">
                 {r.cost.total == null ? 'Call the landlord for rent; ' : `rent ${money(r.cost.rent)} + `}utilities {money(r.cost.utilities)} + rides {money(r.cost.rideshare)} (est.)
               </div>
-            </div>
+            </Link>
             <div className="text-xs text-stone-600">
               <span className="font-semibold text-stone-500">🏘 Block facts <InfoTip side="left">{EXPLAIN.incidents}</InfoTip></span>
               <p className="mt-0.5">{r.block.summary}</p>
