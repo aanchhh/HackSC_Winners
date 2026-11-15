@@ -32,8 +32,9 @@ export default function MapPage() {
   const [layers, setLayers] = useState({ zone: true, incidents: false, police: true, phones: true, medical: true, recent: true, units: true, lyft: true })
   const [maxRent, setMaxRent] = useState(4000)
   const [insideOnly, setInsideOnly] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768)
-  const [panelOpen, setPanelOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024)  // tablets: map first, compare on demand
+  // phones: start collapsed so the map is visible first (the panel would otherwise cover it)
+  const [panelOpen, setPanelOpen] = useState(() => window.innerWidth >= 640 || params.get('mode') === 'route')
   // night map after 7 PM (LA time) unless you switch it
   const [night, setNight] = useState(() => { const h = +new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', hourCycle: 'h23' }); return h >= 19 || h < 6 })
   const [zoneFocus, setZoneFocus] = useState<'hsc' | 'upc' | null>(null)
@@ -128,7 +129,7 @@ export default function MapPage() {
 
         {/* Floating control panel: Layers | Safe route */}
         <motion.div layout transition={{ type: 'spring', stiffness: 360, damping: 34 }}
-          className={`glass absolute left-3 top-3 z-[500] max-w-[calc(100%-1.5rem)] overflow-hidden rounded-3xl ${tab === 'route' && panelOpen ? 'w-[23rem]' : 'w-72'}`}>
+          className={`glass-solid absolute left-3 top-3 z-[500] max-w-[calc(100%-1.5rem)] overflow-hidden rounded-3xl ${tab === 'route' && panelOpen ? 'w-[23rem]' : 'w-72'}`}>
           <div className="flex items-center gap-1 border-b border-stone-900/10 p-1.5 text-sm font-semibold">
             {(['layers', 'route'] as const).map((t) => (
               <button key={t} onClick={() => { setTab(t); setPanelOpen(true) }} className={`relative flex flex-1 items-center justify-center gap-1.5 rounded-2xl py-2 transition ${tab === t && panelOpen ? 'text-white' : 'text-stone-600 hover:bg-white/60'}`}>
@@ -195,13 +196,14 @@ export default function MapPage() {
           )}
         </motion.div>
 
-        <div className="absolute right-3 top-3 z-[500] flex gap-2">
+        {/* below 1024px: bottom-left, so they never cover the Layers / Safe route panel */}
+        <div className="absolute bottom-8 left-3 z-[500] flex gap-2 lg:bottom-auto lg:left-auto lg:right-3 lg:top-3">
           <button onClick={() => setNight(!night)} title={night ? 'Switch to the day map' : 'Switch to the night map'}
-            className={`glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${night ? '!bg-[#1b1b2b]/80 text-gold' : 'text-stone-700'}`}>
+            className={`glass-solid flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${night ? '!bg-[#1b1b2b]/80 text-gold' : 'text-stone-700'}`}>
             {night ? <Moon size={15} /> : <Sun size={15} />}{night ? 'Night' : 'Day'}
           </button>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-stone-700">
-            <Scale size={15} />{sidebarOpen ? 'Hide compare' : `Compare (${compareIds.length})`}
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="glass-solid flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-stone-700">
+            <Scale size={15} /><span className="sm:hidden">{sidebarOpen ? 'Hide' : compareIds.length}</span><span className="hidden sm:inline">{sidebarOpen ? 'Hide compare' : `Compare (${compareIds.length})`}</span>
           </button>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { api } from '../api/client'
 import type { Priorities } from '../api/types'
 import { money } from '../lib/format'
 import { useAppStore } from '../store/useAppStore'
+import StickyBar from '../components/ui/StickyBar'
 
 const PRIORITY: Record<keyof Priorities, { label: string; how: string }> = {
   cost: { label: 'Low total cost', how: 'True Cost vs your budget: full points at half your budget or less, half at exactly budget, none at 1.5×.' },
@@ -58,7 +59,7 @@ export default function PreferencesPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
       {topListing && top && (
-        <div className="glass sticky top-3 z-[50] flex items-center gap-3 rounded-2xl px-4 py-3">
+        <StickyBar className="flex items-center gap-3 px-4 py-3">
           <Sparkles size={18} className="shrink-0 text-cardinal" />
           <div className="min-w-0 flex-1 text-sm">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-400">Your #1 match right now</div>
@@ -69,7 +70,7 @@ export default function PreferencesPage() {
           </div>
           <Ring value={top[1].match} size={44} label={<span className="text-[11px]">{top[1].match}<span className="text-[8px]">%</span></span>} />
           <Link to="/search" className="hidden rounded-xl bg-cardinal px-3 py-1.5 text-xs font-semibold !text-white sm:block">See top 6</Link>
-        </div>
+        </StickyBar>
       )}
       {onboarding && (
         <div className="rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-200">

@@ -1,5 +1,6 @@
 import { API_URL } from '../api/client'
 import { authHeaders } from './auth'
+import { liveStream } from './liveStream'
 
 // Anonymous rider identity for this browser (no accounts). Two browsers = two riders.
 export function identity() {
@@ -33,10 +34,8 @@ export interface RidesState {
 }
 
 export function subscribeRides(userId: string, onState: (s: RidesState) => void, onStatus: (live: boolean) => void) {
-  const es = new EventSource(`${API_URL}/api/rides/stream?userId=${encodeURIComponent(userId)}`)
-  es.addEventListener('state', (e) => { onStatus(true); onState(JSON.parse((e as MessageEvent).data)) })
-  es.onerror = () => onStatus(false)
-  return () => es.close()
+  return liveStream(`${API_URL}/api/rides/stream?userId=${encodeURIComponent(userId)}`,
+    { state: (d) => onState(d as RidesState) }, onStatus)
 }
 
 async function call<T>(method: string, path: string, body?: unknown): Promise<T> {

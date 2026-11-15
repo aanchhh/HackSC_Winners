@@ -62,7 +62,7 @@ export default function ReportPage() {
         {/* calm, high-contrast emergency band: no animation here */}
         <div className="flex flex-wrap items-center gap-3 rounded-3xl bg-red-700 p-4 text-white shadow-[0_16px_40px_-20px_rgba(185,28,28,.8)]">
           <ShieldAlert size={26} className="shrink-0" />
-          <div className="min-w-0 flex-1 text-sm"><b>In danger right now?</b> Don’t fill out a form. Call for help first.</div>
+          <div className="min-w-[14rem] flex-1 text-sm"><b>In danger right now?</b> Don’t fill out a form. Call for help first.</div>
           <a href="tel:911" className="rounded-xl bg-white px-3.5 py-1.5 text-sm font-bold !text-red-700">911</a>
           <a href="tel:2137404321" className="rounded-xl bg-white/15 px-3 py-1.5 text-sm font-bold !text-white ring-1 ring-white/40">DPS UPC 213-740-4321</a>
           <a href="tel:3234421000" className="rounded-xl bg-white/15 px-3 py-1.5 text-sm font-bold !text-white ring-1 ring-white/40">DPS HSC 323-442-1000</a>
@@ -96,7 +96,7 @@ export default function ReportPage() {
                   </div>
                   <label className="block">
                     <span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-stone-500"><MessageSquareText size={13} />What happened?</span>
-                    <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} maxLength={1000} autoFocus
+                    <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} maxLength={1000} autoFocus={window.innerWidth >= 768}
                       placeholder="Describe what the person did, e.g. “Someone was trying car door handles along the block and walked toward Hoover.”"
                       className="w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm outline-none focus:border-cardinal focus:ring-2 focus:ring-cardinal/15" />
                     <span className="text-[11px] text-stone-400">Describe behaviour, not race, appearance or who someone is. No names or phone numbers.</span>

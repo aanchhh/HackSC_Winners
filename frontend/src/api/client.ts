@@ -1,3 +1,4 @@
+import { liveStream } from '../lib/liveStream'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import type {
   Building, ChatEvent, CostBreakdown, IncidentsResponse, ListingV2, Meta, Profile, ReportV2, RouteResult,
@@ -47,9 +48,7 @@ export const api = {
 
 /** Live DPS unit positions (server-sent events, GET → native EventSource is fine). */
 export function subscribeDpsUnits(onUnits: (u: DpsUnit[]) => void) {
-  const es = new EventSource(`${API_URL}/api/dps-units/stream`)
-  es.addEventListener('units', (e) => onUnits(JSON.parse((e as MessageEvent).data).units))
-  return () => es.close()
+  return liveStream(`${API_URL}/api/dps-units/stream`, { units: (d) => onUnits((d as { units: DpsUnit[] }).units) })
 }
 
 // EventSource only supports GET, so POST via fetch-event-source.

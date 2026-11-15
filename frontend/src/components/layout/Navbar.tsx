@@ -27,9 +27,9 @@ export default function Navbar() {
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-cardinal to-cardinal-dark text-sm font-extrabold text-gold shadow-md shadow-cardinal/30 transition group-hover:rotate-[-6deg]">TS</span>
           <span className="text-[19px] font-extrabold tracking-tight">Trojan<span className="font-display text-[23px] font-normal italic text-cardinal">Scout</span></span>
         </Link>
-        <div className="ml-auto hidden items-center gap-1 rounded-full bg-stone-900/[0.04] p-1 md:flex">
+        <div className="ml-auto hidden items-center gap-1 rounded-full bg-stone-900/[0.04] p-1 lg:flex">
           {LINKS.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={`relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition ${active(to) ? 'text-white' : 'text-stone-600 hover:text-ink'}`}>
+            <NavLink key={to} to={to} className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-semibold transition ${active(to) ? 'text-white' : 'text-stone-600 hover:text-ink'}`}>
               {active(to) && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-full bg-cardinal shadow-md shadow-cardinal/30" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
               <Icon size={15} className="relative" />
               <span className="relative">{label}</span>
@@ -37,7 +37,7 @@ export default function Navbar() {
             </NavLink>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-2 md:ml-2">
+        <div className="ml-auto flex items-center gap-2 lg:ml-2">
           <NavLink to="/report" className={({ isActive }) => `hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold ring-1 transition sm:flex ${isActive ? 'bg-red-700 text-white ring-red-700' : 'text-red-700 ring-red-200 hover:bg-red-50'}`}>
             <TriangleAlert size={15} />Report
           </NavLink>
@@ -54,10 +54,10 @@ export default function Navbar() {
             <button onClick={() => signIn()} className="rounded-full bg-ink px-4 py-1.5 text-sm font-semibold text-white shadow-md transition hover:bg-stone-800">Sign in</button>
           )}
         </div>
-        <button className="rounded-xl p-2 md:hidden" aria-label="Menu" onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
+        <button className="rounded-xl p-2 lg:hidden" aria-label="Menu" onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
       </nav>
       {open && (
-        <div className="flex flex-col gap-1 border-t border-stone-200/70 px-4 py-3 md:hidden">
+        <div className="flex flex-col gap-1 border-t border-stone-200/70 px-4 py-3 lg:hidden">
           {[...LINKS, { to: '/report', label: 'Report suspicious activity', icon: TriangleAlert }, { to: '/emergency', label: 'Emergency contacts', icon: ShieldAlert }].map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} onClick={() => setOpen(false)} className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${active(to) ? 'bg-cardinal text-white' : 'text-stone-700 hover:bg-stone-100'}`}><Icon size={16} />{label}</NavLink>
           ))}

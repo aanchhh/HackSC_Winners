@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { Route as RouteIcon, Users } from 'lucide-react'
@@ -162,6 +162,9 @@ export default function RidesPage() {
   const [pickup, setPickup] = useState<Place | null>(() => fromParam('from', params.get('fromLabel') || 'Your start'))
   const [drop, setDrop] = useState<Place | null>(() => fromParam('to', params.get('toLabel') || 'Destination'))
   const [picking, setPicking] = useState<'pickup' | 'drop' | null>(null)
+  // phones: the map is below the form, so bring it into view when you choose "Pick on map"
+  const mapBox = useRef<HTMLDivElement>(null)
+  useEffect(() => { if (picking && window.innerWidth < 768) mapBox.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, [picking])
   const [leaveIn, setLeaveIn] = useState(0)
   const [seats, setSeats] = useState(1)
   const [quote, setQuote] = useState<Quote | null>(null)
@@ -200,8 +203,9 @@ export default function RidesPage() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <aside className="w-full space-y-4 overflow-y-auto border-r border-stone-200/70 bg-white/70 p-4 backdrop-blur-xl md:w-[440px]">
+      {/* phones: the whole page scrolls (full form, then the map below); md+: form and map side by side */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
+        <aside className="w-full shrink-0 space-y-4 border-r border-stone-200/70 bg-white/70 p-4 backdrop-blur-xl md:w-[440px] md:shrink md:overflow-y-auto">
           <div>
             <p className="eyebrow">Real-time · private until you both accept</p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Share a <span className="font-display font-normal italic text-cardinal">ride</span></h1>
@@ -320,7 +324,7 @@ export default function RidesPage() {
           <p className="text-[11px] text-stone-400">Pickups, drop-offs and the stop order are shared only after both riders accept. “demo” riders are simulated (they share with everyone) so the demo has demand.</p>
         </aside>
 
-        <div className={`relative min-h-[320px] flex-1 ${picking ? 'cursor-crosshair' : ''}`}>
+        <div ref={mapBox} className={`relative h-[65vh] min-h-[320px] shrink-0 md:h-auto md:flex-1 md:shrink ${picking ? 'cursor-crosshair' : ''}`}>
           <MapContainer center={[34.04, -118.29]} zoom={12} className="h-full w-full">
             <Basemap />
             <ClickPick onPick={picking ? async (p) => {
