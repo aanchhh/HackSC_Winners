@@ -20,7 +20,7 @@ export default function ScoutWidget() {
             <div className="relative flex items-center justify-between overflow-hidden bg-gradient-to-r from-cardinal to-cardinal-dark px-4 py-3 text-white">
               <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold/30 blur-2xl" />
               <div className="relative flex items-center gap-2.5 font-bold"><span className="grid h-8 w-8 place-items-center rounded-xl bg-white/15 ring-1 ring-white/20">🐴</span>
-                <span>Ask Scout<span className="block text-[11px] font-medium text-white/70">Local AI · shows its work</span></span></div>
+                <span>Ask Scout<span className="block text-[11px] font-medium text-white/70">AI assistant · shows its work</span></span></div>
               <div className="relative flex gap-1">
                 <button onClick={() => setOpen(false)} aria-label="Minimize" className="grid h-8 w-8 place-items-center rounded-full hover:bg-white/15"><Minus size={16} /></button>
                 <button onClick={() => { setOpen(false); setStarted(false) }} aria-label="Close and clear" className="grid h-8 w-8 place-items-center rounded-full hover:bg-white/15"><X size={16} /></button>

@@ -4,19 +4,42 @@ Pick the provider with LLM_PROVIDER in ai-service/.env:
   ollama     → local, free, private: runs on this Mac via Ollama (ollama.com). Default model qwen2.5:7b. No key needed.
   google     → free tier via Google AI Studio (aistudio.google.com/apikey). Default model gemini-2.5-flash.
   anthropic  → Claude (paid API, console.anthropic.com). Default model claude-opus-5-5.
-  groq       → free tier (console.groq.com). Set LLM_MODEL to a model from console.groq.com/docs/models.
+  groq       → free tier (console.groq.com). Picks an available model itself (see GROQ_PREFERRED), or set LLM_MODEL.
 All four support structured output (filter extraction) and streaming (the chat answer)."""
 from app.config import settings
 
-DEFAULT_MODELS = {"ollama": "qwen2.5:7b", "google": "gemini-2.5-flash", "anthropic": "claude-opus-5-5", "groq": "llama-3.3-70b-versatile"}
+DEFAULT_MODELS = {"ollama": "qwen2.5:7b", "google": "gemini-2.5-flash", "anthropic": "claude-opus-5-5", "groq": "openai/gpt-oss-120b"}
+
+# Groq retires models (llama-3.3-70b-versatile was shut down for free keys on 2026-08-16), so with no
+# LLM_MODEL set we ask Groq which models this key can use and take the first of these that is offered.
+GROQ_PREFERRED = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile"]
+_groq_pick: str | None = None
 
 
 def provider() -> str:
     return (settings.llm_provider or "google").lower()
 
 
+def _groq_model() -> str:
+    global _groq_pick
+    if _groq_pick:
+        return _groq_pick
+    import httpx
+    try:
+        r = httpx.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {settings.llm_api_key}"}, timeout=8)
+        ids = {m["id"] for m in r.json().get("data", []) if m.get("active", True)}
+        _groq_pick = next((m for m in GROQ_PREFERRED if m in ids), None) or DEFAULT_MODELS["groq"]
+    except (httpx.HTTPError, ValueError, KeyError, TypeError):  # offline or bad reply: default now, retry next time
+        return DEFAULT_MODELS["groq"]
+    return _groq_pick
+
+
 def model_name() -> str:
-    return settings.llm_model or DEFAULT_MODELS.get(provider(), "")
+    if settings.llm_model:
+        return settings.llm_model
+    if provider() == "groq" and settings.llm_api_key:
+        return _groq_model()
+    return DEFAULT_MODELS.get(provider(), "")
 
 
 _client = None
