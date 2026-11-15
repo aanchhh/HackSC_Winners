@@ -16,7 +16,8 @@ export interface Zones { inDps: boolean; inFryft: boolean; metersToFryftEdge: nu
 export interface Commute { building: string; walk: number; bike: number; tram: number | null }
 export interface Citation { n: number; source: string; date: string; url: string }
 export interface Block { summary: string; incidents6mo: Record<string, number>; citations: Citation[] }
-export interface Cost { rent: number; utilities: number; transit: number; rideshare: number; total: number; assumptions: string[] }
+// rent/total are null when the listing doesn't publish a price ("call for pricing")
+export interface Cost { rent: number | null; utilities: number; transit: number; rideshare: number; total: number | null; assumptions: string[] }
 export interface Report { listing: Listing; zones: Zones; commute: Commute[]; block: Block; cost: Cost; fitScore: number }
 
 export interface Priorities { cost: number; commute: number; zone: number; incidents: number }
@@ -24,7 +25,8 @@ export interface Profile { budget: number; buildingIds: number[]; lateNights: nu
 
 export type ChatEvent =
   | { event: 'step'; data: { label: string; status: 'running' | 'done' } }
-  | { event: 'listings'; data: { ids: string[] } }
+  | { event: 'listings'; data: { ids: string[]; reasons?: Record<string, string[]>; fit?: Record<string, number | null> } }
+  | { event: 'understood'; data: { chips: string[]; relaxed: string[]; rankedBy: string | null; parser: string | null; anchor: string | null } }
   | { event: 'token'; data: { text: string } }
   | { event: 'error'; data: { message: string } }
   | { event: 'done'; data: Record<string, never> }
@@ -41,7 +43,7 @@ export interface SmartSearchResponse {
 export interface FitPart { value: number; weight: number; explain: string }
 export interface ReportV2 extends Report {
   listing: ListingV2; longestWalkMin: number
-  perPerson: { people: number; total: number }
+  perPerson: { people: number; total: number | null }
   fit: { score: number; parts: Record<'cost' | 'commute' | 'zone' | 'incidents', FitPart> }
   incidentFacts: { total: number; againstPerson: number; byCategory: Record<string, number> }
 }

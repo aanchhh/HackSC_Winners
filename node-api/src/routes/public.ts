@@ -7,6 +7,7 @@ import { COST_DEFAULTS, costLines, trueCost } from '../services/cost.js'
 import { DEFAULT_WEIGHTS, fitBreakdown, type Weights } from '../services/score.js'
 import { blockPoints, incidentMeta, incidentsNear, recency, safetyResources, summarize } from '../services/safety.js'
 import { route, streetArt } from '../services/route.js'
+import { reversePlace, searchPlaces } from '../services/places.js'
 import { dpsPositions } from '../services/dpsUnits.js'
 import { config } from '../config.js'
 
@@ -73,22 +74,26 @@ publicRouter.post('/true-cost', (req, res) => {
   res.json({ ...c, inputs: { rent, utilities, inFryft, priceUnit, unit: unit ?? null }, defaults: COST_DEFAULTS, listing: l ?? null })
 })
 
-// Address → coordinates for the landing-page zone checker (Nominatim, cached, LA only)
-const geoCache = new Map<string, unknown>()
+// Places anywhere in LA County (Photon/OpenStreetMap): suggestions as you type, reverse lookup, and a one-shot geocode.
+publicRouter.get('/places', async (req, res) => {
+  const q = String(req.query.q ?? '').trim()
+  if (q.length < 2) return res.json([])
+  const near = String(req.query.near ?? '').split(',').map(Number)
+  res.json(await searchPlaces(q, near.length === 2 && near.every(Number.isFinite) ? (near as [number, number]) : undefined))
+})
+
+publicRouter.get('/places/reverse', async (req, res) => {
+  const lat = Number(req.query.lat), lng = Number(req.query.lng)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return res.status(400).json({ error: 'lat and lng required' })
+  res.json(await reversePlace(lat, lng))
+})
+
 publicRouter.get('/geocode', async (req, res) => {
   const q = String(req.query.q ?? '').trim()
-  if (q.length < 3) return res.status(400).json({ error: 'q required' })
-  if (geoCache.has(q)) return res.json(geoCache.get(q))
-  try {
-    const { data } = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: { q: /los angeles|, ca\b/i.test(q) ? q : `${q}, Los Angeles, CA`, format: 'json', limit: 1, viewbox: '-118.35,34.06,-118.24,33.99', bounded: 1 },
-      headers: { 'User-Agent': 'TrojanScout/0.1 (USC student hackathon project)' }, timeout: 8000,
-    })
-    const hit = data[0] ? { lat: Number(data[0].lat), lng: Number(data[0].lon), label: data[0].display_name } : null
-    const out = hit ? { ...hit, ...zoneCheck(hit.lat, hit.lng) } : { error: 'Address not found near USC' }
-    geoCache.set(q, out)
-    res.status(hit ? 200 : 404).json(out)
-  } catch { res.status(503).json({ error: 'Geocoder unavailable' }) }
+  if (q.length < 2) return res.status(400).json({ error: 'q required' })
+  const hit = (await searchPlaces(q))[0]
+  if (!hit) return res.status(404).json({ error: 'No place found in the LA area. Try a street address or landmark.' })
+  res.json({ lat: hit.lat, lng: hit.lng, label: [hit.label, hit.detail].filter(Boolean).join(', '), ...zoneCheck(hit.lat, hit.lng) })
 })
 
 // Weighted incidents within 150 m, normalized by the 90th percentile across listings (for the fit score)
@@ -136,7 +141,7 @@ publicRouter.get('/listings/:id/report', async (req, res) => {
   const longestWalkMin = Math.max(...commuteRes.map((c) => c.walk))
   // A whole multi-bedroom unit is shared: compare each person's share with the (per-person) budget.
   const people = listing.priceUnit === 'per unit' && (listing.beds ?? 0) >= 2 ? (listing.beds as number) : 1
-  const perPerson = { people, total: Math.round((cost.rent + cost.utilities) / people + cost.transit + cost.rideshare) }
+  const perPerson = { people, total: cost.rent == null ? null : Math.round((cost.rent + cost.utilities) / people + cost.transit + cost.rideshare) }
   const fit = fitBreakdown({ total: perPerson.total, budget, longestWalkMin, inFryft: zonesRes.inFryft, inDps: zonesRes.inDps, incidentsNorm: incidentsNorm(listing.lat, listing.lng) }, weightsFrom(req.query))
   res.json({ listing, zones: zonesRes, commute: commuteRes, longestWalkMin, block, cost, perPerson, fitScore: fit.score, fit, incidentFacts: facts })
 })

@@ -14,7 +14,7 @@ const ROWS: Record<CompareRow, Row> = {
   price: { label: 'Listed price', get: (r) => r.listing.rent, best: 'min', fmt: money },
   trueCost: { label: 'True Trojan Cost', tip: EXPLAIN.trueCost, get: (r) => r.cost.total, best: 'min', fmt: (v) => `${money(v)}/mo` },
   perPerson: { label: 'Your share / mo', tip: 'True Cost per person. A whole unit is assumed split evenly, one person per bedroom; rooms are already per person. This is the number the fit score compares with your budget.', get: (r) => r.perPerson.total, best: 'min', fmt: money },
-  rideshare: { label: 'Late-night rides', get: (r) => r.cost.rideshare, best: 'min', fmt: money },
+  rideshare: { label: 'Late-night rides', get: (r) => (r.cost.total == null ? null : r.cost.rideshare), best: 'min', fmt: money },
   longestWalk: { label: 'Longest walk', tip: EXPLAIN.longestWalk, get: (r) => r.longestWalkMin, best: 'min', fmt: (v) => `${v} min` },
   incidents: { label: 'Incidents ≤150 m', tip: EXPLAIN.incidents, get: (r) => r.incidentFacts.total, best: 'min', fmt: (v) => `${v} (6 mo)` },
   dps: { label: 'DPS zone', tip: EXPLAIN.dps, get: (r) => (r.zones.inDps ? 'Inside' : 'Outside') },

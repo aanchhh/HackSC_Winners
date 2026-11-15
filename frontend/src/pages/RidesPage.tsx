@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CircleMarker, MapContainer, Polyline, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet'
+import { CircleMarker, MapContainer, Polyline, Tooltip, useMap, useMapEvents } from 'react-leaflet'
+import Basemap from '../components/map/Basemap'
 import L from 'leaflet'
-import { api } from '../api/client'
+import { API_URL } from '../api/client'
 import InfoTip from '../components/ui/InfoTip'
+import PlaceInput from '../components/rides/PlaceInput'
 import { googleMapsDirections, uberLink } from '../lib/directions'
 import {
   ago, identity, inMin, QUICK_DROPS, QUICK_PICKUPS, rides, saveName, subscribeRides,
@@ -11,47 +13,6 @@ import {
 
 const usd = (n: number) => `$${n.toFixed(2)}`
 const PRICING_NOTE = 'Fares are UberX-style estimates for LA: $1.25 base + $3.10 booking fee + $1.15/mile + $0.30/min (min $8.50), with road distance ≈ 1.35× straight-line at ~18 mph. A shared car takes the best pickup/drop order; the single fare is split in proportion to each rider’s solo fare, so everyone saves. A match is shown only if everyone saves and nobody’s detour is more than ~6 min (or 40% of their trip).'
-
-function PlaceInput({ label, value, onChange, quick, onPickMap, picking }: {
-  label: string; value: Place | null; onChange: (p: Place | null) => void; quick: Place[]; onPickMap: () => void; picking: boolean
-}) {
-  const [text, setText] = useState('')
-  const [err, setErr] = useState('')
-  const [busy, setBusy] = useState(false)
-  const lookup = async () => {
-    if (!text.trim()) return
-    setBusy(true); setErr('')
-    try { const g = await api.geocode(text); onChange({ lat: g.lat, lng: g.lng, label: g.label.split(',').slice(0, 2).join(',') }); setText('') }
-    catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
-  }
-  const here = () => navigator.geolocation?.getCurrentPosition(
-    (p) => onChange({ lat: p.coords.latitude, lng: p.coords.longitude, label: 'My location' }), () => setErr('Location not available'))
-  return (
-    <div>
-      <div className="mb-1 text-xs font-semibold text-stone-500">{label}</div>
-      {value ? (
-        <div className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2 text-sm ring-1 ring-stone-200">
-          <span className="truncate font-medium">{value.label}</span>
-          <button onClick={() => onChange(null)} className="ml-2 text-xs text-stone-500 hover:text-cardinal">change</button>
-        </div>
-      ) : (
-        <>
-          <div className="flex gap-1.5">
-            <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), lookup())}
-              placeholder="Type an address or place…" className="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm" />
-            <button onClick={lookup} disabled={busy} className="rounded-lg bg-stone-800 px-3 text-xs font-semibold text-white">{busy ? '…' : 'Find'}</button>
-          </div>
-          <div className="mt-1.5 flex flex-wrap gap-1">
-            {label === 'Pickup' && <button onClick={here} className="rounded-full bg-white px-2 py-0.5 text-[11px] ring-1 ring-stone-300 hover:ring-cardinal">📍 My location</button>}
-            <button onClick={onPickMap} className={`rounded-full px-2 py-0.5 text-[11px] ring-1 ${picking ? 'bg-gold ring-gold' : 'bg-white ring-stone-300 hover:ring-cardinal'}`}>🗺 {picking ? 'Click the map…' : 'Pick on map'}</button>
-            {quick.map((q) => <button key={q.label} onClick={() => onChange(q)} className="rounded-full bg-white px-2 py-0.5 text-[11px] ring-1 ring-stone-300 hover:ring-cardinal">{q.label}</button>)}
-          </div>
-          {err && <p className="mt-1 text-xs text-red-600">{err}</p>}
-        </>
-      )}
-    </div>
-  )
-}
 
 function MatchCard({ m, now, onJoin, onHover }: { m: Match; now: number; onJoin: () => void; onHover: (on: boolean) => void }) {
   return (
@@ -121,15 +82,21 @@ function GroupCard({ ride, now, onCancel }: { ride: MyRide; now: number; onCance
         One car, {g.plan.miles} mi, ~{g.plan.minutes} min, {usd(g.plan.totalFare)} total. You save <b>{usd(me.saves)}</b>; the group saves <b>{usd(totalSaved)}</b> vs everyone riding alone.
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <a href={uberLink([first.lat, first.lng], [last.lat, last.lng], first.label, last.label)} target="_blank" rel="noreferrer"
+        <a href={uberLink(first, ...g.plan.stops.slice(1))} target="_blank" rel="noreferrer"
           className="rounded-lg bg-ink px-3 py-2 text-center text-sm font-semibold !text-white">Book in Uber ↗</a>
         <a href={googleMapsDirections([first.lat, first.lng], [last.lat, last.lng], 'driving', mid)} target="_blank" rel="noreferrer"
           className="rounded-lg px-3 py-2 text-center text-sm font-semibold !text-stone-700 ring-1 ring-stone-300">🧭 Route in Maps ↗</a>
       </div>
-      <p className="text-[11px] text-stone-400">One rider books with the first pickup and final drop, then adds the middle stops in the Uber app (up to 3 stops). Split the fare as shown.</p>
+      <p className="text-[11px] text-stone-400">“Book in Uber” opens Uber with the first pickup, every stop in order, and the final drop already filled in. One rider books after logging in; split the fare as shown.</p>
       <button onClick={onCancel} className="text-xs font-medium text-stone-500 hover:text-cardinal">Leave this ride</button>
     </div>
   )
+}
+
+function PanTo({ p }: { p: [number, number] }) {
+  const map = useMap()
+  useEffect(() => { if (!map.getBounds().pad(-0.1).contains(p)) map.panTo(p, { animate: true }) }, [p[0], p[1]]) // eslint-disable-line react-hooks/exhaustive-deps
+  return null
 }
 
 function ClickPick({ onPick }: { onPick: ((p: [number, number]) => void) | null }) {
@@ -156,6 +123,7 @@ export default function RidesPage() {
   const [seats, setSeats] = useState(1)
   const [quote, setQuote] = useState<Quote | null>(null)
   const [hover, setHover] = useState<Match | null>(null)
+  const [preview, setPreview] = useState<Place | null>(null)
   const [err, setErr] = useState('')
 
   useEffect(() => subscribeRides(me.id, setState, setLive), [me.id])
@@ -196,8 +164,8 @@ export default function RidesPage() {
               <label className="block text-xs font-semibold text-stone-500">Riding as
                 <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm font-normal text-ink" />
               </label>
-              <PlaceInput label="Pickup" value={pickup} onChange={setPickup} quick={QUICK_PICKUPS} picking={picking === 'pickup'} onPickMap={() => setPicking(picking === 'pickup' ? null : 'pickup')} />
-              <PlaceInput label="Drop-off" value={drop} onChange={setDrop} quick={QUICK_DROPS} picking={picking === 'drop'} onPickMap={() => setPicking(picking === 'drop' ? null : 'drop')} />
+              <PlaceInput label="Pickup" value={pickup} onChange={setPickup} quick={QUICK_PICKUPS} picking={picking === 'pickup'} onPickMap={() => setPicking(picking === 'pickup' ? null : 'pickup')} onPreview={setPreview} />
+              <PlaceInput label="Drop-off" value={drop} onChange={setDrop} quick={QUICK_DROPS} picking={picking === 'drop'} onPickMap={() => setPicking(picking === 'drop' ? null : 'drop')} onPreview={setPreview} />
               <div className="flex gap-4">
                 <div className="flex-1">
                   <div className="mb-1 text-xs font-semibold text-stone-500">Leaving</div>
@@ -245,6 +213,7 @@ export default function RidesPage() {
                 </div>
                 <div className="mt-1 truncate text-sm">{ride.pickup.label} → {ride.drop.label}</div>
                 <div className="text-xs text-stone-500">booked {ago(ride.createdAt, now)} · leaves {inMin(ride.departAt, now)} · alone ≈ {usd(ride.solo.fare)}</div>
+                <a href={uberLink(ride.pickup, ride.drop)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-stone-500 hover:text-ink">Or ride alone now in Uber (prefilled) ↗</a>
               </div>
 
               <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Riders on your route ({ride.matches.length})</div>
@@ -262,16 +231,35 @@ export default function RidesPage() {
         </aside>
 
         <div className={`relative min-h-[320px] flex-1 ${picking ? 'cursor-crosshair' : ''}`}>
-          <MapContainer center={[34.035, -118.28]} zoom={13} className="h-full w-full">
-            <TileLayer attribution='&copy; OpenStreetMap' url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <ClickPick onPick={picking ? (p) => { const place = { lat: p[0], lng: p[1], label: `Pin ${p[0].toFixed(4)}, ${p[1].toFixed(4)}` }; if (picking === 'pickup') { setPickup(place) } else { setDrop(place) } setPicking(null) } : null} />
+          <MapContainer center={[34.04, -118.29]} zoom={12} className="h-full w-full">
+            <Basemap />
+            <ClickPick onPick={picking ? async (p) => {
+              const which = picking; setPicking(null)
+              const set = which === 'pickup' ? setPickup : setDrop
+              set({ lat: p[0], lng: p[1], label: 'Dropped pin…' })
+              try {  // show the real address of the spot you clicked
+                const r = await (await fetch(`${API_URL}/api/places/reverse?lat=${p[0]}&lng=${p[1]}`)).json()
+                set({ lat: p[0], lng: p[1], label: [r.label, (r.detail || '').split(',')[0]].filter(Boolean).join(', ') })
+              } catch { set({ lat: p[0], lng: p[1], label: `Pin ${p[0].toFixed(4)}, ${p[1].toFixed(4)}` }) }
+            } : null} />
+            {preview && (
+              <CircleMarker center={[preview.lat, preview.lng]} radius={10} pathOptions={{ color: '#990000', weight: 3, fillColor: '#ffc72c', fillOpacity: 1 }}>
+                <Tooltip permanent direction="top" offset={[0, -8]}>{preview.label}</Tooltip>
+              </CircleMarker>
+            )}
+            {preview && <PanTo p={[preview.lat, preview.lng]} />}
             {state?.board.map((b) => (
               <Polyline key={b.id} positions={[[b.pickup.lat, b.pickup.lng], [b.drop.lat, b.drop.lng]]}
-                pathOptions={{ color: ride?.matches.some((m) => m.requestId === b.id) ? '#d4a106' : '#78716c', weight: ride?.matches.some((m) => m.requestId === b.id) ? 3 : 1.5, opacity: 0.55, dashArray: '4 6' }}>
+                pathOptions={{ color: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.demo ? '#a78bfa' : '#2563eb', weight: ride?.matches.some((m) => m.requestId === b.id) ? 4 : 2, opacity: ride?.matches.some((m) => m.requestId === b.id) ? 0.9 : 0.45, dashArray: '6 6' }}>
                 <Tooltip sticky>{b.name}{b.demo ? ' (demo)' : ''}: {b.pickup.label} → {b.drop.label} · leaves {inMin(b.departAt, now)}</Tooltip>
               </Polyline>
             ))}
-            {state?.board.map((b) => <CircleMarker key={b.id + 'p'} center={[b.pickup.lat, b.pickup.lng]} radius={4} pathOptions={{ color: '#fff', weight: 1, fillColor: '#57534e', fillOpacity: 0.8 }} />)}
+            {state?.board.map((b) => (
+              <CircleMarker key={b.id + 'p'} center={[b.pickup.lat, b.pickup.lng]} radius={ride?.matches.some((m) => m.requestId === b.id) ? 7 : 5}
+                pathOptions={{ color: '#fff', weight: 2, fillColor: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.demo ? '#7c3aed' : '#2563eb', fillOpacity: 1 }}>
+                <Tooltip direction="top">{b.name}{b.demo ? ' (demo)' : ''} · pickup ~{b.pickup.label}</Tooltip>
+              </CircleMarker>
+            ))}
             {plan && <Polyline positions={plan.stops.map((s) => [s.lat, s.lng] as [number, number])} pathOptions={{ color: '#059669', weight: 5, opacity: 0.9 }} />}
             {plan?.stops.map((s, i) => (
               <CircleMarker key={`s${i}`} center={[s.lat, s.lng]} radius={8} pathOptions={{ color: '#fff', weight: 2, fillColor: s.kind === 'pickup' ? '#059669' : '#990000', fillOpacity: 1 }}>
@@ -283,6 +271,11 @@ export default function RidesPage() {
             <Fit pts={plan ? plan.stops.map((s) => [s.lat, s.lng]) : myPts} />
           </MapContainer>
           {picking && <div className="absolute left-1/2 top-3 z-[500] -translate-x-1/2 rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-white">Click the map to set your {picking}</div>}
+          <div className="pointer-events-none absolute bottom-6 right-3 z-[500] space-y-1 rounded-xl bg-white/95 px-3 py-2 text-[11px] shadow ring-1 ring-stone-200">
+            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-emerald-600 align-middle" />Your pickup <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-cardinal align-middle" />Your drop</div>
+            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-amber-600 align-middle" />Matches your route</div>
+            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-blue-600 align-middle" />Real rider <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-violet-600 align-middle" />Demo rider</div>
+          </div>
         </div>
       </div>
     </div>

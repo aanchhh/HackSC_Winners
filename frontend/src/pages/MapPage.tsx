@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { MapContainer, TileLayer } from 'react-leaflet'
+import { MapContainer } from 'react-leaflet'
+import Basemap from '../components/map/Basemap'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { ListingV2 } from '../api/types'
@@ -76,7 +77,7 @@ export default function MapPage() {
     <div className="relative flex h-full">
       <div className={`relative min-w-0 flex-1 ${picking ? 'cursor-crosshair' : ''}`}>
         <MapContainer center={USC} zoom={15} className="h-full w-full" zoomControl={false}>
-          <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · incidents: LAPD' url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <Basemap extraAttribution=" · incidents: LAPD" />
           {zones.data && layers.zone && <ZoneLayer data={zones.data} visible={{ DPS: true, Fryft: false }} />}
           {layers.incidents && <IncidentLayer days={180} />}
           {layers.safety && <SafetyLayer />}

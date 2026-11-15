@@ -46,6 +46,21 @@ async def hybrid_search(query: str, maxRent: int | None = None, minBeds: int | N
 
 
 @tool
+async def listing_report(listingId: str, profile: dict) -> dict:
+    """Full report for one listing from node-api: zones, real-street walks, True Cost, per-person share,
+    LAPD incident facts and the Preference-weighted fit score breakdown."""
+    pr = profile.get("priorities") or {}
+    params = {"buildings": ",".join(str(b) for b in (profile.get("buildingIds") or [1])), "lateNights": profile.get("lateNights", 2),
+              "budget": profile.get("budget", 1500), **{f"w_{k}": v for k, v in pr.items()}}
+    try:
+        r = await _client.get(f"/api/listings/{listingId}/report", params=params)
+        r.raise_for_status()
+        return r.json()
+    except Exception as e:
+        return {"error": f"report {listingId}: {e}"}
+
+
+@tool
 async def zone_check(lat: float, lng: float) -> dict:
     """Inside/outside DPS and Fryft + meters to the Fryft edge."""
     return await _post("/internal/zone-check", {"lat": lat, "lng": lng})
@@ -78,4 +93,4 @@ async def neighborhood_rag(lat: float, lng: float, radius: int = 150) -> dict:
         return {"error": str(e)}
 
 
-ALL_TOOLS = [hybrid_search, search_listings, zone_check, commute, true_cost, score, neighborhood_rag]
+ALL_TOOLS = [listing_report, hybrid_search, search_listings, zone_check, commute, true_cost, score, neighborhood_rag]

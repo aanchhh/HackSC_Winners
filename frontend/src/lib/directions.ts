@@ -28,13 +28,15 @@ export function googleMapsForRoute(coords: P[], mode: Mode = 'walking') {
   return googleMapsDirections(coords[0], coords[coords.length - 1], mode, sampleWaypoints(coords))
 }
 
-/** Uber deep link with pickup + dropoff prefilled (universal link: app on phones, web otherwise). */
-export function uberLink(pickup: P, dropoff: P, pickupName = 'Pickup', dropoffName = 'Dropoff') {
-  const u = new URL('https://m.uber.com/ul/')
-  u.searchParams.set('action', 'setPickup')
-  u.searchParams.set('pickup[latitude]', String(pickup[0])); u.searchParams.set('pickup[longitude]', String(pickup[1]))
-  u.searchParams.set('pickup[nickname]', pickupName)
-  u.searchParams.set('dropoff[latitude]', String(dropoff[0])); u.searchParams.set('dropoff[longitude]', String(dropoff[1]))
-  u.searchParams.set('dropoff[nickname]', dropoffName)
+export interface UberStop { lat: number; lng: number; label: string }
+
+/** Uber web booking link with pickup, intermediate stops and the final drop-off already filled in.
+ *  (The older m.uber.com/ul link only prefills inside the phone app; this one also works on desktop.)
+ *  Verified: Uber shows "pickup → destination" with the stops; you log in to see prices and confirm. */
+export function uberLink(pickup: UberStop, ...stops: UberStop[]) {
+  const place = (p: UberStop) => JSON.stringify({ addressLine1: p.label.split(',')[0], addressLine2: p.label.split(',').slice(1).join(',').trim() || 'Los Angeles, CA', latitude: p.lat, longitude: p.lng })
+  const u = new URL('https://m.uber.com/go/product-selection')
+  u.searchParams.set('pickup', place(pickup))
+  stops.slice(0, 4).forEach((s, i) => u.searchParams.set(`drop[${i}]`, place(s)))
   return u.toString()
 }

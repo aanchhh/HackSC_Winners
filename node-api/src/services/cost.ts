@@ -62,8 +62,9 @@ export function trueCost(listing: Pick<Listing, 'rent' | 'utilitiesEst' | 'lat' 
   const inFryft = inFryftOverride ?? zoneCheck(listing.lat, listing.lng).inFryft
   const c = costLines({ rent: listing.rent ?? 0, utilities: listing.utilitiesEst, inFryft, lateNights: profile.lateNights, needsMetro, priceUnit: listing.priceUnit })
   const by = Object.fromEntries(c.lines.map((l) => [l.key, l.amount]))
+  const known = listing.rent != null  // "call for pricing": never pretend the cost is just utilities
   return {
-    rent: by.rent, utilities: by.utilities, transit: by.transit, rideshare: by.rideshare, total: c.total,
+    rent: known ? by.rent : null, utilities: by.utilities, transit: by.transit, rideshare: by.rideshare, total: known ? c.total : null,
     assumptions: [
       `${profile.lateNights} late nights/week`, `~$${c.farePerRide.toFixed(2)} per ride`,
       inFryft ? 'inside Fryft: late rides free' : 'outside Fryft: you pay for late rides',

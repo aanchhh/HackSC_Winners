@@ -14,4 +14,8 @@ class AgentState(TypedDict, total=False):
     enriched: list[dict[str, Any]]
     ranked: list[dict[str, Any]]
     citations: list[dict[str, Any]]
+    understood: list[str]              # constraints the smart parser read from the question
+    relaxed: list[str]                 # constraints dropped because nothing matched them all
+    query: Any                         # SmartQuery parsed from the question
+    parser: str
     answer: str

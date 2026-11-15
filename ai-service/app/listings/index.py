@@ -121,11 +121,11 @@ class HybridIndex:
             return min(rents) if rents else 10**9
 
         def walk(i):
-            return walk_minutes(listings[i], filters.nearBuildingId or 9)
+            return filters.walk_to(listings[i])
 
         def hit(i, score=None, d=None, b=None):
             return {"listing": listings[i], "matchedUnits": matched[i], "score": score, "denseRank": d, "bm25Rank": b,
-                    "walkMin": round(walk(i)) if filters.nearBuildingId is not None else None}
+                    "walkMin": round(walk(i)) if (filters.nearBuildingId is not None or filters.nearLat is not None) else None}
 
         query = query.strip()
         if not query or filters.sort:  # browse / explicit sort: filters decide membership, sort decides order

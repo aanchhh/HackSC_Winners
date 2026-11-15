@@ -2,12 +2,72 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { api, streamChat } from '../api/client'
+import type { ListingV2 } from '../api/types'
+import { priceLabel } from '../lib/format'
 import { useAppStore } from '../store/useAppStore'
-import ListingCard from '../components/listing/ListingCard'
 
 type Step = { label: string; status: 'running' | 'done' }
-type Msg = { role: 'user' | 'assistant'; content: string; steps?: Step[]; ids?: string[] }
-const SUGGESTIONS = ['Under $1,400, inside DPS, close to Viterbi', 'Furnished room with a private bathroom', 'Cheapest 2 bedroom near campus']
+type Understood = { chips: string[]; relaxed: string[]; rankedBy: string | null; parser: string | null }
+type Msg = {
+  role: 'user' | 'assistant'; content: string; steps?: Step[]
+  ids?: string[]; reasons?: Record<string, string[]>; fit?: Record<string, number | null>; understood?: Understood
+}
+const SUGGESTIONS = [
+  'Private room with my own bathroom under $1,200 inside DPS',
+  'Something cozy for me and a roommate, each with our own bathroom, near the business school, under 3 grand',
+  'Budget studio around $1.8k near the Village',
+  '3 bed 2 bath for friends with in-unit laundry',
+]
+
+function UnderstoodCard({ u }: { u: Understood }) {
+  return (
+    <div className="rounded-xl bg-white p-3 text-xs ring-1 ring-stone-200">
+      <div className="mb-1.5 font-semibold text-stone-500">What I understood</div>
+      <div className="flex flex-wrap gap-1.5">
+        {u.chips.length === 0 && <span className="text-stone-500">No hard requirements, so I ranked everything by how well it fits you.</span>}
+        {u.chips.map((c) => {
+          const dropped = u.relaxed.some((r) => r.includes(c))
+          return (
+            <span key={c} className={`rounded-full px-2.5 py-0.5 font-medium ring-1 ${dropped ? 'bg-amber-50 text-amber-800 line-through decoration-amber-500 ring-amber-200' : 'bg-cardinal-50 text-cardinal ring-red-200'}`}>{c}</span>
+          )
+        })}
+      </div>
+      {u.relaxed.length > 0 && <p className="mt-1.5 text-amber-800">Nothing matched all of that, so I relaxed: {u.relaxed.join(', ')}.</p>}
+      {u.rankedBy && <p className="mt-1 text-stone-500">Also ranked by meaning: “{u.rankedBy}”</p>}
+      <p className="mt-1 text-[10px] text-stone-400">Read by {u.parser === 'rules+llm' ? 'language rules + local LLM' : 'language rules'} · then ranked by your Preferences</p>
+    </div>
+  )
+}
+
+function WhyCard({ l, reasons, fit, rank }: { l: ListingV2; reasons: string[]; fit: number | null | undefined; rank: number }) {
+  const { compareIds, toggleCompare } = useAppStore()
+  const comparing = compareIds.includes(l.id)
+  return (
+    <article className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-stone-200">
+      <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-xl bg-stone-100">
+        {l.photos?.[0] ? <img src={l.photos[0]} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-2xl">🏢</div>}
+        <span className="absolute left-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-cardinal text-xs font-bold text-white">{rank}</span>
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h3 className="truncate font-semibold">{l.name}</h3>
+            <p className="truncate text-xs text-stone-500">{priceLabel(l)} · {l.source}</p>
+          </div>
+          {fit != null && <span className="shrink-0 rounded-full bg-gold-50 px-2 py-0.5 text-xs font-bold ring-1 ring-gold">Fit {Math.round(fit * 100)}</span>}
+        </div>
+        <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-400">Why this place</div>
+        <ul className="mt-0.5 space-y-0.5 text-xs text-stone-700">
+          {reasons.map((r) => <li key={r} className="flex gap-1.5"><span className="text-emerald-600">✓</span><span>{r}</span></li>)}
+        </ul>
+        <div className="mt-2 flex gap-2">
+          <Link to={`/map?focus=${encodeURIComponent(l.id)}`} className="rounded-lg bg-cardinal px-3 py-1 text-xs font-semibold !text-white">Show on map</Link>
+          <button onClick={() => toggleCompare(l.id)} className={`rounded-lg px-3 py-1 text-xs font-semibold ring-1 ${comparing ? 'bg-gold ring-gold' : 'ring-stone-300'}`}>{comparing ? '✓ Comparing' : '+ Compare'}</button>
+        </div>
+      </div>
+    </article>
+  )
+}
 
 export default function ChatPage() {
   const { profile, highlight } = useAppStore()
@@ -15,6 +75,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
+  const [showAll, setShowAll] = useState<Record<number, boolean>>({})
   const end = useRef<HTMLDivElement>(null)
   useEffect(() => { end.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
@@ -30,10 +91,12 @@ export default function ChatPage() {
       await streamChat({ message, profile, history }, (e) => {
         if (e.event === 'step') patchLast((m) => {
           const steps = m.steps ?? []
-          const i = steps.findIndex((s) => s.label === e.data.label)
+          const base = e.data.label.split(' · ')[0]
+          const i = steps.findIndex((s) => s.label.split(' · ')[0] === base)
           return { ...m, steps: i < 0 ? [...steps, e.data] : steps.map((s, j) => (j === i ? e.data : s)) }
         })
-        else if (e.event === 'listings') { highlight(e.data.ids); patchLast((m) => ({ ...m, ids: e.data.ids })) }
+        else if (e.event === 'understood') patchLast((m) => ({ ...m, understood: e.data }))
+        else if (e.event === 'listings') { highlight(e.data.ids); patchLast((m) => ({ ...m, ids: e.data.ids, reasons: e.data.reasons, fit: e.data.fit })) }
         else if (e.event === 'token') patchLast((m) => ({ ...m, content: m.content + e.data.text }))
         else if (e.event === 'error') patchLast((m) => ({ ...m, content: m.content + `\n⚠️ ${e.data.message}` }))
       })
@@ -48,7 +111,10 @@ export default function ChatPage() {
           <div className="pt-10 text-center">
             <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-cardinal text-3xl">🐴</div>
             <h1 className="text-3xl font-extrabold tracking-tight">Ask Scout</h1>
-            <p className="mx-auto mt-2 max-w-md text-stone-500">Ask with several constraints at once. Scout checks zones, commute and cost for each listing and shows each step.</p>
+            <p className="mx-auto mt-2 max-w-lg text-stone-500">
+              Describe what you want in your own words. Scout shows what it understood, searches live listings, checks zones, walks, cost and
+              LAPD data, and explains why each place made the list. It runs on a local model, so nothing leaves your machine.
+            </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               {SUGGESTIONS.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full bg-white px-4 py-2 text-sm ring-1 ring-stone-200 hover:ring-cardinal">{s}</button>)}
             </div>
@@ -63,21 +129,26 @@ export default function ChatPage() {
                 {m.steps.map((s) => <li key={s.label}>{s.status === 'done' ? '✅' : <span className="inline-block animate-spin">⏳</span>} {s.label}</li>)}
               </ul>
             )}
+            {m.understood && <UnderstoodCard u={m.understood} />}
             {m.content && <div className="max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-stone-200">{m.content}</div>}
             {!!m.ids?.length && (
-              <>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {m.ids.slice(0, 3).map((id) => { const l = listings.data?.find((x) => x.id === id); return l ? <ListingCard key={id} listing={l} /> : null })}
+              <div className="space-y-2">
+                {m.ids.slice(0, showAll[i] ? 8 : 3).map((id, k) => {
+                  const l = listings.data?.find((x) => x.id === id)
+                  return l ? <WhyCard key={id} l={l} rank={k + 1} reasons={m.reasons?.[id] ?? []} fit={m.fit?.[id]} /> : null
+                })}
+                <div className="flex gap-4 text-sm font-semibold">
+                  {m.ids.length > 3 && <button onClick={() => setShowAll({ ...showAll, [i]: !showAll[i] })} className="text-cardinal">{showAll[i] ? 'Show fewer' : `Show all ${m.ids.length}`}</button>}
+                  <Link to={`/map?ids=${m.ids.join(',')}`} className="text-cardinal">See them on the map →</Link>
                 </div>
-                <Link to={`/map?ids=${m.ids.join(',')}`} className="inline-block text-sm font-semibold text-cardinal">See all {m.ids.length} on the map →</Link>
-              </>
+              </div>
             )}
           </div>
         ))}
         <div ref={end} />
       </div>
       <form onSubmit={(e) => { e.preventDefault(); send() }} className="sticky bottom-0 flex gap-2 bg-stone-50 py-4">
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Under $1,400, inside DPS, 15 minutes to Viterbi…"
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. a quiet room near Leavey, own bathroom, under $1,300…"
           className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 outline-none focus:border-cardinal focus:ring-2 focus:ring-cardinal/20" />
         <button disabled={busy} className="rounded-xl bg-cardinal px-6 font-semibold text-white disabled:opacity-50">{busy ? '…' : 'Ask'}</button>
       </form>

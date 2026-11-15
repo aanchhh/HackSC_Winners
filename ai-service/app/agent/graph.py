@@ -1,10 +1,11 @@
-"""START → parse_intent ─┬ search            → extract_filters → search_listings → enrich → rank → explain → END
-                         ├ ask_about_listing → enrich → explain → END
-                         ├ need_info         → ask_clarifying → END
-                         └ general           → explain → END
-Every node emits an SSE `step` via the `emit` callable in config["configurable"]."""
+"""START → parse_intent ─┬ search  → understand → search_listings → enrich → rank → explain → END
+                         └ general → explain → END
+Every node emits SSE events through config["configurable"]["emit"]:
+  step (progress) · understood (what we read from the question) · listings (ids + per-listing reasons) · token (answer text).
+The answer text is a short summary; the reasons shown on each card are computed from data, never written by the model."""
 import asyncio
 import re
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
@@ -12,16 +13,29 @@ from langgraph.graph import END, START, StateGraph
 
 from app.agent import prompts
 from app.agent.state import AgentState
-from app.agent.tools import commute, hybrid_search, neighborhood_rag, score, search_listings, true_cost, zone_check
+from app.agent.tools import listing_report, search_listings
 from app.listings.index import INDEX
+from app.listings.query import SmartQuery, buildings, parse as query_parse, parse_rules
 from app.llm import get_llm
-from app.schemas import Filters
+
+# What to give up first when nothing matches (chip key, plain-English name)
+RELAX_ORDER = [("near", "walk time"), ("amenity", "amenities"), ("baths", "bathrooms"), ("beds", "bedrooms"),
+               ("privateBath", "private bathroom"), ("roomType", "room type"), ("maxRent", "price"), ("price", "price")]
+
+
+async def _emit(config: RunnableConfig, event: str, data: dict):
+    emit = config["configurable"].get("emit")
+    if emit:
+        await emit(event, data)
 
 
 async def _step(config: RunnableConfig, label: str, status: str):
-    emit = config["configurable"].get("emit")
-    if emit:
-        await emit("step", {"label": label, "status": status})
+    await _emit(config, "step", {"label": label, "status": status})
+
+
+async def _say(config: RunnableConfig, text: str):
+    for word in text.split(" "):
+        await _emit(config, "token", {"text": word + " "})
 
 
 def _last_user_text(state: AgentState) -> str:
@@ -31,124 +45,205 @@ def _last_user_text(state: AgentState) -> str:
 async def parse_intent(state: AgentState, config: RunnableConfig):
     await _step(config, "Understanding your question", "running")
     text = _last_user_text(state).lower()
-    # TODO(Yash): replace heuristic with LLM structured output
-    intent = "search" if re.search(r"\$|under|fryft|dps|min|bed|cheap|find|near", text) else "general"
+    housing = re.search(r"\$|\d|under|fryft|dps|bed|bath|room|studio|apartment|apt|place|house|home|unit|rent|lease|live|stay|"
+                        r"move|cheap|find|near|close to|walk|furnish|roommate|housing|listing", text)
+    intent = "search" if housing or parse_rules(text).chips() else "general"
     await _step(config, "Understanding your question", "done")
     return {"intent": intent}
 
 
-async def extract_filters(state: AgentState, config: RunnableConfig):
-    await _step(config, "Extracting filters", "running")
-    profile, text = state["profile"], _last_user_text(state)
-    llm = get_llm()
-    if llm:
-        f = await llm.with_structured_output(Filters).ainvoke(
-            [SystemMessage(prompts.EXTRACT_FILTERS), HumanMessage(f"Profile: {profile.model_dump_json()}\nMessage: {text}")])
-    else:  # mock mode
-        m = re.search(r"\$?\s?([\d,]{3,})", text)
-        f = Filters(maxRent=int(m.group(1).replace(",", "")) if m else profile.budget,
-                    inFryft=True if "fryft" in text.lower() else None, buildingIds=profile.buildingIds)
-    await _step(config, "Extracting filters", "done")
-    return {"filters": f}
+async def understand(state: AgentState, config: RunnableConfig):
+    """Same guarded smart parser as the Search page: rules first, the LLM only adds what the user actually mentioned."""
+    await _step(config, "Reading your requirements", "running")
+    sq, parser = await query_parse(_last_user_text(state))
+    await _step(config, "Reading your requirements", "done")
+    return {"query": sq, "parser": parser, "understood": [c["label"] for c in sq.chips()]}
+
+
+def _run_search(sq: SmartQuery) -> list[dict]:
+    out = []
+    for h in INDEX.search(sq.text, sq, 8):
+        d = h["listing"].model_dump()
+        d["matchedUnits"] = [u.model_dump() for u in h["matchedUnits"]]
+        d["walkToAnchor"] = h["walkMin"]
+        out.append(d)
+    return out
 
 
 async def search(state: AgentState, config: RunnableConfig):
-    await _step(config, "Searching listings", "running")
-    f = state["filters"]
-    if INDEX.listings:  # live scraped listings via hybrid retrieval
-        res = await hybrid_search.ainvoke({"query": _last_user_text(state), "maxRent": f.maxRent, "minBeds": f.beds,
-                                           "inDps": f.inDps, "inFryft": f.inFryft, "k": 8})
-    else:               # fallback: Node filter over seed data
-        res = await search_listings.ainvoke({"maxRent": f.maxRent, "beds": f.beds, "inFryft": f.inFryft, "inDps": f.inDps})
-    await _step(config, "Searching listings", "done")
-    return {"candidates": res if isinstance(res, list) else []}
+    await _step(config, "Searching live listings", "running")
+    sq: SmartQuery = state["query"]
+    relaxed: list[str] = []
+    if INDEX.listings:
+        res = await asyncio.to_thread(_run_search, sq)
+        for key, label in RELAX_ORDER:  # nothing matched everything → give up the least important constraint, and say so
+            if res:
+                break
+            chips = [c for c in sq.chips() if c["key"] == key or c["key"].startswith(key)]
+            if not chips:
+                continue
+            sq.drop([c["key"] for c in chips])
+            relaxed.append(f"{label} ({chips[0]['label']})")
+            res = await asyncio.to_thread(_run_search, sq)
+    else:
+        res = await search_listings.ainvoke({"maxRent": sq.maxRent, "inDps": sq.inDps})
+    await _emit(config, "understood", {
+        "chips": state.get("understood", []), "relaxed": relaxed, "rankedBy": sq.text or None,
+        "parser": state.get("parser"), "anchor": sq.nearLabel,
+    })
+    await _step(config, f"Searching live listings · {len(res)} found" + (f" after relaxing {len(relaxed)}" if relaxed else ""), "done")
+    return {"candidates": res if isinstance(res, list) else [], "relaxed": relaxed}
 
 
 async def enrich(state: AgentState, config: RunnableConfig):
-    await _step(config, "Checking zones, commute, cost & block data", "running")
+    await _step(config, "Checking zones, walks, cost & LAPD data", "running")
     profile = state["profile"].model_dump()
+    reports = await asyncio.gather(*(listing_report.ainvoke({"listingId": l["id"], "profile": profile}) for l in state.get("candidates", [])))
+    enriched = [{**l, "report": r if isinstance(r, dict) and "error" not in r else None} for l, r in zip(state.get("candidates", []), reports)]
+    await _step(config, "Checking zones, walks, cost & LAPD data", "done")
+    return {"enriched": enriched}
 
-    async def one(l: dict):
-        z, c, tc, nb = await asyncio.gather(
-            zone_check.ainvoke({"lat": l["lat"], "lng": l["lng"]}),
-            commute.ainvoke({"listingId": l["id"], "buildingIds": profile["buildingIds"] or [1]}),
-            true_cost.ainvoke({"listingId": l["id"], "profile": profile}),
-            neighborhood_rag.ainvoke({"lat": l["lat"], "lng": l["lng"]}),
-        )
-        return {**l, "zones": z, "commute": c, "cost": tc, "block": nb}
 
-    enriched = await asyncio.gather(*(one(l) for l in state.get("candidates", [])))
-    await _step(config, "Checking zones, commute, cost & block data", "done")
-    return {"enriched": list(enriched)}
+def _money(n: Any) -> str:
+    return "—" if n is None else f"${round(n):,}"
+
+
+def reasons_for(l: dict, sq: SmartQuery) -> list[str]:
+    """Plain-English, data-backed reasons for recommending one listing."""
+    r, out = l.get("report") or {}, []
+    units = l.get("matchedUnits") or []
+    priced = [u for u in units if u.get("rent")]
+    if priced:
+        u = min(priced, key=lambda x: x["rent"])
+        each = sq.perPerson and u["roomType"] == "entire" and (u.get("beds") or 0) >= 2
+        line = f"Has a {u['label']} for {_money(u['rent'])}" + (f" ({_money(u['rent'] / u['beds'])} each)" if each else "")
+        if sq.maxRent is not None:
+            line += f", under your {_money(sq.maxRent)}" + (" per person" if sq.perPerson else "") + " limit"
+        out.append(line)
+    elif units:
+        out.append(f"Has a {units[0]['label']} (price not published, call to confirm)")
+    elif l.get("rent") is not None:
+        out.append(f"From {_money(l['rent'])} {l.get('priceUnit', '')}")
+    if l.get("walkToAnchor") is not None and (sq.nearLabel or sq.nearBuildingId):
+        place = sq.nearLabel or next((b["name"] for b in buildings() if b["id"] == sq.nearBuildingId), "your building")
+        out.append(f"{l['walkToAnchor']} min walk to {place}")
+    elif r.get("longestWalkMin") is not None:
+        out.append(f"Longest walk to your class buildings: {r['longestWalkMin']} min (real streets)")
+    z = r.get("zones") or {}
+    if z:
+        out.append("Inside the DPS patrol zone, with free Fryft rides home" if z.get("inDps")
+                   else "Outside the DPS patrol zone: no DPS patrols or free Fryft rides")
+    facts = r.get("incidentFacts") or {}
+    if facts:
+        top = sorted((facts.get("byCategory") or {}).items(), key=lambda kv: -kv[1])[:2]
+        out.append(f"{facts.get('total', 0)} LAPD-reported incidents within 150 m in 6 months" + (f" (mostly {', '.join(k for k, _ in top)})" if top else ""))
+    if sq.amenities:
+        out.append("Has " + ", ".join(a if a != "ac" else "A/C" for a in sq.amenities))
+    # True Cost for the floorplan that actually matched (not the building's cheapest room)
+    rides = (r.get("cost") or {}).get("rideshare") or 0
+    if priced:
+        u = min(priced, key=lambda x: x["rent"])
+        people = (u.get("beds") or 1) if u["roomType"] == "entire" and (u.get("beds") or 0) >= 2 else 1
+        utilities = (60 + 30 * max(u.get("beds") or 1, 1)) if u["roomType"] == "entire" else 75
+        share = (u["rent"] + utilities) / people + rides
+        out.append(f"True Trojan Cost about {_money(share)}/mo" + (f" each, split {people} ways" if people > 1 else "")
+                   + f" (rent + ~{_money(utilities)} utilities" + (f" + {_money(rides)} late rides" if rides else "") + ")")
+    elif (r.get("perPerson") or {}).get("total") is not None:
+        out.append(f"True Trojan Cost about {_money(r['perPerson']['total'])}/mo for your share")
+    fit = r.get("fit") or {}
+    parts = fit.get("parts") or {}
+    if parts:
+        best = max(parts.items(), key=lambda kv: kv[1]["value"])
+        worst = min(parts.items(), key=lambda kv: kv[1]["value"])
+        out.append(f"Fit {round(fit.get('score', 0) * 100)}/100: strongest on {best[0]}, weakest on {worst[0]}")
+    if l.get("sampleData"):
+        out.append("Sample data: real building, illustrative prices")
+    return out
 
 
 async def rank(state: AgentState, config: RunnableConfig):
     await _step(config, "Ranking by your priorities", "running")
+    sq: SmartQuery = state["query"]
     enriched = state.get("enriched", [])
-    scores = await score.ainvoke({"listingIds": [l["id"] for l in enriched], "profile": state["profile"].model_dump()})
-    by_id = {s["listingId"]: s["fitScore"] for s in scores} if isinstance(scores, list) else {}
-    ranked = sorted(enriched, key=lambda l: by_id.get(l["id"], 0), reverse=True)
-    for l in ranked:
-        l["fitScore"] = by_id.get(l["id"])
-    emit = config["configurable"].get("emit")
-    if emit:
-        await emit("listings", {"ids": [l["id"] for l in ranked]})
+    for l in enriched:
+        l["fitScore"] = ((l.get("report") or {}).get("fit") or {}).get("score")
+        l["reasons"] = reasons_for(l, sq)
+    # The user's explicit sort wins; otherwise their Preference-weighted fit score.
+    if sq.sort == "price":
+        ranked = sorted(enriched, key=lambda l: (l.get("rent") is None, l.get("rent") or 0))
+    elif sq.sort == "walk":
+        ranked = sorted(enriched, key=lambda l: l.get("walkToAnchor") or 99)
+    else:
+        ranked = sorted(enriched, key=lambda l: l.get("fitScore") or 0, reverse=True)
+    await _emit(config, "listings", {
+        "ids": [l["id"] for l in ranked],
+        "reasons": {l["id"]: l["reasons"] for l in ranked},
+        "fit": {l["id"]: l["fitScore"] for l in ranked},
+    })
     await _step(config, "Ranking by your priorities", "done")
     return {"ranked": ranked}
 
 
 async def explain(state: AgentState, config: RunnableConfig):
     await _step(config, "Writing the answer", "running")
-    emit = config["configurable"].get("emit")
-    ranked = state.get("ranked", [])
+    ranked, relaxed, understood = state.get("ranked", []), state.get("relaxed") or [], state.get("understood") or []
     llm = get_llm()
+
+    if state.get("intent") == "search" and not ranked:  # never let the model improvise listings
+        await _say(config, "I couldn't find any live listings that match" + (f" ({', '.join(understood)})" if understood else "") +
+                   ", even after relaxing the walk time, amenities, layout and price. Try a higher budget, a room instead of a whole "
+                   "unit, or a different area. On the Search page you can remove filters one by one.")
+        await _step(config, "Writing the answer", "done")
+        return {}
+
+    if not ranked:  # general question
+        if llm:
+            msgs = [SystemMessage(prompts.EXPLAIN + " This is a general question, not a search. Answer briefly about USC off-campus "
+                                  "housing. Do NOT name, number or price any specific listing."), HumanMessage(_last_user_text(state))]
+            async for chunk in llm.astream(msgs):
+                if chunk.text:
+                    await _emit(config, "token", {"text": chunk.text})
+        else:
+            await _say(config, "Ask me about places to live near USC: a budget, a room type, a building you walk to, or “inside DPS”.")
+        await _step(config, "Writing the answer", "done")
+        return {}
+
+    top = ranked[:3]
+    if relaxed:  # stated by code, not left to the model
+        await _say(config, f"Nothing matched everything you asked for, so I relaxed {', '.join(relaxed)}.")
     if llm:
-        # Compact facts only (local models are much faster with a short context)
-        facts = []
-        for i, l in enumerate(ranked[:5], 1):
-            cost, zones = l.get("cost") or {}, l.get("zones") or {}
-            walk = ", ".join(f"{c['building']} {c['walk']} min" for c in (l.get("commute") or []) if isinstance(c, dict))
-            units = ", ".join(u["label"] for u in (l.get("units") or [])[:4])
-            facts.append(f"[{i}] {l.get('name')} | {l.get('rent')} {l.get('priceUnit')} | {units} | "
-                         f"{'inside' if zones.get('inDps') else 'outside'} DPS | walk: {walk} | True Cost ${cost.get('total', '?')}/mo | "
-                         f"fit {l.get('fitScore')} | {(l.get('block') or {}).get('summary', '')[:160]}")
-        msgs = [SystemMessage(prompts.EXPLAIN + " Keep it under 150 words: a one-line recommendation, then the top 3 as short bullets."),
-                HumanMessage(f"Question: {_last_user_text(state)}\nRanked listings (best first):\n" + "\n".join(facts))]
+        facts = "\n".join(f"- {l['name']}: " + "; ".join(l["reasons"]) for l in top)
+        msgs = [SystemMessage(
+                    "You are TrojanScout, a USC off-campus housing assistant, talking directly to the student (use 'you'). "
+                    "Write 2-3 short sentences: recommend the FIRST listing by name and say why using its reasons, then mention one "
+                    "trade-off or an alternative from the others. Use only the facts given; never invent numbers or listings; never "
+                    "claim a relaxed requirement is met; never call an area safe or unsafe. No lists, no headings."),
+                HumanMessage(f"Student asked: {_last_user_text(state)}\nStill required: {', '.join(c for c in understood if not any(c in x for x in relaxed)) or 'nothing specific'}\n"
+                             + (f"NOT met (relaxed): {', '.join(relaxed)}\n" if relaxed else "")
+                             + f"Ranked listings (best first) with reasons:\n{facts}")]
         async for chunk in llm.astream(msgs):
-            if chunk.text and emit:
-                await emit("token", {"text": chunk.text})
-    elif emit:
-        text = (f"[mock] Found {len(ranked)} listing(s). Top: "
-                + ", ".join(f"{l.get('name', l['id'])} ${l.get('rent')} (fit {l.get('fitScore')})" for l in ranked[:3])
-                if ranked else "[mock] Set LLM_API_KEY in ai-service/.env to enable real answers.")
-        for word in text.split(" "):
-            await emit("token", {"text": word + " "})
-            await asyncio.sleep(0.02)
+            if chunk.text:
+                await _emit(config, "token", {"text": chunk.text})
+    else:  # deterministic summary when no model is available
+        lead = top[0]
+        await _say(config, (f"Nothing matched everything, so I relaxed {', '.join(relaxed)}. " if relaxed else "") +
+                   f"Top pick: {lead['name']}, because " + "; ".join(lead["reasons"][:3]).lower() + ". See the cards for the rest.")
     await _step(config, "Writing the answer", "done")
-    return {}
-
-
-async def ask_clarifying(state: AgentState, config: RunnableConfig):
-    emit = config["configurable"].get("emit")
-    if emit:
-        await emit("token", {"text": "Which buildings do you have class in, and what's your monthly budget?"})
     return {}
 
 
 def build_graph():
     g = StateGraph(AgentState)
-    for name, fn in [("parse_intent", parse_intent), ("extract_filters", extract_filters), ("search_listings", search),
-                     ("enrich", enrich), ("rank", rank), ("explain", explain), ("ask_clarifying", ask_clarifying)]:
+    for name, fn in [("parse_intent", parse_intent), ("understand", understand), ("search_listings", search),
+                     ("enrich", enrich), ("rank", rank), ("explain", explain)]:
         g.add_node(name, fn)
     g.add_edge(START, "parse_intent")
-    g.add_conditional_edges("parse_intent", lambda s: s["intent"], {
-        "search": "extract_filters", "ask_about_listing": "enrich", "need_info": "ask_clarifying", "general": "explain"})
-    g.add_edge("extract_filters", "search_listings")
+    g.add_conditional_edges("parse_intent", lambda s: s["intent"], {"search": "understand", "general": "explain"})
+    g.add_edge("understand", "search_listings")
     g.add_edge("search_listings", "enrich")
     g.add_edge("enrich", "rank")
     g.add_edge("rank", "explain")
     g.add_edge("explain", END)
-    g.add_edge("ask_clarifying", END)
     return g.compile()
 
 
