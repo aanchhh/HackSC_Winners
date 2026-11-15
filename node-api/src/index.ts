@@ -7,6 +7,9 @@ import { internalRouter } from './routes/internal.js'
 import { startDpsSimulation } from './services/dpsUnits.js'
 import { ridesRouter } from './routes/rides.js'
 import { startRides } from './services/rides.js'
+import { startRecent } from './services/recent.js'
+import { authRouter, demoIdpRouter } from './routes/auth.js'
+import { meRouter } from './routes/me.js'
 
 const app = express()
 app.use(cors({ origin: config.corsOrigin }))
@@ -25,7 +28,10 @@ app.use('/api/chat', createProxyMiddleware({
 }))
 
 app.use(express.json())
+app.use('/auth', authRouter)
+app.use('/demo-idp', demoIdpRouter)
 app.use('/api/rides', ridesRouter)
+app.use('/api', meRouter)
 app.use('/api', publicRouter)
 app.use('/internal', internalRouter)
 
@@ -37,4 +43,5 @@ app.use(onError)
 
 startDpsSimulation()
 startRides()
+startRecent()
 app.listen(config.port, () => console.log(`node-api listening on :${config.port}`))

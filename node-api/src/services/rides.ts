@@ -1,5 +1,6 @@
 // Shared rides: real-time ride requests, route matching, fare splitting, and a demo-demand simulator.
 // State is in memory (fine for a demo; move to Supabase for production). Every browser subscribes over SSE.
+import { friendIds, PERSONAS } from './users.js'
 import { EventEmitter } from 'node:events'
 import { randomUUID } from 'node:crypto'
 import { meters, type LatLng } from './geo.js'
@@ -112,6 +113,7 @@ const ridersOf = (r: RideRequest) => (r.groupId ? groups.get(r.groupId)!.request
 /** Compatible riders for one of my open requests: everyone saves money and nobody's detour is too long. */
 export function matchesFor(me: RideRequest) {
   if (me.status !== 'open') return []
+  const friends = friendIds(me.userId)
   const out = []
   for (const other of requests.values()) {
     if (other.userId === me.userId || !['open', 'matched'].includes(other.status)) continue
@@ -123,13 +125,13 @@ export function matchesFor(me: RideRequest) {
     if (!ok) continue
     const mine = plan.riders.find((x) => x.requestId === me.id)!
     out.push({
-      requestId: other.id, name: other.name, demo: other.demo, groupSize: riders.length - 1,
+      requestId: other.id, name: other.name, demo: other.demo, friend: friends.has(other.userId), groupSize: riders.length - 1,
       departAt: other.departAt, pickupArea: short(other.pickup.label), dropArea: short(other.drop.label),
       ...relation(me, other), you: mine, plan,
       pendingJoin: [...joins.values()].some((j) => j.fromRequestId === me.id && j.toRequestId === other.id && j.status === 'pending'),
     })
   }
-  return out.sort((a, b) => b.you.saves - a.you.saves).slice(0, 12)
+  return out.sort((a, b) => Number(b.friend) - Number(a.friend) || b.you.saves - a.you.saves).slice(0, 12)
 }
 
 // ---------- mutations ----------
@@ -196,14 +198,17 @@ export function respondJoin(joinId: string, accept: boolean, userId: string) {
 // ---------- views ----------
 const approx = (p: Place) => ({ lat: +p.lat.toFixed(3), lng: +p.lng.toFixed(3), label: short(p.label) })  // ~100 m: don't expose exact pickups
 
+export const liveRides = () => [...requests.values()].filter((r) => r.status === 'open' || r.status === 'matched')
+
 export function stateFor(userId: string) {
+  const friends = friendIds(userId)
   const mine = [...requests.values()].filter((r) => r.userId === userId && r.status !== 'cancelled' && r.status !== 'expired')
   const myIds = new Set(mine.map((r) => r.id))
   const live = [...requests.values()].filter((r) => r.status === 'open' || r.status === 'matched')
   return {
     now: Date.now(),
     stats: { live: live.length, real: live.filter((r) => !r.demo).length, sharing: groups.size },
-    board: live.filter((r) => r.userId !== userId).map((r) => ({ id: r.id, name: r.name, demo: r.demo, status: r.status, departAt: r.departAt, pickup: approx(r.pickup), drop: approx(r.drop), seats: r.seats })),
+    board: live.filter((r) => r.userId !== userId).map((r) => ({ id: r.id, name: r.name, demo: r.demo, friend: friends.has(r.userId), status: r.status, departAt: r.departAt, pickup: approx(r.pickup), drop: approx(r.drop), seats: r.seats })),
     activity: activity.slice(0, 12),
     mine: mine.map((r) => ({
       ...r, solo: soloQuote([r.pickup.lat, r.pickup.lng], [r.drop.lat, r.drop.lng]),
@@ -237,8 +242,15 @@ const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
 const jitter = (p: Place, m: number): Place => ({ ...p, lat: p.lat + ((Math.random() - 0.5) * 2 * m) / 111000, lng: p.lng + ((Math.random() - 0.5) * 2 * m) / 92000 })
 let demoN = 0
 
-function demoRide(pickup: Place, drop: Place, departAt: number) {
-  return createRequest({ userId: `demo-${++demoN}`, name: pick(NAMES), pickup, drop, departAt, seats: Math.random() < 0.8 ? 1 : 2 }, true)
+function demoRide(pickup: Place, drop: Place, departAt: number, persona?: { id: string; name: string }) {
+  return createRequest({ userId: persona?.id ?? `demo-${++demoN}`, name: persona?.name ?? pick(NAMES), pickup, drop, departAt, seats: Math.random() < 0.8 ? 1 : 2 }, true)
+}
+/** A demo persona (befriendable in the demo) who isn't already riding. */
+function freePersona(prefer?: Set<string>) {
+  const busy = new Set(liveRides().map((r) => r.userId))
+  const pool = PERSONAS.filter((p) => !busy.has(p.id))
+  const pref = pool.filter((p) => prefer?.has(p.id))
+  return pref.length ? pick(pref) : pool.length ? pick(pool) : undefined
 }
 
 /** Someone just booked: within ~1–3 min, 1–2 demo riders book similar trips (near the pickup / on the way / near the drop). */
@@ -252,7 +264,10 @@ function scheduleDemoNear(r: RideRequest) {
       const mid: Place = { lat: r.pickup.lat + (r.drop.lat - r.pickup.lat) * t * 0.5, lng: r.pickup.lng + (r.drop.lng - r.pickup.lng) * t * 0.5, label: 'on the way' }
       const pickup = Math.random() < 0.6 ? jitter({ ...r.pickup, label: short(r.pickup.label) }, 350) : jitter({ ...mid, label: `${short(r.pickup.label)} area` }, 250)
       const drop = Math.random() < 0.7 ? jitter({ ...r.drop, label: short(r.drop.label) }, 450) : jitter({ lat: r.pickup.lat + (r.drop.lat - r.pickup.lat) * 0.8, lng: r.pickup.lng + (r.drop.lng - r.pickup.lng) * 0.8, label: `near ${short(r.drop.label)}` }, 300)
-      demoRide(pickup, drop, r.departAt + (Math.random() - 0.5) * 10 * 60e3)
+      // first rider on your route is often one of your friends (if you have demo friends), so the friends view has something to show
+      const friends = friendIds(r.userId)
+      const persona = k === 0 && friends.size && Math.random() < 0.7 ? freePersona(friends) : undefined
+      demoRide(pickup, drop, r.departAt + (Math.random() - 0.5) * 10 * 60e3, persona)
     }, (40 + Math.random() * 130) * 1000 * (k + 1) * 0.8)
   }
 }
@@ -268,7 +283,7 @@ export function startRides() {
     if (dirty) changed()
   }, 15_000)
   if (!SIM) return
-  const spawn = () => demoRide(jitter(pick(HOTSPOTS), 250), jitter(pick(DESTINATIONS), 400), Date.now() + (3 + Math.random() * 25) * 60e3)
+  const spawn = () => demoRide(jitter(pick(HOTSPOTS), 250), jitter(pick(DESTINATIONS), 400), Date.now() + (3 + Math.random() * 25) * 60e3, Math.random() < 0.3 ? freePersona() : undefined)
   for (let i = 0; i < 7; i++) spawn()
   const loop = () => { if ([...requests.values()].filter((r) => r.demo && r.status === 'open').length < 14) spawn(); setTimeout(loop, (20 + Math.random() * 20) * 1000) }
   setTimeout(loop, 15_000)

@@ -1,0 +1,157 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "usc_lyft_upc",
+    "label": "USC Lyft Rides boundary (UPC)",
+    "source": "transnet.usc.edu/how-to-use-lyft: east of Normandie Ave, south of Washington Blvd, west of Main St, north of MLK Jr Blvd. Corners from OSM street intersections.",
+    "last_verified": "2026-11-14"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -118.3006,
+       34.03997
+      ],
+      [
+       -118.26465,
+       34.03106
+      ],
+      [
+       -118.27403,
+       34.01113
+      ],
+      [
+       -118.30019,
+       34.01086
+      ],
+      [
+       -118.3006,
+       34.03997
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "usc_lyft_hsc",
+    "label": "USC Lyft Rides boundary (HSC, approximate)",
+    "source": "APPROXIMATE 1.2 km around HSC; official map not machine-readable. Union Station is covered separately.",
+    "last_verified": "2026-11-14"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -118.195957,
+       34.0607
+      ],
+      [
+       -118.196401,
+       34.063498
+      ],
+      [
+       -118.197704,
+       34.066105
+      ],
+      [
+       -118.199777,
+       34.068344
+      ],
+      [
+       -118.202478,
+       34.070062
+      ],
+      [
+       -118.205624,
+       34.071142
+      ],
+      [
+       -118.209,
+       34.071511
+      ],
+      [
+       -118.212376,
+       34.071142
+      ],
+      [
+       -118.215522,
+       34.070062
+      ],
+      [
+       -118.218223,
+       34.068344
+      ],
+      [
+       -118.220296,
+       34.066105
+      ],
+      [
+       -118.221599,
+       34.063498
+      ],
+      [
+       -118.222043,
+       34.0607
+      ],
+      [
+       -118.221599,
+       34.057902
+      ],
+      [
+       -118.220296,
+       34.055295
+      ],
+      [
+       -118.218223,
+       34.053056
+      ],
+      [
+       -118.215522,
+       34.051338
+      ],
+      [
+       -118.212376,
+       34.050258
+      ],
+      [
+       -118.209,
+       34.049889
+      ],
+      [
+       -118.205624,
+       34.050258
+      ],
+      [
+       -118.202478,
+       34.051338
+      ],
+      [
+       -118.199777,
+       34.053056
+      ],
+      [
+       -118.197704,
+       34.055295
+      ],
+      [
+       -118.196401,
+       34.057902
+      ],
+      [
+       -118.195957,
+       34.0607
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router'
+import { signIn, token, useMe } from '../lib/auth'
+import RecentCheck from '../components/safety/RecentCheck'
 import { CircleMarker, MapContainer, Polyline, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import Basemap from '../components/map/Basemap'
 import L from 'leaflet'
 import { API_URL } from '../api/client'
 import InfoTip from '../components/ui/InfoTip'
 import PlaceInput from '../components/rides/PlaceInput'
+import FreeNow from '../components/free/FreeNow'
+import TripOptions from '../components/free/TripOptions'
 import { googleMapsDirections, uberLink } from '../lib/directions'
 import {
   ago, identity, inMin, QUICK_DROPS, QUICK_PICKUPS, rides, saveName, subscribeRides,
@@ -16,12 +21,13 @@ const PRICING_NOTE = 'Fares are UberX-style estimates for LA: $1.25 base + $3.10
 
 function MatchCard({ m, now, onJoin, onHover }: { m: Match; now: number; onJoin: () => void; onHover: (on: boolean) => void }) {
   return (
-    <div onMouseEnter={() => onHover(true)} onMouseLeave={() => onHover(false)} className="rounded-xl bg-white p-3 ring-1 ring-stone-200 transition hover:ring-gold">
+    <div onMouseEnter={() => onHover(true)} onMouseLeave={() => onHover(false)} className={`rounded-xl bg-white p-3 ring-1 transition hover:ring-gold ${m.friend ? 'ring-2 ring-pink-300' : 'ring-stone-200'}`}>
       <div className="flex items-start gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-cardinal text-sm font-bold text-gold">{m.name[0]}</span>
+        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-bold ${m.friend ? 'bg-pink-600 text-white' : 'bg-cardinal text-gold'}`}>{m.name[0]}</span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span className="font-semibold">{m.name}</span>
+            {m.friend && <span className="rounded bg-pink-100 px-1 text-[10px] font-semibold text-pink-700">👋 Friend</span>}
             {m.demo && <span className="rounded bg-stone-100 px-1 text-[10px] text-stone-500" title="Simulated rider so the demo has live demand">demo</span>}
             {m.groupSize > 1 && <span className="rounded bg-gold-50 px-1 text-[10px] text-amber-800">+{m.groupSize - 1} already sharing</span>}
             <span className="ml-auto text-xs text-stone-500">leaves {inMin(m.departAt, now)}</span>
@@ -111,13 +117,19 @@ function Fit({ pts }: { pts: [number, number][] }) {
 }
 
 export default function RidesPage() {
+  const [params] = useSearchParams()
+  const account = useMe()
+  const signedIn = !!token()
   const me = useMemo(identity, [])
+  const [friendsOnly, setFriendsOnly] = useState(false)
   const [name, setName] = useState(me.name)
   const [state, setState] = useState<RidesState | null>(null)
   const [live, setLive] = useState(false)
   const [now, setNow] = useState(Date.now())
-  const [pickup, setPickup] = useState<Place | null>(null)
-  const [drop, setDrop] = useState<Place | null>(null)
+  // prefilled from the safe-route planner (/rides?from=lat,lng&to=lat,lng&toLabel=…)
+  const fromParam = (k: string, label: string): Place | null => { const v = params.get(k)?.split(',').map(Number); return v?.length === 2 && v.every(Number.isFinite) ? { lat: v[0], lng: v[1], label } : null }
+  const [pickup, setPickup] = useState<Place | null>(() => fromParam('from', params.get('fromLabel') || 'Your start'))
+  const [drop, setDrop] = useState<Place | null>(() => fromParam('to', params.get('toLabel') || 'Destination'))
   const [picking, setPicking] = useState<'pickup' | 'drop' | null>(null)
   const [leaveIn, setLeaveIn] = useState(0)
   const [seats, setSeats] = useState(1)
@@ -130,6 +142,8 @@ export default function RidesPage() {
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [])
   useEffect(() => { if (pickup && drop) rides.quote(pickup, drop).then(setQuote).catch(() => setQuote(null)); else setQuote(null) }, [pickup, drop])
 
+  useEffect(() => { if (!pickup && account.data?.home) setPickup(account.data.home) }, [account.data?.home]) // eslint-disable-line react-hooks/exhaustive-deps
+  const friendRides = state?.board.filter((b) => b.friend && b.status === 'open') ?? []
   const ride = state?.mine.find((r) => r.status === 'open' || r.status === 'matched') ?? null
   const book = async () => {
     if (!pickup || !drop) return
@@ -159,11 +173,34 @@ export default function RidesPage() {
             <p className="text-sm text-stone-500">Book where you’re going. Students heading the same way, with a pickup near yours, on the way, or near your drop, show up here live. Split the fare and save. <InfoTip>{PRICING_NOTE}</InfoTip></p>
           </div>
 
+          {!ride && friendRides.length > 0 && (
+            <div className="space-y-2 rounded-2xl bg-pink-50 p-3 ring-1 ring-pink-200">
+              <div className="text-xs font-bold uppercase tracking-wide text-pink-700">👋 Friends riding soon</div>
+              {friendRides.slice(0, 4).map((b) => (
+                <div key={b.id} className="flex items-center gap-2 text-sm">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-pink-600 text-xs font-bold text-white">{b.name[0]}</span>
+                  <div className="min-w-0 flex-1"><b>{b.name}</b>{b.demo ? <span className="text-[10px] text-stone-400"> demo</span> : null}<div className="truncate text-xs text-stone-600">{b.pickup.label} → {b.drop.label} · leaves {inMin(b.departAt, now)}</div></div>
+                  <button onClick={() => { setDrop(b.drop); if (!pickup) setPickup(b.pickup) }} className="shrink-0 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-pink-700 ring-1 ring-pink-300">Go same way</button>
+                </div>
+              ))}
+            </div>
+          )}
+          {signedIn && !ride && account.data && account.data.friends.length === 0 && (
+            <a href="/profile" className="block rounded-xl bg-white p-3 text-xs text-stone-600 ring-1 ring-stone-200">Add friends in your profile to see their rides here first →</a>
+          )}
+
           {!ride && (
             <div className="space-y-4 rounded-2xl bg-white p-4 ring-1 ring-stone-200">
-              <label className="block text-xs font-semibold text-stone-500">Riding as
-                <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm font-normal text-ink" />
-              </label>
+              {signedIn && account.data ? (
+                <div className="flex items-center gap-2 text-sm"><span className="grid h-7 w-7 place-items-center rounded-full bg-cardinal text-xs font-bold text-gold">{account.data.name[0]}</span>Riding as <b>{account.data.name}</b><span className="ml-auto text-xs text-stone-500">{account.data.friends.length} friends</span></div>
+              ) : (
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-stone-500">Riding as
+                    <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm font-normal text-ink" />
+                  </label>
+                  <button onClick={() => signIn('/rides')} className="text-xs font-semibold text-cardinal">Sign in to ride with friends →</button>
+                </div>
+              )}
               <PlaceInput label="Pickup" value={pickup} onChange={setPickup} quick={QUICK_PICKUPS} picking={picking === 'pickup'} onPickMap={() => setPicking(picking === 'pickup' ? null : 'pickup')} onPreview={setPreview} />
               <PlaceInput label="Drop-off" value={drop} onChange={setDrop} quick={QUICK_DROPS} picking={picking === 'drop'} onPickMap={() => setPicking(picking === 'drop' ? null : 'drop')} onPreview={setPreview} />
               <div className="flex gap-4">
@@ -181,6 +218,9 @@ export default function RidesPage() {
                 </div>
               </div>
               {quote && <div className="rounded-lg bg-stone-50 p-2 text-sm">Riding alone: about <b>{usd(quote.fare)}</b> · {quote.miles} mi · {quote.minutes} min</div>}
+              {drop && <RecentCheck at={[drop.lat, drop.lng]} label={drop.label.split(',')[0]} compact />}
+              {pickup && drop && <TripOptions from={[pickup.lat, pickup.lng]} to={[drop.lat, drop.lng]} compact />}
+              {pickup && !drop && <FreeNow at={[pickup.lat, pickup.lng]} title="Free rides from here" query="free ride home tonight" />}
               {err && <p className="text-xs text-red-600">{err}</p>}
               <button onClick={book} disabled={!pickup || !drop} className="w-full rounded-xl bg-cardinal py-2.5 font-semibold text-white hover:bg-cardinal-dark disabled:opacity-40">Find riders on my route</button>
             </div>
@@ -216,10 +256,13 @@ export default function RidesPage() {
                 <a href={uberLink(ride.pickup, ride.drop)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-stone-500 hover:text-ink">Or ride alone now in Uber (prefilled) ↗</a>
               </div>
 
-              <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Riders on your route ({ride.matches.length})</div>
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Riders on your route ({ride.matches.length}{ride.matches.some((m) => m.friend) ? `, ${ride.matches.filter((m) => m.friend).length} friends` : ''})</div>
+                {signedIn && <label className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-pink-700"><input type="checkbox" checked={friendsOnly} onChange={(e) => setFriendsOnly(e.target.checked)} className="accent-pink-600" />Friends only</label>}
+              </div>
               {ride.matches.length === 0 && <p className="rounded-xl bg-white p-4 text-sm text-stone-500 ring-1 ring-stone-200">No one on your route yet. New bookings appear here live, usually within a few minutes.</p>}
               <div className="space-y-2">
-                {ride.matches.map((m) => (
+                {ride.matches.filter((m) => !friendsOnly || m.friend).map((m) => (
                   <MatchCard key={m.requestId} m={m} now={now} onHover={(on) => setHover(on ? m : null)}
                     onJoin={() => rides.join(m.requestId, me.id, ride.id).catch((e) => setErr((e as Error).message))} />
                 ))}
@@ -250,13 +293,13 @@ export default function RidesPage() {
             {preview && <PanTo p={[preview.lat, preview.lng]} />}
             {state?.board.map((b) => (
               <Polyline key={b.id} positions={[[b.pickup.lat, b.pickup.lng], [b.drop.lat, b.drop.lng]]}
-                pathOptions={{ color: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.demo ? '#a78bfa' : '#2563eb', weight: ride?.matches.some((m) => m.requestId === b.id) ? 4 : 2, opacity: ride?.matches.some((m) => m.requestId === b.id) ? 0.9 : 0.45, dashArray: '6 6' }}>
-                <Tooltip sticky>{b.name}{b.demo ? ' (demo)' : ''}: {b.pickup.label} → {b.drop.label} · leaves {inMin(b.departAt, now)}</Tooltip>
+                pathOptions={{ color: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.friend ? '#db2777' : b.demo ? '#a78bfa' : '#2563eb', weight: ride?.matches.some((m) => m.requestId === b.id) ? 4 : 2, opacity: ride?.matches.some((m) => m.requestId === b.id) ? 0.9 : 0.45, dashArray: '6 6' }}>
+                <Tooltip sticky>{b.friend ? '👋 ' : ''}{b.name}{b.demo ? ' (demo)' : ''}: {b.pickup.label} → {b.drop.label} · leaves {inMin(b.departAt, now)}</Tooltip>
               </Polyline>
             ))}
             {state?.board.map((b) => (
               <CircleMarker key={b.id + 'p'} center={[b.pickup.lat, b.pickup.lng]} radius={ride?.matches.some((m) => m.requestId === b.id) ? 7 : 5}
-                pathOptions={{ color: '#fff', weight: 2, fillColor: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.demo ? '#7c3aed' : '#2563eb', fillOpacity: 1 }}>
+                pathOptions={{ color: '#fff', weight: 2, fillColor: ride?.matches.some((m) => m.requestId === b.id) ? '#d97706' : b.friend ? '#db2777' : b.demo ? '#7c3aed' : '#2563eb', fillOpacity: 1 }}>
                 <Tooltip direction="top">{b.name}{b.demo ? ' (demo)' : ''} · pickup ~{b.pickup.label}</Tooltip>
               </CircleMarker>
             ))}
@@ -274,7 +317,7 @@ export default function RidesPage() {
           <div className="pointer-events-none absolute bottom-6 right-3 z-[500] space-y-1 rounded-xl bg-white/95 px-3 py-2 text-[11px] shadow ring-1 ring-stone-200">
             <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-emerald-600 align-middle" />Your pickup <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-cardinal align-middle" />Your drop</div>
             <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-amber-600 align-middle" />Matches your route</div>
-            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-blue-600 align-middle" />Real rider <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-violet-600 align-middle" />Demo rider</div>
+            <div><span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-blue-600 align-middle" />Real rider <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-violet-600 align-middle" />Demo rider <span className="ml-2 mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-pink-600 align-middle" />Friend</div>
           </div>
         </div>
       </div>

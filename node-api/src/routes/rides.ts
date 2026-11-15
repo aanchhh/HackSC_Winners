@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
+import { sessionUser } from '../services/users.js'
 import { bus, cancelRequest, createRequest, FARE, requestJoin, respondJoin, soloQuote, stateFor } from '../services/rides.js'
 
 export const ridesRouter = Router()
@@ -30,9 +31,10 @@ ridesRouter.get('/quote', (req, res) => {
   res.json({ ...soloQuote(p as [number, number], d as [number, number]), pricing: FARE })
 })
 
-ridesRouter.post('/', (req, res) => {
+ridesRouter.post('/', async (req, res) => {
   const b = z.object({ userId: User, name: z.string().max(30), pickup: Place, drop: Place, departAt: z.number().optional(), seats: z.number().int().min(1).max(2).optional() }).parse(req.body)
-  res.json(createRequest(b))
+  const u = await sessionUser(req)  // signed in: ride as your account, so friends can see it
+  res.json(createRequest(u ? { ...b, userId: u.id, name: u.name } : b))
 })
 
 ridesRouter.delete('/:id', (req, res) => {

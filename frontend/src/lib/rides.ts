@@ -1,4 +1,5 @@
 import { API_URL } from '../api/client'
+import { authHeaders } from './auth'
 
 // Anonymous rider identity for this browser (no accounts). Two browsers = two riders.
 export function identity() {
@@ -17,13 +18,13 @@ export interface Place { lat: number; lng: number; label: string }
 export interface Quote { miles: number; minutes: number; fare: number }
 export interface RiderCost { requestId: string; solo: Quote; share: number; saves: number; savesPct: number; detourMin: number }
 export interface Plan { stops: { kind: 'pickup' | 'drop'; requestId: string; name: string; lat: number; lng: number; label: string }[]; miles: number; minutes: number; totalFare: number; riders: RiderCost[] }
-export interface Match { requestId: string; name: string; demo: boolean; groupSize: number; departAt: number; pickupArea: string; dropArea: string; tags: string[]; pickupM: number; dropM: number; you: RiderCost; plan: Plan; pendingJoin: boolean }
+export interface Match { requestId: string; name: string; demo: boolean; friend: boolean; groupSize: number; departAt: number; pickupArea: string; dropArea: string; tags: string[]; pickupM: number; dropM: number; you: RiderCost; plan: Plan; pendingJoin: boolean }
 export interface MyRide {
   id: string; userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number; createdAt: number
   status: 'open' | 'matched'; demo: boolean; solo: Quote; matches: Match[]
   group: null | { id: string; plan: Plan; members: { requestId: string; name: string; demo: boolean; pickup: Place; drop: Place; departAt: number }[] }
 }
-export interface BoardItem { id: string; name: string; demo: boolean; status: string; departAt: number; pickup: Place; drop: Place; seats: number }
+export interface BoardItem { id: string; name: string; demo: boolean; friend: boolean; status: string; departAt: number; pickup: Place; drop: Place; seats: number }
 export interface RidesState {
   now: number; stats: { live: number; real: number; sharing: number }; board: BoardItem[]
   activity: { at: number; text: string; demo: boolean }[]; mine: MyRide[]
@@ -38,7 +39,7 @@ export function subscribeRides(userId: string, onState: (s: RidesState) => void,
 }
 
 async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const r = await fetch(`${API_URL}/api/rides${path}`, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
+  const r = await fetch(`${API_URL}/api/rides${path}`, { method, headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: body ? JSON.stringify(body) : undefined })
   const j = await r.json().catch(() => ({}))
   if (!r.ok) throw new Error(j.error ?? `${r.status}`)
   return j as T

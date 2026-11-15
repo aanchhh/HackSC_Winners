@@ -33,6 +33,7 @@ React (Vite) :5173 ──REST+SSE──► Node+Express :4000 ──► OpenRout
 | `/true-cost` | True Trojan Cost calculator (live listing or custom numbers) |
 | `/preferences` | Budget, class buildings, late nights, priority weights (saved in the browser) |
 | `/rides` | Book Ride: real-time shared rides with live matching and fare savings |
+| `/free` | Free & Safe: search free rides, escorts, apps and programs by situation, with live status |
 
 ## LLM (local by default)
 
@@ -42,6 +43,24 @@ The AI service uses a **local model through Ollama**: free, private, no API key.
 3. `LLM_PROVIDER=ollama` in `ai-service/.env` (the default). `/health` shows `"llm": true` once the model is reachable.
 
 Alternatives via `LLM_PROVIDER`: `google` (free AI Studio key), `anthropic`, `groq`. If no model is reachable the app runs in mock mode.
+
+## Free & Safe directory (`/free`)
+
+- `data/free_programs.json`: 26 free or low-cost safety and mobility programs (USC, LA Metro/LADOT, LA County, California, national
+  app features), each with eligibility, cost, a schedule (daily hours or yearly windows like Dec 24/Dec 31), coverage area, how to
+  use it, official sources, the date it was checked, and `confidence: "check"` where sources disagree.
+- `ai-service/app/free/search.py`: meaning + keyword search, situation rules ("I've been drinking", "someone is following me",
+  "can't afford the bus"…), live status in LA time ("Available now, until 2 AM", "Next: New Year's Eve"), and area checks
+  (Fryft/DPS polygons, the South LA mobility pilot). Edits to the JSON are picked up automatically.
+- **Little-known USC transport, confirmed from transnet.usc.edu / dps.usc.edu:** USC Lyft Rides with its official boundary
+  (`data/usc_ride_zones.geojson`: east of Normandie, south of Washington, west of Main, north of MLK; 7 PM–2 AM, Shared only),
+  HSC Lyft incl. Union Station, the UPC ↔ Union Station shuttle (37 weekday departures), the weekend intercampus shuttle,
+  the Thanksgiving LAX shuttle (reserve by Nov 20), and free first-year Zipcar.
+- **Alerts** (`/api/free/alerts`): reservation deadlines, free days, service gaps and rides starting tonight → 🔔 bell, a top
+  banner for urgent ones, and optional browser notifications (sent once each while the site is open).
+- **Trip options** (`/api/free/trip`): for a from/to it lists the free ways that apply to that exact trip and why (both ends in
+  the Lyft boundary, next shuttle departure, etc.). "Safest walk to the stop" routes the safe walk to the shuttle stop.
+  Shown in the safe-route planner and in Book Ride before you pay.
 
 ## Shared rides (Book Ride page)
 
@@ -103,3 +122,19 @@ Fill in `LLM_API_KEY`, `ORS_API_KEY`, `DATABASE_URL` to go real. `INTERNAL_KEY` 
 | ai-service | Render | `pip install -r requirements.txt` / `uvicorn app.main:app --host 0.0.0.0 --port $PORT` | `DATABASE_URL LLM_API_KEY NODE_INTERNAL_URL INTERNAL_KEY` |
 
 Render free instances sleep: hit both `/health` endpoints 5 min before the demo.
+
+## Sign-in (OIDC) and friends
+
+TrojanScout signs users in with OpenID Connect (authorization code + PKCE, id_token verified against the provider's JWKS).
+
+- **Demo (default):** `/auth/login` redirects to a built-in identity provider at `/demo-idp`, which is clearly labelled
+  "Demo identity provider · not USC" and never asks for a password. You can pick a demo student or type a name and email.
+- **Production:** set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` (and `PUBLIC_API_URL`, `SESSION_SECRET`) in `node-api/.env` to point at the university IdP. The same code path is used.
+- The profile (`/profile`) holds your home (for DPS alerts within 600 m), emergency contacts (one tap texts them your safe route), and friends.
+- In Book Ride, friends' rides rank first, are shown in pink, and can be filtered with "Friends only". Accounts live in `data/users.json`, which is git-ignored.
+
+## Recent-incident check and safety places
+
+- `GET /api/recent?lat&lng&hours=24` returns USC DPS crime alerts (from the dps.usc.edu feed, refreshed every 20 min, placed by intersection, block or building, with honest precision) plus student reports. LAPD data lags about 2 weeks, so it is shown separately.
+- `GET /api/alerts` is one feed for the bell: DPS alerts near home or campus, student reports, friend requests, friends' rides and ride-share requests. Free-program alerts are merged in by the frontend.
+- The map shows police stations (LAPD and others), DPS stations, blue-light phones, clinics and USC health vending machines (OpenStreetMap plus USC pages; vending positions are approximate).

@@ -95,6 +95,34 @@ async def listings_refresh(x_internal_key: str | None = Header(None)):
     return await pipeline.refresh()
 
 
+@app.get("/ai/free/search")
+async def free_search(q: str = "", lat: float | None = None, lng: float | None = None, usc: bool = True,
+                      category: str | None = None, availableNow: bool = False, k: int = Query(30, le=60)):
+    """Free & Safe directory: hybrid search + situation rules + live status (LA time) + area check."""
+    from app.free.search import search as free
+    return await asyncio.to_thread(free, q, lat=lat, lng=lng, usc=usc, category=category, available_now=availableNow, k=k)
+
+
+@app.get("/ai/free/alerts")
+async def free_alerts(days: int = Query(10, le=60)):
+    """Reservation deadlines, free days, service gaps and tonight's free rides, soonest/most urgent first."""
+    from app.free.search import alerts
+    return await asyncio.to_thread(alerts, None, days)
+
+
+@app.get("/ai/free/trip")
+async def free_trip(fromLat: float, fromLng: float, toLat: float, toLng: float, usc: bool = True):
+    """Little-known free/cheap ways to make this specific trip right now (USC Lyft boundary, shuttles + next departure, escorts)."""
+    from app.free.search import trip_options
+    return await asyncio.to_thread(trip_options, (fromLat, fromLng), (toLat, toLng), None, usc)
+
+
+@app.get("/ai/free/upcoming")
+async def free_upcoming(days: int = Query(120, le=366)):
+    from app.free.search import upcoming
+    return await asyncio.to_thread(upcoming, days)
+
+
 @app.get("/ai/neighborhood", response_model=BlockSummary)
 async def neighborhood(lat: float, lng: float, x_internal_key: str | None = Header(None)):
     _check_key(x_internal_key)

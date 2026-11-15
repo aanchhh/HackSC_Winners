@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { useAppStore } from '../../store/useAppStore'
+import { AlertBell } from '../free/Alerts'
+import { signIn, token, useMe } from '../../lib/auth'
 
 const LINKS = [
   { to: '/map', label: 'Explore Map' },
   { to: '/search', label: 'Search' },
   { to: '/ask', label: 'Ask Scout' },
   { to: '/rides', label: 'Book Ride' },
+  { to: '/free', label: 'Free & Safe' },
   { to: '/true-cost', label: 'True Cost' },
   { to: '/preferences', label: 'Preferences' },
 ]
@@ -14,6 +17,7 @@ const LINKS = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const compareCount = useAppStore((s) => s.compareIds.length)
+  const me = useMe()
   const cls = ({ isActive }: { isActive: boolean }) =>
     `rounded-full px-3.5 py-1.5 text-sm font-medium transition ${isActive ? 'bg-cardinal text-white' : 'text-stone-700 hover:bg-stone-100'}`
   return (
@@ -31,7 +35,18 @@ export default function Navbar() {
             </NavLink>
           ))}
         </div>
-        <button className="ml-auto rounded-lg p-2 md:hidden" aria-label="Menu" onClick={() => setOpen(!open)}>
+        <div className="ml-auto flex items-center gap-1 md:ml-2">
+          <AlertBell />
+          {token() && me.data ? (
+            <Link to="/profile" title={`${me.data.name} · profile`} className="relative grid h-9 w-9 place-items-center rounded-full bg-cardinal text-sm font-bold text-gold">
+              {me.data.name[0]?.toUpperCase()}
+              {me.data.incoming.length > 0 && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-gold ring-2 ring-white" />}
+            </Link>
+          ) : (
+            <button onClick={() => signIn()} className="rounded-full bg-ink px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-stone-800">Sign in</button>
+          )}
+        </div>
+        <button className="rounded-lg p-2 md:hidden" aria-label="Menu" onClick={() => setOpen(!open)}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={open ? 'M6 6l12 12M18 6L6 18' : 'M4 7h16M4 12h16M4 17h16'} /></svg>
         </button>
       </nav>

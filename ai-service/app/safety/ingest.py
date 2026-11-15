@@ -155,6 +155,10 @@ def main():
         print("Overpass fetch failed (keeping previous streets.json if any):", e, file=sys.stderr)
     (DATA / "safety_resources.json").write_text(json.dumps(SAFETY_RESOURCES, indent=1))
     print("safety resources written")
+    try:
+        campus_places_only()
+    except Exception as e:
+        print("campus places fetch failed (keeping previous file):", e, file=sys.stderr)
 
 
 if __name__ == "__main__":
@@ -165,3 +169,47 @@ def streets_only():
     st = fetch_streets()
     (DATA / "streets.json").write_text(json.dumps(st))
     print(f"streets: {len(st['ways'])} ways, {len(st['nodes'])} nodes")
+
+
+def campus_places_from(elements: list[dict]) -> list[dict]:
+    """Named OSM places around campus → compact gazetteer rows used by node-api place search."""
+    out, seen = [], set()
+    for e in elements:
+        t = e.get("tags", {})
+        name = t.get("name")
+        lat = e.get("lat") or (e.get("center") or {}).get("lat")
+        lon = e.get("lon") or (e.get("center") or {}).get("lon")
+        if not name or lat is None:
+            continue
+        key = (name.lower(), round(lat, 4), round(lon, 4))
+        if key in seen:
+            continue
+        seen.add(key)
+        alt = [v for k in ("short_name", "alt_name", "old_name", "official_name") if (v := t.get(k))]
+        if (ref := t.get("ref")) and re.fullmatch(r"[A-Za-z]{2,5}", ref):
+            alt.append(ref)
+        street = " ".join(x for x in (t.get("addr:housenumber"), t.get("addr:street")) if x)
+        kind = t.get("amenity") or t.get("shop") or t.get("tourism") or t.get("leisure") or t.get("building") or "place"
+        out.append({"name": name, "alt": alt, "lat": round(lat, 6), "lng": round(lon, 6), "kind": kind, "address": street})
+    return out
+
+
+def fetch_campus_places() -> dict:
+    s, w, n, e = 34.0080, -118.3060, 34.0420, -118.2650
+    sel = "".join(f'nwr["name"]({s},{w},{n},{e})["{k}"];' for k in ("amenity", "shop", "building", "leisure", "tourism"))
+    q = f"[out:json][timeout:60];({sel}nwr[\"name\"]({s},{w},{n},{e})[\"public_transport\"=\"station\"];);out center tags;"
+    import time
+    for attempt, url in enumerate(OVERPASS * 2):
+        try:
+            r = httpx.post(url, data={"data": q}, headers={**UA, "Accept": "application/json"}, timeout=180)
+            r.raise_for_status()
+            return {"source": "© OpenStreetMap contributors (ODbL), via Overpass API", "places": campus_places_from(r.json()["elements"])}
+        except Exception:
+            time.sleep(5 * (attempt + 1))
+    raise RuntimeError("Overpass unavailable")
+
+
+def campus_places_only():
+    d = fetch_campus_places()
+    (DATA / "campus_places.json").write_text(json.dumps(d))
+    print(f"campus places: {len(d['places'])}")

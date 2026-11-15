@@ -8,6 +8,7 @@ import { DEFAULT_WEIGHTS, fitBreakdown, type Weights } from '../services/score.j
 import { blockPoints, incidentMeta, incidentsNear, recency, safetyResources, summarize } from '../services/safety.js'
 import { route, streetArt } from '../services/route.js'
 import { reversePlace, searchPlaces } from '../services/places.js'
+import { addReport, dpsAlerts, recentNear, recentReports } from '../services/recent.js'
 import { dpsPositions } from '../services/dpsUnits.js'
 import { config } from '../config.js'
 
@@ -79,7 +80,7 @@ publicRouter.get('/places', async (req, res) => {
   const q = String(req.query.q ?? '').trim()
   if (q.length < 2) return res.json([])
   const near = String(req.query.near ?? '').split(',').map(Number)
-  res.json(await searchPlaces(q, near.length === 2 && near.every(Number.isFinite) ? (near as [number, number]) : undefined))
+  res.json(await searchPlaces(q, near.length === 2 && near.every(Number.isFinite) ? (near as [number, number]) : undefined, req.query.final === '1'))
 })
 
 publicRouter.get('/places/reverse', async (req, res) => {
@@ -91,7 +92,7 @@ publicRouter.get('/places/reverse', async (req, res) => {
 publicRouter.get('/geocode', async (req, res) => {
   const q = String(req.query.q ?? '').trim()
   if (q.length < 2) return res.status(400).json({ error: 'q required' })
-  const hit = (await searchPlaces(q))[0]
+  const hit = (await searchPlaces(q, undefined, true))[0]
   if (!hit) return res.status(404).json({ error: 'No place found in the LA area. Try a street address or landmark.' })
   res.json({ lat: hit.lat, lng: hit.lng, label: [hit.label, hit.detail].filter(Boolean).join(', '), ...zoneCheck(hit.lat, hit.lng) })
 })
@@ -159,7 +160,39 @@ publicRouter.get('/incidents', (req, res) => {
   res.json({ ...incidentMeta, days, points: blockPoints(days) })
 })
 
+// Free & Safe directory (search lives in ai-service; it embeds the programs for meaning-based search)
+publicRouter.get('/free/search', async (req, res) => {
+  try { res.json((await ai.get('/ai/free/search', { params: req.query, timeout: 30000 })).data) }
+  catch { res.status(503).json({ error: 'Free & Safe search is unavailable (AI service offline).' }) }
+})
+publicRouter.get('/free/alerts', async (req, res) => {
+  try { res.json((await ai.get('/ai/free/alerts', { params: req.query, timeout: 15000 })).data) } catch { res.json([]) }
+})
+publicRouter.get('/free/trip', async (req, res) => {
+  try { res.json((await ai.get('/ai/free/trip', { params: req.query, timeout: 15000 })).data) }
+  catch { res.status(503).json({ error: 'Trip options unavailable' }) }
+})
+publicRouter.get('/free/upcoming', async (req, res) => {
+  try { res.json((await ai.get('/ai/free/upcoming', { params: req.query, timeout: 15000 })).data) }
+  catch { res.json([]) }
+})
+
 publicRouter.get('/streets/art', (_req, res) => { res.set('Cache-Control', 'public, max-age=86400'); res.json(streetArt()) })
+
+// ---------- last-24h checks ----------
+publicRouter.get('/recent', (req, res) => {
+  const lat = Number(req.query.lat), lng = Number(req.query.lng)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return res.status(400).json({ error: 'lat and lng required' })
+  res.json(recentNear([lat, lng], Math.min(Number(req.query.radius ?? 500), 2000), Math.min(Number(req.query.hours ?? 24), 24 * 14)))
+})
+publicRouter.get('/dps-alerts', (_req, res) => res.json(dpsAlerts()))
+publicRouter.get('/reports', (req, res) => res.json(recentReports(Math.min(Number(req.query.hours ?? 72), 168))))
+publicRouter.post('/reports', (req, res) => {
+  const b = req.body ?? {}
+  const lat = Number(b.lat), lng = Number(b.lng)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || !b.category) return res.status(400).json({ error: 'lat, lng and category required' })
+  res.json(addReport({ lat, lng, category: String(b.category).slice(0, 40), description: String(b.description ?? ''), userId: String(b.userId ?? 'anon') }))
+})
 
 publicRouter.get('/safety-resources', (_req, res) => res.json(safetyResources))
 

@@ -60,6 +60,12 @@ export default function PlaceInput({ label, value, onChange, quick, onPickMap, p
                 if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => Math.min(a + 1, hits.length - 1)) }
                 else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => Math.max(a - 1, 0)) }
                 else if (e.key === 'Enter' && hits[active]) { e.preventDefault(); choose(hits[active]) }
+                else if (e.key === 'Enter' && text.trim().length >= 2) {  // no suggestion yet: one full lookup
+                  e.preventDefault(); setLoading(true)
+                  fetch(`${API_URL}/api/places?final=1&q=${encodeURIComponent(text)}`).then((r) => r.json())
+                    .then((j: Suggestion[]) => (j[0] ? choose(j[0]) : setErr('No matching place in the LA area')))
+                    .catch(() => setErr('Place search unavailable')).finally(() => setLoading(false))
+                }
                 else if (e.key === 'Escape') setOpen(false)
               }}
               placeholder="Search anywhere in LA: address, place, landmark…" className="w-full rounded-lg border border-stone-300 px-3 py-2 pr-8 text-sm" />

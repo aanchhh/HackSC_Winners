@@ -55,7 +55,7 @@ export interface RouteLeg {
 export interface RouteResult { night: boolean; fastest: RouteLeg; safest: RouteLeg; sameRoute: boolean; summary: string; method: string }
 export interface IncidentPoint { lat: number; lng: number; block: string; count: number; severe: number; night: number; byCategory: Record<string, number>; latest: string }
 export interface IncidentsResponse { source: string; synthetic: boolean; count: number; days: number; points: IncidentPoint[] }
-export interface SafetyResource { type: 'dps_station' | 'blue_phone' | 'service'; name: string; lat: number; lng: number; address?: string; hours?: string; phone?: string; approximate?: boolean }
+export interface SafetyResource { type: 'dps_station' | 'blue_phone' | 'police' | 'medical' | 'vending' | 'service'; name: string; lat: number; lng: number; operator?: string; address?: string; hours?: string; phone?: string; detail?: string; precision?: 'exact' | 'approximate'; source?: string; approximate?: boolean }
 export interface DpsUnit { id: string; callsign: string; status: string; lat: number; lng: number; heading: number }
 export interface CostLine { key: string; label: string; amount: number; formula: string; why: string }
 export interface CostBreakdown {

@@ -1,5 +1,5 @@
 {
- "scrapedAt": "2026-11-14T17:25:17",
+ "scrapedAt": "2026-11-14T21:30:44",
  "sources": {
   "stuho": 41,
   "tripalink": 42,
@@ -8,25 +8,34 @@
  },
  "listings": [
   {
-   "id": "stuho:64ed2b627b28967b78d9b4b5",
+   "id": "stuho:64ed2b537b28967b78d9b429",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2833-Menlo-Ave-Los-Angeles-CA-90007-USA",
-   "name": " 2833 Menlo Ave",
-   "address": "2833 Menlo Ave, Los Angeles, CA 90007",
-   "lat": 34.0285696,
-   "lng": -118.2905976,
-   "rent": 9625,
-   "rentMax": 9625,
+   "url": "https://stuho.com/for-rent-building/1283-W-36th-St-Los-Angeles-CA-90007-USA",
+   "name": "1283 W. 36th St.",
+   "address": "1283 W. 36th St., Los Angeles, CA 90007",
+   "lat": 34.0230509,
+   "lng": -118.2969916,
+   "rent": 1795,
+   "rentMax": 5700,
    "priceUnit": "per unit",
    "callForPricing": true,
-   "beds": 4,
-   "bedsMax": 4,
-   "baths": 4.5,
+   "beds": 1,
+   "bedsMax": 5,
+   "baths": 1.0,
    "units": [
     {
-     "label": "4B",
+     "label": "1B",
      "roomType": "entire",
-     "beds": 4,
+     "beds": 1,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "5B",
+     "roomType": "entire",
+     "beds": 5,
      "baths": null,
      "privateBath": null,
      "rent": null,
@@ -38,24 +47,185 @@
    ],
    "availability": "Fall 2027",
    "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283128312w36thst_3exky1nbq",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283128312w36thst_lw5vwvltl",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283_w_36th_st_5.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283_w_36th_st_3.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283_w_36th_st_2.webp"
+   ],
+   "photoCredit": "",
+   "description": "2 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.69,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b587b28967b78d9b456",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2658-Menlo-Ave-Los-Angeles-CA-90007-USA",
+   "name": "Providence ",
+   "address": "2658 Menlo Ave., Los Angeles, CA 90007",
+   "lat": 34.0311969,
+   "lng": -118.2898737,
+   "rent": 3000,
+   "rentMax": 4350,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 2,
+   "bedsMax": 3,
+   "baths": 2.0,
+   "units": [
+    {
+     "label": "2B",
+     "roomType": "entire",
+     "beds": 2,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 14
+    },
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 4
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
     "Apartments"
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/2833_main_picture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/_tud1249.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/_tud1252.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/_tud1251.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/test-upload_m7edkaaat"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/providencemainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/_tud1256.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/test-upload_mqtbawcxz",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/test-upload_xkq3gnylf",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/test-upload_nqbykyecz"
+   ],
+   "photoCredit": "",
+   "description": "18 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 120,
+   "distanceToCampusMi": 0.78,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b5e7b28967b78d9b488",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2649-Ellendale-Pl-Los-Angeles-CA-90007-USA",
+   "name": "2649 Ellendale Pl.",
+   "address": "2649 Ellendale Pl., Los Angeles, CA 90007",
+   "lat": 34.0313349,
+   "lng": -118.2894604,
+   "rent": 3900,
+   "rentMax": 4425,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 3,
+   "bedsMax": 3,
+   "baths": 3.0,
+   "units": [
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 4
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_4u_tmdj-x",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_uputahu8h1",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_d0_xjcdftt",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_tkwsc8mip",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_dgjmuf9pj"
+   ],
+   "photoCredit": "",
+   "description": "4 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 150,
+   "distanceToCampusMi": 0.78,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b567b28967b78d9b44c",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2640-Menlo-Ave-Los-Angeles-CA-90007-USA",
+   "name": "2640 Menlo Ave. ",
+   "address": "2640 Menlo Ave., Los Angeles, CA 90007",
+   "lat": 34.0315359,
+   "lng": -118.2900311,
+   "rent": 10800,
+   "rentMax": 10800,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 9,
+   "bedsMax": 9,
+   "baths": 7.5,
+   "units": [
+    {
+     "label": "9B",
+     "roomType": "entire",
+     "beds": 9,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/2640mainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/_tud1266.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/_tud1264.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/_tud1263.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/test-upload_nl6sh6jiw"
    ],
    "photoCredit": "",
    "description": "1 units managed by Stuho",
    "sampleData": false,
-   "utilitiesEst": 180,
-   "distanceToCampusMi": 0.63,
+   "utilitiesEst": 330,
+   "distanceToCampusMi": 0.8,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:64ed2b517b28967b78d9b415",
@@ -106,23 +276,23 @@
    "distanceToCampusMi": 0.63,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b5e7b28967b78d9b488",
+   "id": "stuho:64ed2b697b28967b78d9b500",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2649-Ellendale-Pl-Los-Angeles-CA-90007-USA",
-   "name": "2649 Ellendale Pl.",
-   "address": "2649 Ellendale Pl., Los Angeles, CA 90007",
-   "lat": 34.0313349,
-   "lng": -118.2894604,
-   "rent": 3900,
-   "rentMax": 4425,
+   "url": "https://stuho.com/for-rent-building/1118-W-25th-St-Los-Angeles-CA-90007-USA",
+   "name": "1118 W. 25th St.",
+   "address": "1118 W. 25th St., Los Angeles, CA 90007",
+   "lat": 34.0333616,
+   "lng": -118.2846719,
+   "rent": 3150,
+   "rentMax": 3150,
    "priceUnit": "per unit",
    "callForPricing": true,
    "beds": 3,
    "bedsMax": 3,
-   "baths": 3.0,
+   "baths": 2.0,
    "units": [
     {
      "label": "3B",
@@ -131,7 +301,7 @@
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 4
+     "count": 2
     }
    ],
    "roomTypes": [
@@ -143,20 +313,20 @@
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_4u_tmdj-x",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_uputahu8h1",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_d0_xjcdftt",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_tkwsc8mip",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2649ellendalepl/2649ellendalepl_dgjmuf9pj"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_w4zgkrqgdh",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_qce9anura",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_igkg5ergw",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_osl1dbb-l",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_tfuyp8kgw"
    ],
    "photoCredit": "",
-   "description": "4 units managed by Stuho",
+   "description": "2 units managed by Stuho",
    "sampleData": false,
    "utilitiesEst": 150,
-   "distanceToCampusMi": 0.78,
+   "distanceToCampusMi": 0.88,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:69a0836d2cbb7b6c79b487ba",
@@ -222,195 +392,28 @@
    "distanceToCampusMi": 0.89,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:6887cfcf25372bc256459c0d",
+   "id": "stuho:64ed2b5b7b28967b78d9b46f",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2660-Magnolia-Ave-Los-Angeles-CA-90007-USA",
-   "name": "2660 Magnolia Ave",
-   "address": "2660 Magnolia Ave, Los Angeles, CA 90007",
-   "lat": 34.03118244678426,
-   "lng": -118.28626932883569,
-   "rent": 2100,
-   "rentMax": 2700,
+   "url": "https://stuho.com/for-rent-building/2356-Portland-St-Los-Angeles-CA-90007-USA",
+   "name": "2356 Portland St.",
+   "address": "2356 Portland St., Los Angeles, CA 90007",
+   "lat": 34.0322849,
+   "lng": -118.2816455,
+   "rent": 1995,
+   "rentMax": 3200,
    "priceUnit": "per unit",
    "callForPricing": true,
-   "beds": 2,
-   "bedsMax": 3,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "2B",
-     "roomType": "entire",
-     "beds": 2,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 4
-    },
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Immediate Move In- Spring 2027",
-   "propertyTypes": [],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/94ab8460c0c562bf74b2a61ccd603ff9-uncropped_scaled_within_1536_1152.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/91b1bf11359472b4a37cc790e069a411-uncropped_scaled_within_1536_1152.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/a556c9bf0df1568965d90ff3b95da73e-uncropped_scaled_within_1536_1152.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/2720ed4964bdf77ed057bacf821a3e23-uncropped_scaled_within_1536_1152.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/2660.webp"
-   ],
-   "photoCredit": "",
-   "description": "5 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 120,
-   "distanceToCampusMi": 0.73,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b567b28967b78d9b44c",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2640-Menlo-Ave-Los-Angeles-CA-90007-USA",
-   "name": "2640 Menlo Ave. ",
-   "address": "2640 Menlo Ave., Los Angeles, CA 90007",
-   "lat": 34.0315359,
-   "lng": -118.2900311,
-   "rent": 10800,
-   "rentMax": 10800,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 9,
-   "bedsMax": 9,
-   "baths": 7.5,
-   "units": [
-    {
-     "label": "9B",
-     "roomType": "entire",
-     "beds": 9,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/2640mainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/_tud1266.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/_tud1264.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/_tud1263.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2640menloave/test-upload_nl6sh6jiw"
-   ],
-   "photoCredit": "",
-   "description": "1 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 330,
-   "distanceToCampusMi": 0.8,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b587b28967b78d9b456",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2658-Menlo-Ave-Los-Angeles-CA-90007-USA",
-   "name": "Providence ",
-   "address": "2658 Menlo Ave., Los Angeles, CA 90007",
-   "lat": 34.0311969,
-   "lng": -118.2898737,
-   "rent": 3000,
-   "rentMax": 4350,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 2,
-   "bedsMax": 3,
-   "baths": 2.0,
-   "units": [
-    {
-     "label": "2B",
-     "roomType": "entire",
-     "beds": 2,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 14
-    },
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 4
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/providencemainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/_tud1256.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/test-upload_mqtbawcxz",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/test-upload_xkq3gnylf",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/providence/test-upload_nqbykyecz"
-   ],
-   "photoCredit": "",
-   "description": "18 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 120,
-   "distanceToCampusMi": 0.78,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b547b28967b78d9b438",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1126-W-36th-Pl-Los-Angeles-CA-90007-USA",
-   "name": "1126-1128 W. 36th Pl.",
-   "address": "1126 W. 36th Pl., Los Angeles, CA 90007",
-   "lat": 34.0218517,
-   "lng": -118.2925106,
-   "rent": 2400,
-   "rentMax": 2400,
-   "priceUnit": "per unit",
-   "callForPricing": false,
-   "beds": 1,
+   "beds": 0,
    "bedsMax": 4,
    "baths": 1.0,
    "units": [
     {
-     "label": "1B",
+     "label": "Studio",
      "roomType": "entire",
-     "beds": 1,
+     "beds": 0,
      "baths": null,
      "privateBath": null,
      "rent": null,
@@ -423,7 +426,7 @@
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 1
+     "count": 3
     },
     {
      "label": "3B",
@@ -432,7 +435,7 @@
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 2
+     "count": 1
     },
     {
      "label": "4B",
@@ -447,77 +450,26 @@
    "roomTypes": [
     "entire"
    ],
-   "availability": "Immediate Move In- Spring 2027",
+   "availability": "Fall 2027",
    "propertyTypes": [
     "Apartments"
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/1126_w_36th_st-ext-1_1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/1126_w_36th_st-ext-8.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/_tud1716_print.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/_tud1707_print.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/_tud1697_print-mvpul3wr927b37.webp"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_fd166ldai",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_dxxa7h9-w6",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_dsbfzuoyu",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_756avgzdhy",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_lgp2jvp9e"
    ],
    "photoCredit": "",
    "description": "2 units managed by Stuho",
    "sampleData": false,
    "utilitiesEst": 90,
-   "distanceToCampusMi": 0.42,
+   "distanceToCampusMi": 0.84,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b5f7b28967b78d9b492",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2639-Monmouth-Ave-Los-Angeles-CA-90007-USA",
-   "name": "2639 Monmouth Ave. ",
-   "address": "2639 Monmouth Ave., Los Angeles, CA 90007",
-   "lat": 34.0309698,
-   "lng": -118.285231,
-   "rent": 1495,
-   "rentMax": 1850,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
-   "bedsMax": 0,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 12
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Rooms",
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/2639mainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/_tud1294.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/test-upload_eq-id7zdv",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/test-upload_wnsecdu9p",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/test-upload_r4wjnlvlk"
-   ],
-   "photoCredit": "",
-   "description": "12 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.72,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:66c4ec2fd8e81947bc26d534",
@@ -595,32 +547,41 @@
    "distanceToCampusMi": 0.46,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b5a7b28967b78d9b465",
+   "id": "stuho:64ed2b527b28967b78d9b41f",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1201-W-27th-St-Los-Angeles-CA-90007-USA",
-   "name": "Vista Magnolia",
-   "address": "1201 W. 27th St, Los Angeles, CA 90007",
-   "lat": 34.030482,
-   "lng": -118.286624,
-   "rent": 3900,
-   "rentMax": 4900,
+   "url": "https://stuho.com/for-rent-building/1280-W-Jefferson-Blvd-Los-Angeles-CA-90007-USA",
+   "name": "1280 W. Jefferson Blvd.",
+   "address": "1280 W. Jefferson Blvd., Los Angeles, CA 90007",
+   "lat": 34.02522769999999,
+   "lng": -118.2939984,
+   "rent": 1725,
+   "rentMax": 2350,
    "priceUnit": "per unit",
    "callForPricing": true,
-   "beds": 3,
-   "bedsMax": 3,
-   "baths": 3.0,
+   "beds": 1,
+   "bedsMax": 2,
+   "baths": 1.0,
    "units": [
     {
-     "label": "3B",
+     "label": "1B",
      "roomType": "entire",
-     "beds": 3,
+     "beds": 1,
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 10
+     "count": 4
+    },
+    {
+     "label": "2B",
+     "roomType": "entire",
+     "beds": 2,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 4
     }
    ],
    "roomTypes": [
@@ -628,40 +589,39 @@
    ],
    "availability": "Fall 2027",
    "propertyTypes": [
-    "Apartments",
-    "Student Housing"
+    "Apartments"
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_zwt3bgyhdr",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_eerng3nql",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_3dar4231x9",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_x9nez7ab1",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_fbqd579vuy"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/mainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/_tud1220.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/_tud1219.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/1280_w_jefferson_blvd_1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/1280_w_jefferson_blvd_2.webp"
    ],
    "photoCredit": "",
-   "description": "10 units managed by Stuho",
+   "description": "8 units managed by Stuho",
    "sampleData": false,
-   "utilitiesEst": 150,
-   "distanceToCampusMi": 0.69,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.59,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b697b28967b78d9b4fb",
+   "id": "stuho:64ed2b5f7b28967b78d9b497",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/949-W-Adams-Blvd-Los-Angeles-CA-90007-USA",
-   "name": "The Series - Parq On Portland",
-   "address": "949 W. Adams Blvd, Los Angeles, CA 90007",
-   "lat": 34.0316052,
-   "lng": -118.2826047,
-   "rent": 1400,
-   "rentMax": 3350,
+   "url": "https://stuho.com/for-rent-building/2662-1-2-Orchard-Ave-Los-Angeles-CA-90007-USA",
+   "name": "2660 - 2662 Orchard Ave.",
+   "address": "2662 1/2 Orchard Ave., Los Angeles, CA 90007",
+   "lat": 34.0309311,
+   "lng": -118.2872907,
+   "rent": 1385,
+   "rentMax": 8075,
    "priceUnit": "per unit",
    "callForPricing": true,
    "beds": 0,
-   "bedsMax": 2,
+   "bedsMax": 5,
    "baths": 1.0,
    "units": [
     {
@@ -674,72 +634,22 @@
      "count": 1
     },
     {
-     "label": "1B",
+     "label": "4B",
      "roomType": "entire",
-     "beds": 1,
+     "beds": 4,
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 26
+     "count": 1
     },
     {
-     "label": "2B",
+     "label": "5B",
      "roomType": "entire",
-     "beds": 2,
+     "beds": 5,
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 17
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_t38qtcl5r1",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_zclamkp7-",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_kwh07veh8k",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_73b7c7qvqv",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_wqjpbdkbm"
-   ],
-   "photoCredit": "",
-   "description": "4 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.78,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b687b28967b78d9b4f6",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/3006-Royal-St-Los-Angeles-CA-90007-USA",
-   "name": "The Series - The Royal",
-   "address": "3006 Royal St., Los Angeles, CA 90007",
-   "lat": 34.0259839,
-   "lng": -118.2806733,
-   "rent": 2095,
-   "rentMax": 2545,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 1,
-   "bedsMax": 1,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "1B",
-     "roomType": "entire",
-     "beds": 1,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 36
+     "count": 1
     }
    ],
    "roomTypes": [
@@ -748,24 +658,24 @@
    "availability": "Fall 2027",
    "propertyTypes": [
     "Apartments",
-    "Student Housing"
+    "Houses"
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_gyoqu_yhm",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_agqiejfdv7",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_pkrlaz_wcc",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_r4ndqkyoi",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_t4o5koz0n"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_oi6ny_r_k9",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_mjjgklcfj",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_9cqdbxxyj",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_5sdohmsgu",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_g0bvofvcz"
    ],
    "photoCredit": "",
-   "description": "36 units managed by Stuho",
+   "description": "2 units managed by Stuho",
    "sampleData": false,
    "utilitiesEst": 90,
-   "distanceToCampusMi": 0.46,
+   "distanceToCampusMi": 0.72,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:64ed2b677b28967b78d9b4e7",
@@ -833,7 +743,1045 @@
    "distanceToCampusMi": 0.56,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b567b28967b78d9b447",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2633-Ellendale-Pl-Los-Angeles-CA-90007-USA",
+   "name": "2633 Ellendale Pl. ",
+   "address": "2633 Ellendale Pl., Los Angeles, CA 90007",
+   "lat": 34.031739,
+   "lng": -118.2892845,
+   "rent": 1500,
+   "rentMax": 1800,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 0,
+   "bedsMax": 0,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 18
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl__5affd1hjm",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_wg_amgrj7",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_ggur7bphp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_j3zpbkaga_",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_mp1xqtfvx"
+   ],
+   "photoCredit": "",
+   "description": "18 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.8,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b697b28967b78d9b4fb",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/949-W-Adams-Blvd-Los-Angeles-CA-90007-USA",
+   "name": "The Series - Parq On Portland",
+   "address": "949 W. Adams Blvd, Los Angeles, CA 90007",
+   "lat": 34.0316052,
+   "lng": -118.2826047,
+   "rent": 1400,
+   "rentMax": 3350,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 0,
+   "bedsMax": 2,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "1B",
+     "roomType": "entire",
+     "beds": 1,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 26
+    },
+    {
+     "label": "2B",
+     "roomType": "entire",
+     "beds": 2,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 17
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_t38qtcl5r1",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_zclamkp7-",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_kwh07veh8k",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_73b7c7qvqv",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesparqonportland/test-upload_wqjpbdkbm"
+   ],
+   "photoCredit": "",
+   "description": "4 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.78,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b5d7b28967b78d9b47e",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/1021-W-24th-St-Los-Angeles-CA-90007-USA",
+   "name": "1021 W. 24th St.",
+   "address": "1021 W. 24th St., Los Angeles, CA 90007",
+   "lat": 34.03392669999999,
+   "lng": -118.2826047,
+   "rent": 5400,
+   "rentMax": 5400,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 6,
+   "bedsMax": 6,
+   "baths": 3.0,
+   "units": [
+    {
+     "label": "6B",
+     "roomType": "entire",
+     "beds": 6,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/_tud1351-1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/_tud1352-1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/_tud1354-1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/test-upload_xwunnrcnc",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/test-upload_arfoexs4i"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 240,
+   "distanceToCampusMi": 0.93,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b677b28967b78d9b4ec",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/738-42-W-27th-St-Los-Angeles-CA-90007-USA",
+   "name": "The Series - The Moon",
+   "address": "738-42 W. 27th St., Los Angeles, CA 90007",
+   "lat": 34.0284161,
+   "lng": -118.2803996,
+   "rent": 2000,
+   "rentMax": 3850,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 1,
+   "bedsMax": 3,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "1B",
+     "roomType": "entire",
+     "beds": 1,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 17
+    },
+    {
+     "label": "2B",
+     "roomType": "entire",
+     "beds": 2,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 13
+    },
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 4
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Student Housing"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/test-upload_fr2sbkl3h6",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/test-upload_m_nkddtxfe",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/theseriesthemoon_2yqqdaekb",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/theseriesthemoon_nycbid1ap0",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/theseriesthemoon_9hl9ohok2"
+   ],
+   "photoCredit": "",
+   "description": "34 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.61,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b687b28967b78d9b4f1",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2620-Severance-St-Los-Angeles-CA-90007-USA",
+   "name": "The Series - The Dime",
+   "address": "2620 Severance St., Los Angeles, CA 90007",
+   "lat": 34.0296025,
+   "lng": -118.2810061,
+   "rent": 2050,
+   "rentMax": 2950,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 1,
+   "bedsMax": 2,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "1B",
+     "roomType": "entire",
+     "beds": 1,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 8
+    },
+    {
+     "label": "2B",
+     "roomType": "entire",
+     "beds": 2,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 8
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload__dppugwaf",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_vpjzracz3",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_2n-l9n9p7",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_utrkl8aoz",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_7dfil-pwf"
+   ],
+   "photoCredit": "",
+   "description": "16 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.67,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b587b28967b78d9b45b",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/841-W-23rd-St-Los-Angeles-CA-90007-USA",
+   "name": "841 W. 23rd St.",
+   "address": "841 W. 23rd St., Los Angeles, CA 90007",
+   "lat": 34.0330682,
+   "lng": -118.2787489,
+   "rent": 1250,
+   "rentMax": 1500,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 0,
+   "bedsMax": 1,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 11
+    },
+    {
+     "label": "1B",
+     "roomType": "entire",
+     "beds": 1,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 12
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/841w23rdst_orj4n5tn4",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_dpdf5blig",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_p-qqo5rdd",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_d3y1lxapw",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_wo92ksiaj"
+   ],
+   "photoCredit": "",
+   "description": "23 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.94,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b627b28967b78d9b4ba",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2595-Hoover-St-Los-Angeles-CA-90007-USA",
+   "name": "Element",
+   "address": "2595 Hoover St., Los Angeles, CA 90007",
+   "lat": 34.032052,
+   "lng": -118.2843636,
+   "rent": 725,
+   "rentMax": 725,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 1,
+   "bedsMax": 3,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "1B",
+     "roomType": "entire",
+     "beds": 1,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 5
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Immediate Move In- Spring 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Student Housing"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/dji_0144-1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/element_003.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/element_007.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/elememt.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/element_013.webp"
+   ],
+   "photoCredit": "",
+   "description": "2 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.79,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b517b28967b78d9b410",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/3010-Shrine-Pl-Los-Angeles-CA-90007-USA",
+   "name": "The Series - Cielo",
+   "address": "3010 Shrine Pl., Los Angeles, CA 90007",
+   "lat": 34.0253184,
+   "lng": -118.2797272,
+   "rent": 5600,
+   "rentMax": 6950,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 4,
+   "bedsMax": 4,
+   "baths": 3.0,
+   "units": [
+    {
+     "label": "4B",
+     "roomType": "entire",
+     "beds": 4,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 2
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Student Housing"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_cotozjuncc",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_kguegfpfp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_5pi8s2r9z",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_49-j0oyad",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_svoqiop56"
+   ],
+   "photoCredit": "",
+   "description": "2 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 180,
+   "distanceToCampusMi": 0.46,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b577b28967b78d9b451",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2646-Menlo-Ave-Los-Angeles-CA-90007-USA",
+   "name": "2646 Menlo Ave. ",
+   "address": "2646 Menlo Ave., Los Angeles, CA 90007",
+   "lat": 34.0313195,
+   "lng": -118.2900038,
+   "rent": 12000,
+   "rentMax": 12000,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 8,
+   "bedsMax": 8,
+   "baths": 6.0,
+   "units": [
+    {
+     "label": "8B",
+     "roomType": "entire",
+     "beds": 8,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/2646mainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/_tud1259.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/_tud1260.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/_tud1262.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/test-upload_wb84pm7gr"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 300,
+   "distanceToCampusMi": 0.79,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b507b28967b78d9b40b",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/1201-W-30th-St-Los-Angeles-CA-90007-USA",
+   "name": "1201 - 1205 W. 30th St.",
+   "address": "1201 W. 30th St., Los Angeles, CA 90007",
+   "lat": 34.0276259,
+   "lng": -118.2891769,
+   "rent": 4200,
+   "rentMax": 12800,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 3,
+   "bedsMax": 8,
+   "baths": 2.0,
+   "units": [
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "4B",
+     "roomType": "entire",
+     "beds": 4,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "8B",
+     "roomType": "entire",
+     "beds": 8,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/1201mainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/_tud1224.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/_tud1228.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/_tud1229.webp"
+   ],
+   "photoCredit": "",
+   "description": "3 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 150,
+   "distanceToCampusMi": 0.53,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b637b28967b78d9b4bf",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2335-Portland-St-Los-Angeles-CA-90007-USA",
+   "name": "2335 Portland St.",
+   "address": "2335 Portland St., Los Angeles, CA 90007",
+   "lat": 34.033057,
+   "lng": -118.2819196,
+   "rent": 7500,
+   "rentMax": 7500,
+   "priceUnit": "per unit",
+   "callForPricing": false,
+   "beds": 0,
+   "bedsMax": 10,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "10B",
+     "roomType": "entire",
+     "beds": 10,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Immediate Move In- Spring 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3863_print.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3866_print.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3869_print.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3872_print.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3878_print.webp"
+   ],
+   "photoCredit": "",
+   "description": "3 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.88,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b5c7b28967b78d9b474",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/1222-W-23rd-St-Los-Angeles-CA-90007-USA",
+   "name": "1222 W. 23rd St.",
+   "address": "1222 W. 23rd St., Los Angeles, CA 90007",
+   "lat": 34.0350148,
+   "lng": -118.2846602,
+   "rent": 7250,
+   "rentMax": 7250,
+   "priceUnit": "per unit",
+   "callForPricing": false,
+   "beds": 7,
+   "bedsMax": 7,
+   "baths": 3.5,
+   "units": [
+    {
+     "label": "7B",
+     "roomType": "entire",
+     "beds": 7,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Rooms",
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/1222mainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/_tud1285.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/_tud1277.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/test-upload_qd6xtkytkw",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/test-upload_bmn1uh1jo"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 270,
+   "distanceToCampusMi": 1.0,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b5e7b28967b78d9b48d",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/1223-1-2-W-23rd-St-Los-Angeles-CA-90007-USA",
+   "name": "1223 W 23rd St.",
+   "address": "1223 1/2 W. 23rd St., Los Angeles, CA 90007",
+   "lat": 34.0354035,
+   "lng": -118.2847057,
+   "rent": 1100,
+   "rentMax": 5000,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 0,
+   "bedsMax": 7,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "7B",
+     "roomType": "entire",
+     "beds": 7,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses",
+    "Student Housing"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/1223w23rdst_5mzbrk0zy",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2030.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2033.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2024.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2009.webp"
+   ],
+   "photoCredit": "",
+   "description": "2 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 1.02,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b617b28967b78d9b4ab",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/1355-W-29th-St-Los-Angeles-CA-90007-USA",
+   "name": "1355 & 1357 W 29th St.",
+   "address": "1355 W. 29th St., Los Angeles, CA 90007",
+   "lat": 34.0285077,
+   "lng": -118.2907953,
+   "rent": 5340,
+   "rentMax": 5375,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 3,
+   "bedsMax": 3,
+   "baths": 3.0,
+   "units": [
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 2
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses",
+    "Student Housing"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_lnwa00o8t",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_uelwq1r1z",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_vdi1srxgx",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_szzn99gsy"
+   ],
+   "photoCredit": "",
+   "description": "2 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 150,
+   "distanceToCampusMi": 0.63,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b5d7b28967b78d9b483",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2647-Ellendale-Pl-Los-Angeles-CA-90007-USA",
+   "name": "2647 Ellendale Pl.",
+   "address": "2647 Ellendale Pl., Los Angeles, CA 90007",
+   "lat": 34.0313621,
+   "lng": -118.2892603,
+   "rent": 12995,
+   "rentMax": 12995,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 8,
+   "bedsMax": 8,
+   "baths": 6.5,
+   "units": [
+    {
+     "label": "8B",
+     "roomType": "entire",
+     "beds": 8,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/2649_ellendale_place-apt_3-2.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/2649_ellendale_place-apt_3-1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/test-upload_fjpaqbnnr",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/test-upload_phht-hkgp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/test-upload__fymwaluoh"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 300,
+   "distanceToCampusMi": 0.78,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b557b28967b78d9b43d",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/3416-Walton-Ave-Los-Angeles-CA-90007-USA",
+   "name": "3416 Walton Ave.",
+   "address": "3416 Walton Ave., Los Angeles, CA 90007",
+   "lat": 34.0249743,
+   "lng": -118.2946677,
+   "rent": 1800,
+   "rentMax": 2400,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 2,
+   "bedsMax": 4,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "2B",
+     "roomType": "entire",
+     "beds": 2,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "3B",
+     "roomType": "entire",
+     "beds": 3,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 2
+    },
+    {
+     "label": "4B",
+     "roomType": "entire",
+     "beds": 4,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Immediate Move In- Spring 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Rooms"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/waltonmainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud1215.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud1218.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud6480.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud6477.webp"
+   ],
+   "photoCredit": "",
+   "description": "4 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 120,
+   "distanceToCampusMi": 0.61,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b517b28967b78d9b41a",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/1293-W-36th-St-Los-Angeles-CA-90007-USA",
+   "name": "1293 W. 36th St.",
+   "address": "1293 W. 36th St., Los Angeles, CA 90007",
+   "lat": 34.0229836,
+   "lng": -118.2972685,
+   "rent": 6000,
+   "rentMax": 6000,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 5,
+   "bedsMax": 5,
+   "baths": 4.0,
+   "units": [
+    {
+     "label": "5B",
+     "roomType": "entire",
+     "beds": 5,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/lkysndqa.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/rwwwwh9a.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/rlcojq1q.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/1zlnj1gg.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/fof7f_zw.webp"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 210,
+   "distanceToCampusMi": 0.7,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b627b28967b78d9b4b5",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2833-Menlo-Ave-Los-Angeles-CA-90007-USA",
+   "name": " 2833 Menlo Ave",
+   "address": "2833 Menlo Ave, Los Angeles, CA 90007",
+   "lat": 34.0285696,
+   "lng": -118.2905976,
+   "rent": 9625,
+   "rentMax": 9625,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 4,
+   "bedsMax": 4,
+   "baths": 4.5,
+   "units": [
+    {
+     "label": "4B",
+     "roomType": "entire",
+     "beds": 4,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/2833_main_picture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/_tud1249.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/_tud1252.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/_tud1251.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2833menloave/test-upload_m7edkaaat"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 180,
+   "distanceToCampusMi": 0.63,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:64ed2b607b28967b78d9b49c",
@@ -911,7 +1859,169 @@
    "distanceToCampusMi": 0.5,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b6a7b28967b78d9b505",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2634-Monmouth-Ave-Los-Angeles-CA-90007-USA",
+   "name": "Hoover Square- 2634 Monmouth Ave",
+   "address": "2634 Monmouth Ave., Los Angeles, CA 90007",
+   "lat": 34.0309894,
+   "lng": -118.2847514,
+   "rent": 4000,
+   "rentMax": 4000,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 8,
+   "bedsMax": 8,
+   "baths": 8.0,
+   "units": [
+    {
+     "label": "8B",
+     "roomType": "entire",
+     "beds": 8,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Student Housing"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/_tud1299.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/2634monmouthmainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/tud_7477-hdr.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/tud_7474-hdr.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/tud_7483-hdr.webp"
+   ],
+   "photoCredit": "",
+   "description": "1 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 300,
+   "distanceToCampusMi": 0.72,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b5f7b28967b78d9b492",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/2639-Monmouth-Ave-Los-Angeles-CA-90007-USA",
+   "name": "2639 Monmouth Ave. ",
+   "address": "2639 Monmouth Ave., Los Angeles, CA 90007",
+   "lat": 34.0309698,
+   "lng": -118.285231,
+   "rent": 1495,
+   "rentMax": 1850,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 0,
+   "bedsMax": 0,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 12
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Rooms",
+    "Apartments"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/2639mainpicture.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/_tud1294.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/test-upload_eq-id7zdv",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/test-upload_wnsecdu9p",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2639monmouthave/test-upload_r4wjnlvlk"
+   ],
+   "photoCredit": "",
+   "description": "12 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.72,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
+  },
+  {
+   "id": "stuho:64ed2b637b28967b78d9b4c4",
+   "source": "Stuho",
+   "url": "https://stuho.com/for-rent-building/956-1-2-W-23rd-St-Los-Angeles-CA-90007-USA",
+   "name": "956 W 23rd St. ",
+   "address": "956 1/2 W. 23rd St., Los Angeles, CA 90007",
+   "lat": 34.0338745,
+   "lng": -118.2816912,
+   "rent": 1395,
+   "rentMax": 3800,
+   "priceUnit": "per unit",
+   "callForPricing": true,
+   "beds": 0,
+   "bedsMax": 4,
+   "baths": 1.0,
+   "units": [
+    {
+     "label": "Studio",
+     "roomType": "entire",
+     "beds": 0,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    },
+    {
+     "label": "4B",
+     "roomType": "entire",
+     "beds": 4,
+     "baths": null,
+     "privateBath": null,
+     "rent": null,
+     "count": 1
+    }
+   ],
+   "roomTypes": [
+    "entire"
+   ],
+   "availability": "Fall 2027",
+   "propertyTypes": [
+    "Apartments",
+    "Houses"
+   ],
+   "amenities": [],
+   "photos": [
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/_tud1291.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/_tud1287.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/test-upload_wuedrevkt",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/test-upload_zsab9ck7p",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/test-upload_tdghop7a8"
+   ],
+   "photoCredit": "",
+   "description": "2 units managed by Stuho",
+   "sampleData": false,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.94,
+   "inDps": true,
+   "inFryft": true,
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:64ed2b5c7b28967b78d9b479",
@@ -972,7 +2082,7 @@
    "distanceToCampusMi": 0.91,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:65d3c346e68fbe733ba9aa99",
@@ -1058,84 +2168,33 @@
    "distanceToCampusMi": 0.77,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b637b28967b78d9b4c4",
+   "id": "stuho:64ed2b547b28967b78d9b438",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/956-1-2-W-23rd-St-Los-Angeles-CA-90007-USA",
-   "name": "956 W 23rd St. ",
-   "address": "956 1/2 W. 23rd St., Los Angeles, CA 90007",
-   "lat": 34.0338745,
-   "lng": -118.2816912,
-   "rent": 1395,
-   "rentMax": 3800,
+   "url": "https://stuho.com/for-rent-building/1126-W-36th-Pl-Los-Angeles-CA-90007-USA",
+   "name": "1126-1128 W. 36th Pl.",
+   "address": "1126 W. 36th Pl., Los Angeles, CA 90007",
+   "lat": 34.0218517,
+   "lng": -118.2925106,
+   "rent": 2400,
+   "rentMax": 2400,
    "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
+   "callForPricing": false,
+   "beds": 1,
    "bedsMax": 4,
    "baths": 1.0,
    "units": [
     {
-     "label": "Studio",
+     "label": "1B",
      "roomType": "entire",
-     "beds": 0,
+     "beds": 1,
      "baths": null,
      "privateBath": null,
      "rent": null,
      "count": 1
     },
-    {
-     "label": "4B",
-     "roomType": "entire",
-     "beds": 4,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/_tud1291.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/_tud1287.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/test-upload_wuedrevkt",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/test-upload_zsab9ck7p",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/956w23rdst/test-upload_tdghop7a8"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.94,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b557b28967b78d9b43d",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/3416-Walton-Ave-Los-Angeles-CA-90007-USA",
-   "name": "3416 Walton Ave.",
-   "address": "3416 Walton Ave., Los Angeles, CA 90007",
-   "lat": 34.0249743,
-   "lng": -118.2946677,
-   "rent": 1800,
-   "rentMax": 2400,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 2,
-   "bedsMax": 4,
-   "baths": 1.0,
-   "units": [
     {
      "label": "2B",
      "roomType": "entire",
@@ -1169,282 +2228,41 @@
    ],
    "availability": "Immediate Move In- Spring 2027",
    "propertyTypes": [
-    "Apartments",
-    "Rooms"
+    "Apartments"
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/waltonmainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud1215.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud1218.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud6480.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/3416waltonave/_tud6477.webp"
-   ],
-   "photoCredit": "",
-   "description": "4 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 120,
-   "distanceToCampusMi": 0.61,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b5e7b28967b78d9b48d",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1223-1-2-W-23rd-St-Los-Angeles-CA-90007-USA",
-   "name": "1223 W 23rd St.",
-   "address": "1223 1/2 W. 23rd St., Los Angeles, CA 90007",
-   "lat": 34.0354035,
-   "lng": -118.2847057,
-   "rent": 1100,
-   "rentMax": 5000,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
-   "bedsMax": 7,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "7B",
-     "roomType": "entire",
-     "beds": 7,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses",
-    "Student Housing"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/1223w23rdst_5mzbrk0zy",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2030.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2033.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2024.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1223w23rdst/_tud2009.webp"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/1126_w_36th_st-ext-1_1.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/1126_w_36th_st-ext-8.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/_tud1716_print.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/_tud1707_print.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/11261128w36thpl/_tud1697_print-mvpul3wr927b37.webp"
    ],
    "photoCredit": "",
    "description": "2 units managed by Stuho",
    "sampleData": false,
    "utilitiesEst": 90,
-   "distanceToCampusMi": 1.02,
+   "distanceToCampusMi": 0.42,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b5d7b28967b78d9b483",
+   "id": "stuho:64ed2b687b28967b78d9b4f6",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2647-Ellendale-Pl-Los-Angeles-CA-90007-USA",
-   "name": "2647 Ellendale Pl.",
-   "address": "2647 Ellendale Pl., Los Angeles, CA 90007",
-   "lat": 34.0313621,
-   "lng": -118.2892603,
-   "rent": 12995,
-   "rentMax": 12995,
+   "url": "https://stuho.com/for-rent-building/3006-Royal-St-Los-Angeles-CA-90007-USA",
+   "name": "The Series - The Royal",
+   "address": "3006 Royal St., Los Angeles, CA 90007",
+   "lat": 34.0259839,
+   "lng": -118.2806733,
+   "rent": 2095,
+   "rentMax": 2545,
    "priceUnit": "per unit",
    "callForPricing": true,
-   "beds": 8,
-   "bedsMax": 8,
-   "baths": 6.5,
-   "units": [
-    {
-     "label": "8B",
-     "roomType": "entire",
-     "beds": 8,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/2649_ellendale_place-apt_3-2.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/2649_ellendale_place-apt_3-1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/test-upload_fjpaqbnnr",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/test-upload_phht-hkgp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2647ellendalepl/test-upload__fymwaluoh"
-   ],
-   "photoCredit": "",
-   "description": "1 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 300,
-   "distanceToCampusMi": 0.78,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b637b28967b78d9b4bf",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2335-Portland-St-Los-Angeles-CA-90007-USA",
-   "name": "2335 Portland St.",
-   "address": "2335 Portland St., Los Angeles, CA 90007",
-   "lat": 34.033057,
-   "lng": -118.2819196,
-   "rent": 7500,
-   "rentMax": 7500,
-   "priceUnit": "per unit",
-   "callForPricing": false,
-   "beds": 0,
-   "bedsMax": 10,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "10B",
-     "roomType": "entire",
-     "beds": 10,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Immediate Move In- Spring 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3863_print.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3866_print.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3869_print.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3872_print.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2335portlandst/_tud3878_print.webp"
-   ],
-   "photoCredit": "",
-   "description": "3 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.88,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b577b28967b78d9b451",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2646-Menlo-Ave-Los-Angeles-CA-90007-USA",
-   "name": "2646 Menlo Ave. ",
-   "address": "2646 Menlo Ave., Los Angeles, CA 90007",
-   "lat": 34.0313195,
-   "lng": -118.2900038,
-   "rent": 12000,
-   "rentMax": 12000,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 8,
-   "bedsMax": 8,
-   "baths": 6.0,
-   "units": [
-    {
-     "label": "8B",
-     "roomType": "entire",
-     "beds": 8,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/2646mainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/_tud1259.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/_tud1260.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/_tud1262.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2646menloave/test-upload_wb84pm7gr"
-   ],
-   "photoCredit": "",
-   "description": "1 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 300,
-   "distanceToCampusMi": 0.79,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b587b28967b78d9b45b",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/841-W-23rd-St-Los-Angeles-CA-90007-USA",
-   "name": "841 W. 23rd St.",
-   "address": "841 W. 23rd St., Los Angeles, CA 90007",
-   "lat": 34.0330682,
-   "lng": -118.2787489,
-   "rent": 1250,
-   "rentMax": 1500,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
+   "beds": 1,
    "bedsMax": 1,
    "baths": 1.0,
    "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 11
-    },
     {
      "label": "1B",
      "roomType": "entire",
@@ -1452,57 +2270,7 @@
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 12
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/841w23rdst_orj4n5tn4",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_dpdf5blig",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_p-qqo5rdd",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_d3y1lxapw",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/841w23rdst/test-upload_wo92ksiaj"
-   ],
-   "photoCredit": "",
-   "description": "23 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.94,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b517b28967b78d9b41a",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1293-W-36th-St-Los-Angeles-CA-90007-USA",
-   "name": "1293 W. 36th St.",
-   "address": "1293 W. 36th St., Los Angeles, CA 90007",
-   "lat": 34.0229836,
-   "lng": -118.2972685,
-   "rent": 6000,
-   "rentMax": 6000,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 5,
-   "bedsMax": 5,
-   "baths": 4.0,
-   "units": [
-    {
-     "label": "5B",
-     "roomType": "entire",
-     "beds": 5,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
+     "count": 36
     }
    ],
    "roomTypes": [
@@ -1511,24 +2279,24 @@
    "availability": "Fall 2027",
    "propertyTypes": [
     "Apartments",
-    "Houses"
+    "Student Housing"
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/lkysndqa.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/rwwwwh9a.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/rlcojq1q.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/1zlnj1gg.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1293129312w36thpl/fof7f_zw.webp"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_gyoqu_yhm",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_agqiejfdv7",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_pkrlaz_wcc",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_r4ndqkyoi",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriestheroyal/test-upload_t4o5koz0n"
    ],
    "photoCredit": "",
-   "description": "1 units managed by Stuho",
+   "description": "36 units managed by Stuho",
    "sampleData": false,
-   "utilitiesEst": 210,
-   "distanceToCampusMi": 0.7,
+   "utilitiesEst": 90,
+   "distanceToCampusMi": 0.46,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "stuho:64ed2b5a7b28967b78d9b460",
@@ -1624,32 +2392,32 @@
    "distanceToCampusMi": 0.45,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b6a7b28967b78d9b505",
+   "id": "stuho:64ed2b5a7b28967b78d9b465",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2634-Monmouth-Ave-Los-Angeles-CA-90007-USA",
-   "name": "Hoover Square- 2634 Monmouth Ave",
-   "address": "2634 Monmouth Ave., Los Angeles, CA 90007",
-   "lat": 34.0309894,
-   "lng": -118.2847514,
-   "rent": 4000,
-   "rentMax": 4000,
+   "url": "https://stuho.com/for-rent-building/1201-W-27th-St-Los-Angeles-CA-90007-USA",
+   "name": "Vista Magnolia",
+   "address": "1201 W. 27th St, Los Angeles, CA 90007",
+   "lat": 34.030482,
+   "lng": -118.286624,
+   "rent": 3900,
+   "rentMax": 4900,
    "priceUnit": "per unit",
    "callForPricing": true,
-   "beds": 8,
-   "bedsMax": 8,
-   "baths": 8.0,
+   "beds": 3,
+   "bedsMax": 3,
+   "baths": 3.0,
    "units": [
     {
-     "label": "8B",
+     "label": "3B",
      "roomType": "entire",
-     "beds": 8,
+     "beds": 3,
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 1
+     "count": 10
     }
    ],
    "roomTypes": [
@@ -1662,215 +2430,45 @@
    ],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/_tud1299.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/2634monmouthmainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/tud_7477-hdr.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/tud_7474-hdr.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2634monmouthave/tud_7483-hdr.webp"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_zwt3bgyhdr",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_eerng3nql",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_3dar4231x9",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_x9nez7ab1",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/vistamagnolia/vistamagnolia_fbqd579vuy"
    ],
    "photoCredit": "",
-   "description": "1 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 300,
-   "distanceToCampusMi": 0.72,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b5c7b28967b78d9b474",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1222-W-23rd-St-Los-Angeles-CA-90007-USA",
-   "name": "1222 W. 23rd St.",
-   "address": "1222 W. 23rd St., Los Angeles, CA 90007",
-   "lat": 34.0350148,
-   "lng": -118.2846602,
-   "rent": 7250,
-   "rentMax": 7250,
-   "priceUnit": "per unit",
-   "callForPricing": false,
-   "beds": 7,
-   "bedsMax": 7,
-   "baths": 3.5,
-   "units": [
-    {
-     "label": "7B",
-     "roomType": "entire",
-     "beds": 7,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Rooms",
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/1222mainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/_tud1285.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/_tud1277.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/test-upload_qd6xtkytkw",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1222w23rdst/test-upload_bmn1uh1jo"
-   ],
-   "photoCredit": "",
-   "description": "1 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 270,
-   "distanceToCampusMi": 1.0,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b507b28967b78d9b40b",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1201-W-30th-St-Los-Angeles-CA-90007-USA",
-   "name": "1201 - 1205 W. 30th St.",
-   "address": "1201 W. 30th St., Los Angeles, CA 90007",
-   "lat": 34.0276259,
-   "lng": -118.2891769,
-   "rent": 4200,
-   "rentMax": 12800,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 3,
-   "bedsMax": 8,
-   "baths": 2.0,
-   "units": [
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "4B",
-     "roomType": "entire",
-     "beds": 4,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "8B",
-     "roomType": "entire",
-     "beds": 8,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/1201mainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/_tud1224.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/_tud1228.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12011205w30thst/_tud1229.webp"
-   ],
-   "photoCredit": "",
-   "description": "3 units managed by Stuho",
+   "description": "10 units managed by Stuho",
    "sampleData": false,
    "utilitiesEst": 150,
-   "distanceToCampusMi": 0.53,
+   "distanceToCampusMi": 0.69,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
-   "id": "stuho:64ed2b5d7b28967b78d9b47e",
+   "id": "stuho:6887cfcf25372bc256459c0d",
    "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1021-W-24th-St-Los-Angeles-CA-90007-USA",
-   "name": "1021 W. 24th St.",
-   "address": "1021 W. 24th St., Los Angeles, CA 90007",
-   "lat": 34.03392669999999,
-   "lng": -118.2826047,
-   "rent": 5400,
-   "rentMax": 5400,
+   "url": "https://stuho.com/for-rent-building/2660-Magnolia-Ave-Los-Angeles-CA-90007-USA",
+   "name": "2660 Magnolia Ave",
+   "address": "2660 Magnolia Ave, Los Angeles, CA 90007",
+   "lat": 34.03118244678426,
+   "lng": -118.28626932883569,
+   "rent": 2100,
+   "rentMax": 2700,
    "priceUnit": "per unit",
    "callForPricing": true,
-   "beds": 6,
-   "bedsMax": 6,
-   "baths": 3.0,
-   "units": [
-    {
-     "label": "6B",
-     "roomType": "entire",
-     "beds": 6,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/_tud1351-1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/_tud1352-1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/_tud1354-1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/test-upload_xwunnrcnc",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1021w24thst/test-upload_arfoexs4i"
-   ],
-   "photoCredit": "",
-   "description": "1 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 240,
-   "distanceToCampusMi": 0.93,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b627b28967b78d9b4ba",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2595-Hoover-St-Los-Angeles-CA-90007-USA",
-   "name": "Element",
-   "address": "2595 Hoover St., Los Angeles, CA 90007",
-   "lat": 34.032052,
-   "lng": -118.2843636,
-   "rent": 725,
-   "rentMax": 725,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 1,
+   "beds": 2,
    "bedsMax": 3,
    "baths": 1.0,
    "units": [
     {
-     "label": "1B",
+     "label": "2B",
      "roomType": "entire",
-     "beds": 1,
+     "beds": 2,
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 1
+     "count": 4
     },
     {
      "label": "3B",
@@ -1879,628 +2477,30 @@
      "baths": null,
      "privateBath": null,
      "rent": null,
-     "count": 5
+     "count": 1
     }
    ],
    "roomTypes": [
     "entire"
    ],
    "availability": "Immediate Move In- Spring 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Student Housing"
-   ],
+   "propertyTypes": [],
    "amenities": [],
    "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/dji_0144-1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/element_003.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/element_007.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/elememt.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/element/element_013.webp"
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/94ab8460c0c562bf74b2a61ccd603ff9-uncropped_scaled_within_1536_1152.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/91b1bf11359472b4a37cc790e069a411-uncropped_scaled_within_1536_1152.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/a556c9bf0df1568965d90ff3b95da73e-uncropped_scaled_within_1536_1152.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/2720ed4964bdf77ed057bacf821a3e23-uncropped_scaled_within_1536_1152.webp",
+    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2660MagnoliaAve/2660.webp"
    ],
    "photoCredit": "",
-   "description": "2 units managed by Stuho",
+   "description": "5 units managed by Stuho",
    "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.79,
+   "utilitiesEst": 120,
+   "distanceToCampusMi": 0.73,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b617b28967b78d9b4ab",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1355-W-29th-St-Los-Angeles-CA-90007-USA",
-   "name": "1355 & 1357 W 29th St.",
-   "address": "1355 W. 29th St., Los Angeles, CA 90007",
-   "lat": 34.0285077,
-   "lng": -118.2907953,
-   "rent": 5340,
-   "rentMax": 5375,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 3,
-   "bedsMax": 3,
-   "baths": 3.0,
-   "units": [
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 2
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses",
-    "Student Housing"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_lnwa00o8t",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_uelwq1r1z",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_vdi1srxgx",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1355w29thst/test-upload_szzn99gsy"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 150,
-   "distanceToCampusMi": 0.63,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b537b28967b78d9b429",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1283-W-36th-St-Los-Angeles-CA-90007-USA",
-   "name": "1283 W. 36th St.",
-   "address": "1283 W. 36th St., Los Angeles, CA 90007",
-   "lat": 34.0230509,
-   "lng": -118.2969916,
-   "rent": 1795,
-   "rentMax": 5700,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 1,
-   "bedsMax": 5,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "1B",
-     "roomType": "entire",
-     "beds": 1,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "5B",
-     "roomType": "entire",
-     "beds": 5,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283128312w36thst_3exky1nbq",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283128312w36thst_lw5vwvltl",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283_w_36th_st_5.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283_w_36th_st_3.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1283128312w36thst/1283_w_36th_st_2.webp"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.69,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b687b28967b78d9b4f1",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2620-Severance-St-Los-Angeles-CA-90007-USA",
-   "name": "The Series - The Dime",
-   "address": "2620 Severance St., Los Angeles, CA 90007",
-   "lat": 34.0296025,
-   "lng": -118.2810061,
-   "rent": 2050,
-   "rentMax": 2950,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 1,
-   "bedsMax": 2,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "1B",
-     "roomType": "entire",
-     "beds": 1,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 8
-    },
-    {
-     "label": "2B",
-     "roomType": "entire",
-     "beds": 2,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 8
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload__dppugwaf",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_vpjzracz3",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_2n-l9n9p7",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_utrkl8aoz",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthedime/test-upload_7dfil-pwf"
-   ],
-   "photoCredit": "",
-   "description": "16 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.67,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b567b28967b78d9b447",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2633-Ellendale-Pl-Los-Angeles-CA-90007-USA",
-   "name": "2633 Ellendale Pl. ",
-   "address": "2633 Ellendale Pl., Los Angeles, CA 90007",
-   "lat": 34.031739,
-   "lng": -118.2892845,
-   "rent": 1500,
-   "rentMax": 1800,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
-   "bedsMax": 0,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 18
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl__5affd1hjm",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_wg_amgrj7",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_ggur7bphp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_j3zpbkaga_",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2633ellendalepl/2633ellendalepl_mp1xqtfvx"
-   ],
-   "photoCredit": "",
-   "description": "18 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.8,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b677b28967b78d9b4ec",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/738-42-W-27th-St-Los-Angeles-CA-90007-USA",
-   "name": "The Series - The Moon",
-   "address": "738-42 W. 27th St., Los Angeles, CA 90007",
-   "lat": 34.0284161,
-   "lng": -118.2803996,
-   "rent": 2000,
-   "rentMax": 3850,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 1,
-   "bedsMax": 3,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "1B",
-     "roomType": "entire",
-     "beds": 1,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 17
-    },
-    {
-     "label": "2B",
-     "roomType": "entire",
-     "beds": 2,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 13
-    },
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 4
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Student Housing"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/test-upload_fr2sbkl3h6",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/test-upload_m_nkddtxfe",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/theseriesthemoon_2yqqdaekb",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/theseriesthemoon_nycbid1ap0",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/theseriesthemoon/theseriesthemoon_9hl9ohok2"
-   ],
-   "photoCredit": "",
-   "description": "34 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.61,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b5b7b28967b78d9b46f",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2356-Portland-St-Los-Angeles-CA-90007-USA",
-   "name": "2356 Portland St.",
-   "address": "2356 Portland St., Los Angeles, CA 90007",
-   "lat": 34.0322849,
-   "lng": -118.2816455,
-   "rent": 1995,
-   "rentMax": 3200,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
-   "bedsMax": 4,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "2B",
-     "roomType": "entire",
-     "beds": 2,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 3
-    },
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "4B",
-     "roomType": "entire",
-     "beds": 4,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_fd166ldai",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_dxxa7h9-w6",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_dsbfzuoyu",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_756avgzdhy",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/2356portlandst/2356portlandst_lgp2jvp9e"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.84,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b517b28967b78d9b410",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/3010-Shrine-Pl-Los-Angeles-CA-90007-USA",
-   "name": "The Series - Cielo",
-   "address": "3010 Shrine Pl., Los Angeles, CA 90007",
-   "lat": 34.0253184,
-   "lng": -118.2797272,
-   "rent": 5600,
-   "rentMax": 6950,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 4,
-   "bedsMax": 4,
-   "baths": 3.0,
-   "units": [
-    {
-     "label": "4B",
-     "roomType": "entire",
-     "beds": 4,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 2
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Student Housing"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_cotozjuncc",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_kguegfpfp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_5pi8s2r9z",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_49-j0oyad",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/cielo/test-upload_svoqiop56"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 180,
-   "distanceToCampusMi": 0.46,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b697b28967b78d9b500",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1118-W-25th-St-Los-Angeles-CA-90007-USA",
-   "name": "1118 W. 25th St.",
-   "address": "1118 W. 25th St., Los Angeles, CA 90007",
-   "lat": 34.0333616,
-   "lng": -118.2846719,
-   "rent": 3150,
-   "rentMax": 3150,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 3,
-   "bedsMax": 3,
-   "baths": 2.0,
-   "units": [
-    {
-     "label": "3B",
-     "roomType": "entire",
-     "beds": 3,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 2
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_w4zgkrqgdh",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_qce9anura",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_igkg5ergw",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_osl1dbb-l",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/1118w25thst/1118w25thst_tfuyp8kgw"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 150,
-   "distanceToCampusMi": 0.88,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b5f7b28967b78d9b497",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/2662-1-2-Orchard-Ave-Los-Angeles-CA-90007-USA",
-   "name": "2660 - 2662 Orchard Ave.",
-   "address": "2662 1/2 Orchard Ave., Los Angeles, CA 90007",
-   "lat": 34.0309311,
-   "lng": -118.2872907,
-   "rent": 1385,
-   "rentMax": 8075,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 0,
-   "bedsMax": 5,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "Studio",
-     "roomType": "entire",
-     "beds": 0,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "4B",
-     "roomType": "entire",
-     "beds": 4,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    },
-    {
-     "label": "5B",
-     "roomType": "entire",
-     "beds": 5,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 1
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments",
-    "Houses"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_oi6ny_r_k9",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_mjjgklcfj",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_9cqdbxxyj",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_5sdohmsgu",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/26602662orchardave/test-upload_g0bvofvcz"
-   ],
-   "photoCredit": "",
-   "description": "2 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.72,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
-  },
-  {
-   "id": "stuho:64ed2b527b28967b78d9b41f",
-   "source": "Stuho",
-   "url": "https://stuho.com/for-rent-building/1280-W-Jefferson-Blvd-Los-Angeles-CA-90007-USA",
-   "name": "1280 W. Jefferson Blvd.",
-   "address": "1280 W. Jefferson Blvd., Los Angeles, CA 90007",
-   "lat": 34.02522769999999,
-   "lng": -118.2939984,
-   "rent": 1725,
-   "rentMax": 2350,
-   "priceUnit": "per unit",
-   "callForPricing": true,
-   "beds": 1,
-   "bedsMax": 2,
-   "baths": 1.0,
-   "units": [
-    {
-     "label": "1B",
-     "roomType": "entire",
-     "beds": 1,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 4
-    },
-    {
-     "label": "2B",
-     "roomType": "entire",
-     "beds": 2,
-     "baths": null,
-     "privateBath": null,
-     "rent": null,
-     "count": 4
-    }
-   ],
-   "roomTypes": [
-    "entire"
-   ],
-   "availability": "Fall 2027",
-   "propertyTypes": [
-    "Apartments"
-   ],
-   "amenities": [],
-   "photos": [
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/mainpicture.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/_tud1220.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/_tud1219.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/1280_w_jefferson_blvd_1.webp",
-    "https://cdn.it49.com/an1ince54c3/rentelf/clients/stuho280823/Buildings/12801284wjeffersonblvd/1280_w_jefferson_blvd_2.webp"
-   ],
-   "photoCredit": "",
-   "description": "8 units managed by Stuho",
-   "sampleData": false,
-   "utilitiesEst": 90,
-   "distanceToCampusMi": 0.59,
-   "inDps": true,
-   "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10020002",
@@ -2558,7 +2558,7 @@
    "distanceToCampusMi": 0.48,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000202",
@@ -2616,7 +2616,7 @@
    "distanceToCampusMi": 0.91,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000089",
@@ -2674,7 +2674,7 @@
    "distanceToCampusMi": 0.76,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000084",
@@ -2732,7 +2732,7 @@
    "distanceToCampusMi": 0.84,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000274",
@@ -2790,7 +2790,7 @@
    "distanceToCampusMi": 1.02,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000218",
@@ -2848,7 +2848,7 @@
    "distanceToCampusMi": 1.24,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000040",
@@ -2906,7 +2906,7 @@
    "distanceToCampusMi": 1.2,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000213",
@@ -2964,7 +2964,7 @@
    "distanceToCampusMi": 1.22,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000219",
@@ -3022,7 +3022,7 @@
    "distanceToCampusMi": 1.38,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10015261",
@@ -3080,7 +3080,7 @@
    "distanceToCampusMi": 0.93,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000221",
@@ -3139,7 +3139,7 @@
    "distanceToCampusMi": 0.92,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000210",
@@ -3197,7 +3197,7 @@
    "distanceToCampusMi": 1.1,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000205",
@@ -3255,7 +3255,7 @@
    "distanceToCampusMi": 0.96,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000038",
@@ -3314,7 +3314,7 @@
    "distanceToCampusMi": 0.98,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000037",
@@ -3373,7 +3373,7 @@
    "distanceToCampusMi": 0.78,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10019979",
@@ -3431,7 +3431,7 @@
    "distanceToCampusMi": 1.3,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000207",
@@ -3489,7 +3489,7 @@
    "distanceToCampusMi": 0.98,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000082",
@@ -3547,7 +3547,7 @@
    "distanceToCampusMi": 0.59,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000216",
@@ -3605,7 +3605,7 @@
    "distanceToCampusMi": 1.28,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000212",
@@ -3663,7 +3663,7 @@
    "distanceToCampusMi": 1.23,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000238",
@@ -3721,7 +3721,7 @@
    "distanceToCampusMi": 0.46,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000236",
@@ -3774,7 +3774,7 @@
    "distanceToCampusMi": 1.33,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000155",
@@ -3832,7 +3832,7 @@
    "distanceToCampusMi": 0.76,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000149",
@@ -3890,7 +3890,7 @@
    "distanceToCampusMi": 0.43,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000112",
@@ -3947,7 +3947,7 @@
    "distanceToCampusMi": 1.07,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000056",
@@ -4005,7 +4005,7 @@
    "distanceToCampusMi": 0.84,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000099",
@@ -4063,7 +4063,7 @@
    "distanceToCampusMi": 1.22,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000215",
@@ -4121,7 +4121,7 @@
    "distanceToCampusMi": 1.25,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000201",
@@ -4179,7 +4179,7 @@
    "distanceToCampusMi": 0.9,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:50000247",
@@ -4233,7 +4233,7 @@
    "distanceToCampusMi": 1.51,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000063",
@@ -4291,7 +4291,7 @@
    "distanceToCampusMi": 0.84,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000167",
@@ -4349,7 +4349,7 @@
    "distanceToCampusMi": 0.53,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10020004",
@@ -4405,7 +4405,7 @@
    "distanceToCampusMi": 0.98,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000061",
@@ -4463,7 +4463,7 @@
    "distanceToCampusMi": 0.64,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000222",
@@ -4521,7 +4521,7 @@
    "distanceToCampusMi": 1.02,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000200",
@@ -4580,7 +4580,7 @@
    "distanceToCampusMi": 0.78,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10020005",
@@ -4638,7 +4638,7 @@
    "distanceToCampusMi": 0.84,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10019963",
@@ -4697,7 +4697,7 @@
    "distanceToCampusMi": 0.57,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000062",
@@ -4756,7 +4756,7 @@
    "distanceToCampusMi": 0.74,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000214",
@@ -4814,7 +4814,7 @@
    "distanceToCampusMi": 1.23,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10019975",
@@ -4872,7 +4872,7 @@
    "distanceToCampusMi": 0.93,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "tripalink:10000204",
@@ -4930,7 +4930,7 @@
    "distanceToCampusMi": 0.94,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:830",
@@ -4976,7 +4976,7 @@
    "distanceToCampusMi": 1.07,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:831",
@@ -5022,7 +5022,7 @@
    "distanceToCampusMi": 1.07,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:153",
@@ -5077,7 +5077,7 @@
    "distanceToCampusMi": 0.66,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:61",
@@ -5123,7 +5123,7 @@
    "distanceToCampusMi": 0.68,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:827",
@@ -5169,7 +5169,7 @@
    "distanceToCampusMi": 0.75,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:811",
@@ -5215,7 +5215,7 @@
    "distanceToCampusMi": 0.59,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:808",
@@ -5261,7 +5261,7 @@
    "distanceToCampusMi": 0.71,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:696",
@@ -5307,7 +5307,7 @@
    "distanceToCampusMi": 0.86,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:778",
@@ -5362,7 +5362,7 @@
    "distanceToCampusMi": 0.73,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:749",
@@ -5408,7 +5408,7 @@
    "distanceToCampusMi": 0.8,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:74",
@@ -5454,7 +5454,7 @@
    "distanceToCampusMi": 0.51,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:742",
@@ -5500,7 +5500,7 @@
    "distanceToCampusMi": 0.56,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:680",
@@ -5546,7 +5546,7 @@
    "distanceToCampusMi": 0.76,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:109",
@@ -5592,7 +5592,7 @@
    "distanceToCampusMi": 0.63,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:509",
@@ -5638,7 +5638,7 @@
    "distanceToCampusMi": 0.75,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:677",
@@ -5684,7 +5684,7 @@
    "distanceToCampusMi": 0.86,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:676",
@@ -5730,7 +5730,7 @@
    "distanceToCampusMi": 0.73,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:55",
@@ -5794,7 +5794,7 @@
    "distanceToCampusMi": 0.63,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:59",
@@ -5840,7 +5840,7 @@
    "distanceToCampusMi": 0.68,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:163",
@@ -5895,7 +5895,7 @@
    "distanceToCampusMi": 0.7,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:121",
@@ -5950,7 +5950,7 @@
    "distanceToCampusMi": 0.73,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:42",
@@ -5996,7 +5996,7 @@
    "distanceToCampusMi": 0.73,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:111",
@@ -6042,7 +6042,7 @@
    "distanceToCampusMi": 0.47,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:8",
@@ -6097,7 +6097,7 @@
    "distanceToCampusMi": 0.71,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:40",
@@ -6161,7 +6161,7 @@
    "distanceToCampusMi": 2.55,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:101",
@@ -6207,7 +6207,7 @@
    "distanceToCampusMi": 0.54,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:17",
@@ -6253,7 +6253,7 @@
    "distanceToCampusMi": 0.62,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:176",
@@ -6299,7 +6299,7 @@
    "distanceToCampusMi": 0.78,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:62",
@@ -6354,7 +6354,7 @@
    "distanceToCampusMi": 0.55,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:28",
@@ -6400,7 +6400,7 @@
    "distanceToCampusMi": 0.49,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "mosaicstudent:44",
@@ -6446,7 +6446,7 @@
    "distanceToCampusMi": 0.56,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "featured:lorenzo",
@@ -6577,7 +6577,7 @@
    "distanceToCampusMi": 0.92,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "featured:menlo",
@@ -6675,7 +6675,7 @@
    "distanceToCampusMi": 0.73,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "featured:ellendale",
@@ -6765,7 +6765,7 @@
    "distanceToCampusMi": 0.72,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "featured:palisades",
@@ -6863,7 +6863,7 @@
    "distanceToCampusMi": 0.59,
    "inDps": true,
    "inFryft": true,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   },
   {
    "id": "featured:citypark",
@@ -6942,7 +6942,7 @@
    "distanceToCampusMi": 1.25,
    "inDps": false,
    "inFryft": false,
-   "scrapedAt": "2026-11-14T17:25:17"
+   "scrapedAt": "2026-11-14T21:30:44"
   }
  ]
 }
