@@ -155,7 +155,9 @@ idpRouter.post('/authorize/send', async (req, res) => {
   const code = String(randomInt(0, 1e6)).padStart(6, '0')
   otps.set(email, { hash: b64url(hashOtp(email, code)), exp: Date.now() + 10 * 60e3, tries: 0, sentAt: Date.now() })
   try { await sendLoginCode(email, code) } catch (e) {
-    console.error('mail', (e as Error).message); otps.delete(email)
+    // log the provider's own reason (e.g. Brevo's "unrecognised IP address"), never the key or the code
+    const r = (e as { response?: { status?: number; data?: { code?: string; message?: string } } }).response
+    console.error('mail failed:', r?.status ?? '', r?.data?.code ?? '', r?.data?.message ?? (e as Error).message); otps.delete(email)
     return res.type('html').send(emailForm(q, 'We could not send the email. Try again in a minute.', email))
   }
   res.type('html').send(codeForm(q, email, name))
