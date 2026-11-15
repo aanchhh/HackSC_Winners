@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { TileLayer } from 'react-leaflet'
 
-// Clean, colorful basemap (Stadia "OSM Bright": green parks, warm roads, readable labels).
-// Works on localhost with no key. For a deployed domain, register it (free) at stadiamaps.com, or set
-// VITE_TILE_URL. If tiles keep failing we fall back to standard OpenStreetMap automatically.
-const PRIMARY = import.meta.env.VITE_TILE_URL ?? 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png'
-const PRIMARY_ATTR = '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-const NIGHT = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+// CARTO basemaps: "Voyager" (colorful, readable labels) by day, "Dark Matter" at night.
+// No API key and no domain registration, so they work on localhost and on the deployed site alike.
+// (Stadia Maps only works keyless on localhost: on a real domain it returns an error *image*, which
+// Leaflet can't detect as a failure.) Set VITE_TILE_URL to use your own tiles. If tiles keep failing
+// we fall back to standard OpenStreetMap automatically.
+const PRIMARY = import.meta.env.VITE_TILE_URL ?? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+const NIGHT = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+const PRIMARY_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
 const FALLBACK = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const FALLBACK_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
@@ -19,6 +21,7 @@ export default function Basemap({ extraAttribution = '', night = false }: { extr
     <TileLayer
       key={fallback ? `fallback${night}` : night ? 'night' : 'primary'}
       url={fallback ? FALLBACK : night ? NIGHT : PRIMARY}
+      subdomains="abcd"
       className={fallback && night ? 'ts-tiles-invert' : undefined}
       attribution={(fallback ? FALLBACK_ATTR : PRIMARY_ATTR) + extraAttribution}
       maxZoom={19}
