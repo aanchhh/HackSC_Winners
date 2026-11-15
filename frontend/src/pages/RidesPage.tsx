@@ -198,7 +198,7 @@ export default function RidesPage() {
         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 font-bold tracking-wider">
           <span className={`h-2 w-2 rounded-full ${live ? 'live-dot bg-red-500' : 'bg-stone-500'}`} />{live ? 'LIVE' : signedIn ? 'connecting…' : 'OFFLINE'}
         </span>
-        {state ? <span className="flex shrink-0 items-center gap-1.5"><Users size={13} /><b className="num">{state.stats.live}</b> friends’ rides now · <b className="num">{state.stats.sharing}</b> shared</span>
+        {state ? <span className="flex shrink-0 items-center gap-1.5"><Users size={13} /><b className="num">{state.stats.live}</b> rides with friends now · <b className="num">{state.stats.sharing}</b> shared</span>
           : !signedIn && <span className="shrink-0 text-white/70">Sign in to see rides from your friends</span>}
         <div className="flex min-w-0 gap-6 truncate text-white/70">
           <AnimatePresence initial={false}>
@@ -235,7 +235,7 @@ export default function RidesPage() {
           {signedIn && hasFriends && !ride && (
             <div className="card space-y-4 p-4">
               {account.data && (
-                <div className="flex items-center gap-2 text-sm"><span className="grid h-7 w-7 place-items-center rounded-full bg-cardinal text-xs font-bold text-gold">{account.data.name[0]}</span>Riding as <b>{account.data.name}</b><span className="ml-auto text-xs text-stone-500">{account.data.friends.length} friends</span></div>
+                <div className="flex items-center gap-2 text-sm"><span className="grid h-7 w-7 place-items-center rounded-full bg-cardinal text-xs font-bold text-gold">{account.data.name[0]}</span>Riding as <b>{account.data.name}</b><span className="ml-auto text-xs text-stone-500">{account.data.friends.length} friend{account.data.friends.length === 1 ? "" : "s"}</span></div>
               )}
               <PlaceInput label="Pickup" value={pickup} onChange={setPickup} quick={QUICK_PICKUPS} picking={picking === 'pickup'} onPickMap={() => setPicking(picking === 'pickup' ? null : 'pickup')} onPreview={setPreview} />
               <PlaceInput label="Drop-off" value={drop} onChange={setDrop} quick={QUICK_DROPS} picking={picking === 'drop'} onPickMap={() => setPicking(picking === 'drop' ? null : 'drop')} onPreview={setPreview} />
@@ -318,7 +318,7 @@ export default function RidesPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Riders on your route ({ride.matches.length}{ride.matches.some((m) => m.friend) ? `, ${ride.matches.filter((m) => m.friend).length} friends` : ''})</div>
+                <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Friends on your route ({ride.matches.length})</div>
               </div>
               {ride.matches.length === 0 && <p className="rounded-xl bg-white p-4 text-sm text-stone-500 ring-1 ring-stone-200">None of your friends are on your route yet. If a friend books a similar trip, they’ll appear here live.</p>}
               <div className="space-y-2">
