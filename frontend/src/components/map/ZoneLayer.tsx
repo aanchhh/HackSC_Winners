@@ -1,14 +1,21 @@
 import { GeoJSON } from 'react-leaflet'
 
-const COLORS: Record<string, string> = { DPS: '#990000', Fryft: '#FFC72C', Tram: '#2563eb' }
+export const ZONE_STYLE: Record<string, { color: string; fill: number; dash?: string }> = {
+  DPS: { color: '#990000', fill: 0.1 },
+  Fryft: { color: '#d4a106', fill: 0.04, dash: '6 6' },
+}
 
-// TODO(Aanchal): toggles per zone
-export default function ZoneLayer({ data }: { data: GeoJSON.FeatureCollection }) {
+export default function ZoneLayer({ data, visible }: { data: GeoJSON.FeatureCollection; visible: Record<string, boolean> }) {
+  const features = data.features.filter((f) => visible[f.properties?.name] !== false)
   return (
     <GeoJSON
-      key={JSON.stringify(data).length}
-      data={data}
-      style={(f) => ({ color: COLORS[f?.properties?.name] ?? '#666', weight: 2, fillOpacity: 0.12 })}
+      key={features.map((f) => f.properties?.name).join(',')}
+      data={{ ...data, features } as GeoJSON.FeatureCollection}
+      style={(f) => {
+        const s = ZONE_STYLE[f?.properties?.name] ?? { color: '#666', fill: 0.05 }
+        return { color: s.color, weight: 2.5, fillOpacity: s.fill, dashArray: s.dash }
+      }}
+      interactive={false}
     />
   )
 }

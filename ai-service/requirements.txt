@@ -34,3 +34,8 @@ tiktoken              # ~300-token chunking (token estimate only)
 pytest
 pytest-asyncio
 ruff
+
+# --- Listings retrieval (hybrid) ---
+faiss-cpu             # dense index
+bm25s                 # fast BM25 (sparse)
+PyStemmer             # stemming for bm25s

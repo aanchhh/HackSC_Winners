@@ -12,7 +12,8 @@ from langgraph.graph import END, START, StateGraph
 
 from app.agent import prompts
 from app.agent.state import AgentState
-from app.agent.tools import commute, neighborhood_rag, score, search_listings, true_cost, zone_check
+from app.agent.tools import commute, hybrid_search, neighborhood_rag, score, search_listings, true_cost, zone_check
+from app.listings.index import INDEX
 from app.llm import get_llm
 from app.schemas import Filters
 
@@ -54,7 +55,11 @@ async def extract_filters(state: AgentState, config: RunnableConfig):
 async def search(state: AgentState, config: RunnableConfig):
     await _step(config, "Searching listings", "running")
     f = state["filters"]
-    res = await search_listings.ainvoke({"maxRent": f.maxRent, "beds": f.beds, "inFryft": f.inFryft, "inDps": f.inDps})
+    if INDEX.listings:  # live scraped listings via hybrid retrieval
+        res = await hybrid_search.ainvoke({"query": _last_user_text(state), "maxRent": f.maxRent, "minBeds": f.beds,
+                                           "inDps": f.inDps, "inFryft": f.inFryft, "k": 8})
+    else:               # fallback: Node filter over seed data
+        res = await search_listings.ainvoke({"maxRent": f.maxRent, "beds": f.beds, "inFryft": f.inFryft, "inDps": f.inDps})
     await _step(config, "Searching listings", "done")
     return {"candidates": res if isinstance(res, list) else []}
 
@@ -104,7 +109,7 @@ async def explain(state: AgentState, config: RunnableConfig):
                 await emit("token", {"text": chunk.text})
     elif emit:
         text = (f"[mock] Found {len(ranked)} listing(s). Top: "
-                + ", ".join(f"#{l['id']} ${l['rent']} (fit {l.get('fitScore')})" for l in ranked[:3])
+                + ", ".join(f"{l.get('name', l['id'])} ${l.get('rent')} (fit {l.get('fitScore')})" for l in ranked[:3])
                 if ranked else "[mock] Set LLM_API_KEY in ai-service/.env to enable real answers.")
         for word in text.split(" "):
             await emit("token", {"text": word + " "})

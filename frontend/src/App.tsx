@@ -1,26 +1,27 @@
-import MapView from './components/map/MapView'
-import ProfileBar from './components/profile/ProfileBar'
-import ReportCard from './components/report/ReportCard'
-import ChatPanel from './components/chat/ChatPanel'
-import CompareDrawer from './components/compare/CompareDrawer'
-import { useAppStore } from './store/useAppStore'
+import { Route, Routes } from 'react-router'
+import Navbar from './components/layout/Navbar'
+import HomePage from './pages/HomePage'
+import MapPage from './pages/MapPage'
+import SearchPage from './pages/SearchPage'
+import ChatPage from './pages/ChatPage'
+import CostPage from './pages/CostPage'
+import PreferencesPage from './pages/PreferencesPage'
 
-// Layout: map left, list/report/chat right
 export default function App() {
-  const selectedId = useAppStore((s) => s.selectedId)
   return (
     <div className="flex h-full flex-col">
-      <ProfileBar />
-      <div className="flex min-h-0 flex-1">
-        <div className="flex-1"><MapView /></div>
-        <aside className="flex w-[420px] flex-col border-l">
-          <div className="max-h-[55%] overflow-y-auto border-b">
-            {selectedId ? <ReportCard id={selectedId} /> : <p className="p-4 text-sm text-gray-500">Click a listing to see its Trojan Report Card.</p>}
-          </div>
-          <div className="min-h-0 flex-1"><ChatPanel /></div>
-        </aside>
-      </div>
-      <CompareDrawer />
+      <Navbar />
+      <main className="min-h-0 flex-1 overflow-y-auto">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/ask" element={<ChatPage />} />
+          <Route path="/true-cost" element={<CostPage />} />
+          <Route path="/preferences" element={<PreferencesPage />} />
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+      </main>
     </div>
   )
 }

@@ -15,7 +15,7 @@ async function orsMinutes(profile: 'foot-walking' | 'cycling-regular', from: [nu
   return Math.round(data.routes[0].summary.duration / 60)
 }
 
-export async function commute(listing: Listing, targets: Building[]) {
+export async function commute(listing: Pick<Listing, 'lat' | 'lng'>, targets: Building[]) {
   return Promise.all(targets.map(async (b) => {
     const from: [number, number] = [listing.lng, listing.lat], to: [number, number] = [b.lng, b.lat]
     if (config.orsApiKey) {

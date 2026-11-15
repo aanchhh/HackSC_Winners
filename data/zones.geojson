@@ -1,10 +1,37 @@
 {
   "type": "FeatureCollection",
-  "_note": "PLACEHOLDER polygons. Prasham: redraw DPS + Fryft from official USC maps on geojson.io and update last_verified.",
   "features": [
-    { "type": "Feature", "properties": { "name": "DPS", "last_verified": null },
-      "geometry": { "type": "Polygon", "coordinates": [[[-118.300, 34.012], [-118.272, 34.012], [-118.272, 34.035], [-118.300, 34.035], [-118.300, 34.012]]] } },
-    { "type": "Feature", "properties": { "name": "Fryft", "last_verified": null },
-      "geometry": { "type": "Polygon", "coordinates": [[[-118.305, 34.008], [-118.268, 34.008], [-118.268, 34.040], [-118.305, 34.040], [-118.305, 34.008]]] } }
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "DPS",
+        "label": "USC DPS patrol zone",
+        "source": "Traced from the map 'Map Prepared by the DPS Crime Analysis Unit' (USC Department of Public Safety). Approximate to ~1 block.",
+        "last_verified": "2026-11-14"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-118.3003, 34.0327], [-118.2915, 34.0327], [-118.2915, 34.0359], [-118.2841, 34.0359],
+          [-118.2841, 34.0397], [-118.2684, 34.0325], [-118.2762, 34.0201], [-118.2749, 34.0195],
+          [-118.2771, 34.0162], [-118.2784, 34.0167], [-118.2804, 34.0136], [-118.2828, 34.0140],
+          [-118.2828, 34.0110], [-118.2915, 34.0108], [-118.2915, 34.0183], [-118.3003, 34.0183],
+          [-118.3003, 34.0327]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fryft",
+        "label": "Fryft (free Lyft) service area",
+        "source": "PLACEHOLDER rectangle — replace with the official USC Transportation Fryft map.",
+        "last_verified": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-118.3090, 34.0080], [-118.2650, 34.0080], [-118.2650, 34.0420], [-118.3090, 34.0420], [-118.3090, 34.0080]]]
+      }
+    }
   ]
 }

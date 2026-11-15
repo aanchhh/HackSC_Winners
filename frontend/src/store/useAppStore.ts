@@ -1,27 +1,31 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { Profile } from '../api/types'
 
 interface AppState {
   profile: Profile
-  selectedId: number | null
-  highlightedIds: number[]
-  compareIds: number[]
+  compareIds: string[]
+  highlightedIds: string[]
   setProfile: (p: Partial<Profile>) => void
-  select: (id: number | null) => void
-  highlight: (ids: number[]) => void
-  toggleCompare: (id: number) => void
+  toggleCompare: (id: string) => void
+  clearCompare: () => void
+  highlight: (ids: string[]) => void
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  profile: { budget: 1500, buildingIds: [], lateNights: 2, priorities: { cost: 0.4, commute: 0.3, zone: 0.2, incidents: 0.1 } },
-  selectedId: null,
-  highlightedIds: [],
-  compareIds: [],
-  setProfile: (p) => set((s) => ({ profile: { ...s.profile, ...p } })),
-  select: (id) => set({ selectedId: id }),
-  highlight: (ids) => set({ highlightedIds: ids }),
-  toggleCompare: (id) =>
-    set((s) => ({
-      compareIds: s.compareIds.includes(id) ? s.compareIds.filter((x) => x !== id) : [...s.compareIds, id].slice(-3),
-    })),
-}))
+export const MAX_COMPARE = 3
+
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      profile: { budget: 1500, buildingIds: [1, 3], lateNights: 2, priorities: { cost: 0.4, commute: 0.3, zone: 0.2, incidents: 0.1 } },
+      compareIds: [],
+      highlightedIds: [],
+      setProfile: (p) => set((s) => ({ profile: { ...s.profile, ...p } })),
+      toggleCompare: (id) =>
+        set((s) => ({ compareIds: s.compareIds.includes(id) ? s.compareIds.filter((x) => x !== id) : [...s.compareIds, id].slice(-MAX_COMPARE) })),
+      clearCompare: () => set({ compareIds: [] }),
+      highlight: (ids) => set({ highlightedIds: ids }),
+    }),
+    { name: 'trojanscout', partialize: (s) => ({ profile: s.profile, compareIds: s.compareIds }) },
+  ),
+)
