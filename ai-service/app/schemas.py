@@ -51,4 +51,4 @@ class BlockSummary(BaseModel):
     citations: list[Citation] = Field(default_factory=list)
 
 
-Intent = Literal["search", "ask_about_listing", "general", "need_info"]
+Intent = Literal["search", "ask_about_listing", "general", "need_info", "named"]

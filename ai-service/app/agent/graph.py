@@ -42,9 +42,48 @@ def _last_user_text(state: AgentState) -> str:
     return state["messages"][-1].content if state.get("messages") else ""
 
 
+_GENERIC = {"the", "series", "st", "street", "ave", "avenue", "w", "west", "s", "south", "pl", "place", "blvd", "dr", "apartments",
+            "apts", "apt", "and", "amp", "at", "on", "of"}
+
+
+def _alt_tokens(name: str) -> list[set[str]]:
+    """Ways a student might name a building: 'The Series - The Dime' → {series}, {dime}; '2335 Portland St.' → {2335, portland}."""
+    import html
+    alts = []
+    for part in re.split(r"\(|\)|\s-\s|-\s|\s-", html.unescape(name).lower()):
+        toks = {t for t in re.findall(r"[a-z]+|\d+", part) if t not in _GENERIC}
+        if toks and not all(t.isdigit() and len(t) < 3 for t in toks):
+            alts.append(toks)
+    return alts
+
+
+def named_listings(text: str) -> list[dict]:
+    """Listings the question names outright ("how's the Lorenzo?"); every distinctive word of a name must appear."""
+    words = set(re.findall(r"[a-z]+|\d+", text.lower()))
+    scored = []
+    for l in INDEX.listings:
+        best = max((len(a) for a in _alt_tokens(l.name) if a <= words), default=0)
+        if best:
+            scored.append((best, l))
+    if not scored:
+        return []
+    top = max(b for b, _ in scored)
+    out = []
+    for _, l in [x for x in scored if x[0] == top][:5]:
+        d = l.model_dump()
+        d["matchedUnits"] = d.get("units") or []
+        d["walkToAnchor"] = None
+        out.append(d)
+    return out
+
+
 async def parse_intent(state: AgentState, config: RunnableConfig):
     await _step(config, "Understanding your question", "running")
     text = _last_user_text(state).lower()
+    named = named_listings(text)
+    if named:  # a question about specific buildings: answer from their own reports, not a search
+        await _step(config, f"Looking up {', '.join(l['name'].strip() for l in named)}", "done")
+        return {"intent": "named", "candidates": named, "query": parse_rules(text), "understood": []}
     housing = re.search(r"\$|\d|under|fryft|dps|bed|bath|room|studio|apartment|apt|place|house|home|unit|rent|lease|live|stay|"
                         r"move|cheap|find|near|close to|walk|furnish|roommate|housing|listing", text)
     intent = "search" if housing or parse_rules(text).chips() else "general"
@@ -211,7 +250,18 @@ async def explain(state: AgentState, config: RunnableConfig):
     top = ranked[:3]
     if relaxed:  # stated by code, not left to the model
         await _say(config, f"Nothing matched everything you asked for, so I relaxed {', '.join(relaxed)}.")
-    if llm:
+    if llm and state.get("intent") == "named":
+        facts = "\n".join(f"- {l['name'].strip()} ({l.get('address', '')}): " + "; ".join(l["reasons"]) for l in top)
+        msgs = [SystemMessage(
+                    "You are TrojanScout, a USC off-campus housing assistant, talking directly to the student (use 'you'). "
+                    "The student asked about a specific building. Answer their question in 2-4 short sentences using ONLY the facts "
+                    "given (price, walk, DPS/Fryft zone, nearby LAPD incidents, True Trojan Cost, fit). If the facts don't cover what "
+                    "they asked, say so. Never invent numbers; never call an area safe or unsafe. No lists, no headings."),
+                HumanMessage(f"Student asked: {_last_user_text(state)}\nFacts:\n{facts}")]
+        async for chunk in llm.astream(msgs):
+            if chunk.text:
+                await _emit(config, "token", {"text": chunk.text})
+    elif llm:
         facts = "\n".join(f"- {l['name']}: " + "; ".join(l["reasons"]) for l in top)
         msgs = [SystemMessage(
                     "You are TrojanScout, a USC off-campus housing assistant, talking directly to the student (use 'you'). "
@@ -238,7 +288,7 @@ def build_graph():
                      ("enrich", enrich), ("rank", rank), ("explain", explain)]:
         g.add_node(name, fn)
     g.add_edge(START, "parse_intent")
-    g.add_conditional_edges("parse_intent", lambda s: s["intent"], {"search": "understand", "general": "explain"})
+    g.add_conditional_edges("parse_intent", lambda s: s["intent"], {"search": "understand", "general": "explain", "named": "enrich"})
     g.add_edge("understand", "search_listings")
     g.add_edge("search_listings", "enrich")
     g.add_edge("enrich", "rank")
