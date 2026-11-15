@@ -1,5 +1,8 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
-import type { Building, ChatEvent, Cost, Listing, Meta, Profile, Report, SearchResponse, Zones } from './types'
+import type {
+  Building, ChatEvent, CostBreakdown, IncidentsResponse, ListingV2, Meta, Profile, ReportV2, RouteResult,
+  SafetyResource, SmartSearchResponse, Zones, DpsUnit,
+} from './types'
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
 type Params = Record<string, string | number | boolean | undefined | null>
@@ -17,17 +20,32 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return res.json() as Promise<T>
 }
 
+const weights = (p: Profile) => ({ w_cost: p.priorities.cost, w_commute: p.priorities.commute, w_zone: p.priorities.zone, w_incidents: p.priorities.incidents })
+
 export const api = {
   meta: () => get<Meta>('/api/meta'),
   zones: () => get<GeoJSON.FeatureCollection>('/api/zones'),
   buildings: () => get<Building[]>('/api/buildings'),
   zoneCheck: (lat: number, lng: number) => get<Zones>('/api/zone-check', { lat, lng }),
-  listings: (p: Params = {}) => get<Listing[]>('/api/listings', p),
-  search: (p: Params) => get<SearchResponse>('/api/search', p),
+  geocode: (q: string) => get<{ lat: number; lng: number; label: string } & Zones>('/api/geocode', { q }),
+  listings: (p: Params = {}) => get<ListingV2[]>('/api/listings', p),
+  search: (p: Params) => get<SmartSearchResponse>('/api/search', p),
   report: (id: string, p: Profile) =>
-    get<Report>(`/api/listings/${encodeURIComponent(id)}/report`, { buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget }),
-  trueCost: (b: { listingId?: string; rent?: number; utilities?: number; inFryft?: boolean; lateNights: number; needsMetro: boolean }) =>
-    post<Cost & { listing: Listing | null }>('/api/true-cost', b),
+    get<ReportV2>(`/api/listings/${encodeURIComponent(id)}/report`, { buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, ...weights(p) }),
+  trueCost: (b: { listingId?: string; unitLabel?: string; rent?: number; utilities?: number; inFryft?: boolean; lateNights: number; needsMetro: boolean; roommates: number }) =>
+    post<CostBreakdown>('/api/true-cost', b),
+  route: (from: [number, number], to: [number, number], night: boolean) =>
+    get<RouteResult>('/api/route', { from: from.join(','), to: to.join(','), night }),
+  incidents: (days = 180) => get<IncidentsResponse>('/api/incidents', { days }),
+  safetyResources: () => get<{ note: string; phones: Record<string, string>; resources: SafetyResource[] }>('/api/safety-resources'),
+  dpsUnits: () => get<{ simulated: boolean; units: DpsUnit[] }>('/api/dps-units'),
+}
+
+/** Live DPS unit positions (server-sent events, GET → native EventSource is fine). */
+export function subscribeDpsUnits(onUnits: (u: DpsUnit[]) => void) {
+  const es = new EventSource(`${API_URL}/api/dps-units/stream`)
+  es.addEventListener('units', (e) => onUnits(JSON.parse((e as MessageEvent).data).units))
+  return () => es.close()
 }
 
 // EventSource only supports GET, so POST via fetch-event-source.

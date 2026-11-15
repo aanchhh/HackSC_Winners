@@ -3,7 +3,6 @@ import json
 import logging
 import time
 from contextlib import asynccontextmanager
-from dataclasses import asdict
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Query
@@ -14,7 +13,8 @@ from app.agent.graph import graph
 from app.config import settings
 from app.rag.summarize import neighborhood_summary
 from app.listings import pipeline
-from app.listings.index import INDEX, Filters, parse_query, warm
+from app.listings.index import INDEX, warm
+from app.listings.query import parse as query_parse
 from app.schemas import BlockSummary, ChatRequest
 
 log = logging.getLogger("uvicorn.error")
@@ -54,26 +54,33 @@ def _check_key(key: str | None):
 
 @app.get("/health")
 async def health():
-    return {"ok": True, "service": "ai-service", "llm": bool(settings.llm_api_key)}
+    from app.llm import model_name, provider
+    return {"ok": True, "service": "ai-service", "llm": bool(settings.llm_api_key), "provider": provider(), "model": model_name()}
 
 
 @app.get("/ai/listings/search")
 async def listings_search(
     q: str = "", k: int = Query(20, le=100), maxRent: int | None = None, minBeds: int | None = None,
+    beds: int | None = None, baths: float | None = None, roomType: str | None = None, privateBath: bool | None = None,
     inDps: bool | None = None, inFryft: bool | None = None, source: str | None = None,
-    x_internal_key: str | None = Header(None),
+    ignore: str = "", x_internal_key: str | None = Header(None),
 ):
-    """Hybrid search. Explicit query params override constraints parsed from the text."""
+    """Smart search: plain English → structured filters (rules, + LLM when configured) → hybrid retrieval.
+    Explicit query params override what was parsed; `ignore` drops parsed constraints by chip key."""
     _check_key(x_internal_key)
     t0 = time.perf_counter()
-    text, parsed = parse_query(q)
-    explicit = dict(maxRent=maxRent, minBeds=minBeds, inDps=inDps, inFryft=inFryft, source=source)
-    f = Filters(**{**asdict(parsed), **{k_: v for k_, v in explicit.items() if v is not None}})
-    hits = await asyncio.to_thread(INDEX.search, text, f, k)
+    sq, parser = await query_parse(q)
+    for key, val in dict(maxRent=maxRent, minBeds=minBeds, beds=beds, baths=baths, roomType=roomType,
+                         privateBath=privateBath, inDps=inDps, inFryft=inFryft, source=source).items():
+        if val is not None:
+            setattr(sq, key, val)
+    sq.drop([x for x in ignore.split(",") if x])
+    hits = await asyncio.to_thread(INDEX.search, sq.text, sq, k)
     return {
-        "query": q, "filters": {k_: v for k_, v in asdict(f).items() if v is not None},
+        "query": q, "parser": parser, "understood": sq.chips(), "semanticText": sq.text, "filters": sq.as_dict(),
         "count": len(hits), "tookMs": round((time.perf_counter() - t0) * 1000),
-        "results": [{**h["listing"].model_dump(), "score": h["score"], "denseRank": h["denseRank"], "bm25Rank": h["bm25Rank"]} for h in hits],
+        "results": [{**h["listing"].model_dump(), "matchedUnits": [u.model_dump() for u in h["matchedUnits"]],
+                     "walkMin": h["walkMin"], "score": h["score"], "denseRank": h["denseRank"], "bm25Rank": h["bm25Rank"]} for h in hits],
     }
 
 

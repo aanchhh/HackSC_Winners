@@ -2,7 +2,7 @@
 import re
 
 from app.listings.http import PoliteClient, next_data
-from app.listings.models import Listing
+from app.listings.models import Listing, make_unit
 
 BASE = "https://tripalink.com/usc-off-campus-student-housing"
 KINDS = ["homes", "houses", "apartments", "duplexes"]
@@ -42,6 +42,13 @@ async def fetch(client: PoliteClient) -> list[Listing]:
                 continue
             kind = url.split("/usc-off-campus-student-housing/")[1].split("-for-rent")[0]
             walk = (p.get("routes") or {}).get("walking") or {}
+            amen = p.get("formattedAmenities") or []
+            beds, baths, price = p.get("minBd"), p.get("minBa"), _price(p.get("minPrice"))
+            if p.get("coLiving"):  # rooms in a shared house; own bathroom if the amenity says so or baths >= beds
+                pb = "Private Bathroom" in amen or (beds and baths and baths >= beds)
+                units = [make_unit("private_room", beds, baths, bool(pb), rent=price, count=p.get("lastRoomNum") or 1)]
+            else:
+                units = [make_unit("entire", beds, baths, rent=price)]
             seen[p["id"]] = Listing(
                 id=f"tripalink:{p['id']}", source="Tripalink",
                 url=f"https://tripalink.com/apartments/los-angeles/usc-off-campus-student-housing/{p['id']}",
@@ -49,11 +56,12 @@ async def fetch(client: PoliteClient) -> list[Listing]:
                 lat=float(p["latitude"]), lng=float(p["longitude"]),
                 rent=_price(p.get("minPrice")), priceUnit="per room" if p.get("coLiving") else "per unit",
                 beds=p.get("minBd"), bedsMax=p.get("maxBd"), baths=p.get("minBa"),
+                units=units,
                 availability="Available now" if p.get("availableStatus") == 1 else None,
                 propertyTypes=[kind.rstrip("s").title()] + (["Co-living"] if p.get("coLiving") else []),
-                amenities=p.get("formattedAmenities") or [],
+                amenities=amen,
                 photos=[x["url"] for x in (p.get("picList") or [])[:5]],
                 description=(f"{walk.get('duration')} walk ({walk.get('distance')}) to {p['routes'].get('toward')}"
                              if walk.get("duration") else "") + (f". {p['sellingHeadline']}" if p.get("sellingHeadline") else ""),
-            )
+            ).finalize()
     return list(seen.values())

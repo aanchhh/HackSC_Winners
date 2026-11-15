@@ -55,6 +55,6 @@ internalRouter.post('/score', (req, res) => {
     const l = getListing(id)
     if (!l) return { listingId: id, fitScore: 0 }
     const zr = zoneCheck(l.lat, l.lng), c = trueCost(l, profile)
-    return { listingId: id, fitScore: fitScore({ total: c.total, budget: profile.budget, maxCommuteMin: 30, worstCommuteMin: 15, inFryft: zr.inFryft, inDps: zr.inDps, incidentsNorm: 0 }) }
+    return { listingId: id, fitScore: fitScore({ total: c.total, budget: profile.budget, longestWalkMin: 15, inFryft: zr.inFryft, inDps: zr.inDps, incidentsNorm: 0 }) }
   }))
 })

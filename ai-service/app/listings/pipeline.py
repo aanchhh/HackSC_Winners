@@ -36,6 +36,8 @@ def _addr_key(addr: str) -> str:
 
 
 def _utilities(l: Listing) -> int:
+    """Monthly utilities estimate (electric + gas + internet + water/trash share).
+    Rooms: one person's share (~$75). Whole units: $60 base + $30 per bedroom."""
     if l.priceUnit == "per room":
         return 75
     return 60 + 30 * max(l.beds or 1, 1)

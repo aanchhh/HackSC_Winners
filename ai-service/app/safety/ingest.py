@@ -1,0 +1,167 @@
+"""Safety data for routing + the map. Writes three files into /data:
+
+  incidents.json         LAPD NIBRS offenses (data.lacity.org, dataset k7nn-b2ep), last 6 months, around USC.
+                         Block-level (hundred-block) coordinates, as published by LAPD. Falls back to clearly
+                         labelled synthetic data if the API is unreachable.
+  streets.json           Walkable street network from OpenStreetMap (Overpass API), with `lit` tags.
+  safety_resources.json  DPS HQ + substation, emergency (blue-light) phones, Campus Cruiser — USC public info.
+
+Run:  python -m app.safety.ingest
+"""
+import datetime as dt
+import json
+import random
+import re
+import sys
+from pathlib import Path
+
+import httpx
+
+from app.config import settings
+
+DATA = Path(settings.data_dir)
+UA = {"User-Agent": "TrojanScout/0.1 (USC student hackathon project)"}
+BBOX = (34.0070, -118.3080, 34.0430, -118.2640)  # s, w, n, e — DPS zone + margin
+LAPD = "https://data.lacity.org/resource/k7nn-b2ep.json"
+OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"]
+
+CATEGORIES = [  # (category, regex on NIBRS description, severity weight for routing)
+    ("robbery", r"robbery", 5.0), ("sexual offense", r"rape|sodomy|fondling|sexual", 5.0),
+    ("aggravated assault", r"aggravated assault|shots fired|homicide|murder", 5.0),
+    ("threats / weapons", r"criminal threats|brandish|weapon", 3.5),
+    ("assault", r"simple assault|intimidation|battery|assault", 3.0), ("burglary", r"burglary|breaking", 2.0),
+    ("vehicle crime", r"motor vehicle|from motor vehicle|vehicle parts", 1.5), ("theft", r"theft|larceny|shoplift|pocket|purse", 1.0),
+    ("vandalism", r"vandal|destruction|damage", 0.7), ("trespass", r"trespass", 0.5),
+    # not a street risk to pedestrians: kept for counts, nearly ignored by routing
+    ("non-street", r"warrant|failure to appear|court order|dui|paraphernalia|controlled substance|drunk|license", 0.1),
+]
+
+
+def categorize(desc: str) -> tuple[str, float]:
+    d = desc.lower()
+    for name, pat, w in CATEGORIES:
+        if re.search(pat, d):
+            return name, w
+    return "other", 0.5
+
+
+def fetch_incidents(months: int = 6) -> dict:
+    since = (dt.date.today() - dt.timedelta(days=30 * months)).isoformat()
+    s, w, n, e = BBOX
+    where = (f"hndrdth_lat::number between {s} and {n} AND hndrdth_lon::number between {w} and {e} "
+             f"AND date_occ > '{since}'")
+    rows = httpx.get(LAPD, params={"$where": where, "$limit": 50000, "$order": "date_occ DESC",
+                                   "$select": "uniquenibrno,date_occ,time_occ,nibr_description,crime_against,premis_desc,hndrdth_lat,hndrdth_lon,hndrdth_loc_chk"},
+                     headers=UA, timeout=120).json()
+    out = []
+    for r in rows:
+        try:
+            lat, lng = float(r["hndrdth_lat"]), float(r["hndrdth_lon"])
+        except (KeyError, ValueError, TypeError):
+            continue
+        if lat == 0:
+            continue
+        cat, weight = categorize(r.get("nibr_description", ""))
+        t = r.get("time_occ", "1200")
+        hour = int(t[:2]) if t[:2].isdigit() else 12
+        out.append({"id": r.get("uniquenibrno"), "lat": lat, "lng": lng, "date": r.get("date_occ", "")[:10], "hour": hour,
+                    "night": hour >= 19 or hour < 6, "category": cat, "severity": weight,
+                    "against": r.get("crime_against", ""), "description": re.sub(r"\s+", " ", r.get("nibr_description", "")).strip(),
+                    "premise": r.get("premis_desc", ""), "block": r.get("hndrdth_loc_chk", "")})
+    return {"source": "LAPD NIBRS Offenses (data.lacity.org k7nn-b2ep)", "synthetic": False, "since": since,
+            "fetchedAt": dt.datetime.now().isoformat(timespec="seconds"), "count": len(out), "incidents": out}
+
+
+def synthetic_incidents(n: int = 1500) -> dict:
+    """Fallback only. Realistic shape: denser along commercial corridors (Figueroa, Vermont, Jefferson), more theft than violence."""
+    rnd = random.Random(42)
+    corridors = [(-118.2780, None), (-118.2915, None), (None, 34.0255), (None, 34.0183)]
+    weights = [("theft", 1.0, 40), ("vehicle crime", 1.5, 22), ("burglary", 2.0, 12), ("vandalism", 0.7, 10), ("assault", 3.0, 9), ("robbery", 5.0, 5), ("aggravated assault", 5.0, 2)]
+    out = []
+    for i in range(n):
+        s, w, nn, e = BBOX
+        lat, lng = rnd.uniform(s, nn), rnd.uniform(w, e)
+        if rnd.random() < 0.55:
+            clng, clat = rnd.choice(corridors)
+            lng = clng + rnd.gauss(0, 0.0006) if clng else lng
+            lat = clat + rnd.gauss(0, 0.0005) if clat else lat
+        cat, sev, _ = rnd.choices(weights, [x[2] for x in weights])[0]
+        hour = rnd.choice(list(range(24)))
+        out.append({"id": f"syn-{i}", "lat": round(lat, 4), "lng": round(lng, 4), "date": (dt.date.today() - dt.timedelta(days=rnd.randint(0, 180))).isoformat(),
+                    "hour": hour, "night": hour >= 19 or hour < 6, "category": cat, "severity": sev, "against": "",
+                    "description": f"Synthetic {cat}", "premise": "", "block": ""})
+    return {"source": "SYNTHETIC (LAPD API unreachable)", "synthetic": True, "count": len(out), "incidents": out}
+
+
+def fetch_streets() -> dict:
+    s, w, n, e = BBOX
+    q = f"""[out:json][timeout:60];
+way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street|service|pedestrian|footway|path|steps|cycleway|crossing|primary_link|secondary_link|tertiary_link)$"]["foot"!="no"]["access"!="private"]({s},{w},{n},{e});
+out body; >; out skel qt;"""
+    import time
+    last = None
+    for attempt, url in enumerate(OVERPASS * 2):
+        try:
+            r = httpx.post(url, data={"data": q}, headers={**UA, "Accept": "application/json"}, timeout=180)
+            r.raise_for_status()
+            els = r.json()["elements"]
+            break
+        except Exception as e:  # public Overpass servers are often busy: back off and try a mirror
+            last = e
+            time.sleep(5 * (attempt + 1))
+    else:
+        raise RuntimeError(f"all Overpass mirrors failed: {last}")
+    nodes = {str(x["id"]): [round(x["lat"], 6), round(x["lon"], 6)] for x in els if x["type"] == "node"}
+    ways = [{"id": x["id"], "nodes": [str(i) for i in x["nodes"]], "highway": x["tags"].get("highway"),
+             "lit": x["tags"].get("lit"), "name": x["tags"].get("name", "")} for x in els if x["type"] == "way"]
+    return {"source": "© OpenStreetMap contributors (ODbL), via Overpass API", "fetchedAt": dt.datetime.now().isoformat(timespec="seconds"),
+            "nodes": nodes, "ways": ways}
+
+
+SAFETY_RESOURCES = {
+    "note": "From USC DPS public info (2026 Campus Safety Plan, dps.usc.edu). Emergency-phone positions are APPROXIMATE, for illustration — use the official DPS map for exact locations.",
+    "phones": {"dpsEmergency": "213-740-4321", "dpsNonEmergency": "213-740-6000", "campusCruiser": "213-740-4911", "lapd": "911"},
+    "resources": [
+        {"type": "dps_station", "name": "DPS Headquarters", "address": "3667 McClintock Ave", "lat": 34.02104, "lng": -118.29041, "hours": "24/7"},
+        {"type": "dps_station", "name": "DPS Substation – USC Village", "address": "USC Village", "lat": 34.02560, "lng": -118.28530, "hours": "24/7"},
+        *[{"type": "blue_phone", "name": f"Emergency phone ({n})", "lat": la, "lng": lo, "approximate": True} for n, la, lo in [
+            ("Jefferson & McClintock", 34.02540, -118.29060), ("Jefferson & Hoover", 34.02470, -118.28380), ("Jefferson & Figueroa", 34.02370, -118.27900),
+            ("Exposition & Vermont", 34.01850, -118.29150), ("Exposition & Trousdale", 34.01880, -118.28560), ("Exposition & Figueroa", 34.01930, -118.28100),
+            ("Vermont & 36th", 34.02200, -118.29150), ("Figueroa & 35th", 34.02150, -118.27980), ("McCarthy Quad", 34.02040, -118.28620),
+            ("Trousdale & Childs Way", 34.02110, -118.28500), ("Hoover & 28th", 34.02950, -118.28200), ("Ellendale & 30th", 34.02780, -118.28860),
+            ("Menlo & 28th", 34.03000, -118.29030), ("Adams & Figueroa", 34.03210, -118.27450)]],
+        {"type": "service", "name": "Campus Cruiser (free evening safe ride)", "lat": 34.02040, "lng": -118.28540, "phone": "213-740-4911",
+         "hours": "Evenings (check current hours with DPS)"},
+    ],
+}
+
+
+def main():
+    DATA.mkdir(exist_ok=True)
+    try:
+        inc = fetch_incidents()
+        if not inc["count"]:
+            raise RuntimeError("no rows")
+    except Exception as e:
+        print("LAPD fetch failed, writing synthetic incidents:", e, file=sys.stderr)
+        inc = synthetic_incidents()
+    (DATA / "incidents.json").write_text(json.dumps(inc))
+    print(f"incidents: {inc['count']} ({inc['source']})")
+    try:
+        st = fetch_streets()
+        (DATA / "streets.json").write_text(json.dumps(st))
+        print(f"streets: {len(st['ways'])} ways, {len(st['nodes'])} nodes")
+    except Exception as e:
+        print("Overpass fetch failed (keeping previous streets.json if any):", e, file=sys.stderr)
+    (DATA / "safety_resources.json").write_text(json.dumps(SAFETY_RESOURCES, indent=1))
+    print("safety resources written")
+
+
+if __name__ == "__main__":
+    main()
+
+
+def streets_only():
+    st = fetch_streets()
+    (DATA / "streets.json").write_text(json.dumps(st))
+    print(f"streets: {len(st['ways'])} ways, {len(st['nodes'])} nodes")

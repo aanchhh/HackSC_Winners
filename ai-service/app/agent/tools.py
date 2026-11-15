@@ -32,14 +32,16 @@ async def search_listings(maxRent: int | None = None, beds: int | None = None,
 @tool
 async def hybrid_search(query: str, maxRent: int | None = None, minBeds: int | None = None,
                         inDps: bool | None = None, inFryft: bool | None = None, k: int = 10) -> list[dict]:
-    """Semantic + keyword search over live scraped listings, with hard filters applied first."""
+    """Smart search over live listings: parses room/bath types, price, zones, amenities and walk time from the
+    query, applies them as hard filters, then ranks with hybrid (FAISS + BM25) retrieval."""
     import asyncio
-    from app.listings.index import INDEX, Filters, parse_query
-    text, parsed = parse_query(query)
-    f = Filters(maxRent=maxRent if maxRent is not None else parsed.maxRent,
-                minBeds=minBeds if minBeds is not None else parsed.minBeds, maxBeds=parsed.maxBeds,
-                inDps=inDps if inDps is not None else parsed.inDps, inFryft=inFryft if inFryft is not None else parsed.inFryft)
-    hits = await asyncio.to_thread(INDEX.search, text, f, k)
+    from app.listings.index import INDEX
+    from app.listings.query import parse
+    sq, _ = await parse(query)
+    for key, val in dict(maxRent=maxRent, minBeds=minBeds, inDps=inDps, inFryft=inFryft).items():
+        if val is not None and getattr(sq, key) is None:
+            setattr(sq, key, val)
+    hits = await asyncio.to_thread(INDEX.search, sq.text, sq, k)
     return [h["listing"].model_dump() for h in hits]
 
 

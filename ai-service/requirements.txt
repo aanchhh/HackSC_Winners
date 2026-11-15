@@ -11,7 +11,9 @@ python-dotenv
 langgraph
 langchain
 langchain-core
-langchain-anthropic   # LLM client (swap provider in app/llm.py if needed)
+langchain-anthropic   # LLM providers: pick one with LLM_PROVIDER (app/llm.py)
+langchain-google-genai  # Gemini (free tier via Google AI Studio)
+langchain-groq
 langsmith             # optional tracing
 
 # --- RAG / embeddings ---

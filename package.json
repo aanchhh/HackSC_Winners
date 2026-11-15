@@ -8,7 +8,8 @@
     "dev:ai": "cd ai-service && .venv/bin/uvicorn app.main:app --reload --port 8000",
     "build": "npm --prefix frontend run build && npm --prefix node-api run build",
     "test": "cd ai-service && .venv/bin/pytest -q",
-    "setup": "npm --prefix frontend install && npm --prefix node-api install && cd ai-service && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt"
+    "setup": "npm --prefix frontend install && npm --prefix node-api install && cd ai-service && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    "data:refresh": "cd ai-service && .venv/bin/python -m app.listings.pipeline && .venv/bin/python -m app.safety.ingest"
   },
   "devDependencies": {
     "concurrently": "^10.0.7"

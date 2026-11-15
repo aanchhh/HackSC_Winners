@@ -4,6 +4,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware'
 import { config } from './config.js'
 import { publicRouter } from './routes/public.js'
 import { internalRouter } from './routes/internal.js'
+import { startDpsSimulation } from './services/dpsUnits.js'
 
 const app = express()
 app.use(cors({ origin: config.corsOrigin }))
@@ -31,4 +32,5 @@ const onError: ErrorRequestHandler = (err, _req, res, _next) => {
 }
 app.use(onError)
 
+startDpsSimulation()
 app.listen(config.port, () => console.log(`node-api listening on :${config.port}`))

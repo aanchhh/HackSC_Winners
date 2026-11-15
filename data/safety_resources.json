@@ -1,0 +1,133 @@
+{
+ "note": "From USC DPS public info (2026 Campus Safety Plan, dps.usc.edu). Emergency-phone positions are APPROXIMATE, for illustration \u2014 use the official DPS map for exact locations.",
+ "phones": {
+  "dpsEmergency": "213-740-4321",
+  "dpsNonEmergency": "213-740-6000",
+  "campusCruiser": "213-740-4911",
+  "lapd": "911"
+ },
+ "resources": [
+  {
+   "type": "dps_station",
+   "name": "DPS Headquarters",
+   "address": "3667 McClintock Ave",
+   "lat": 34.02104,
+   "lng": -118.29041,
+   "hours": "24/7"
+  },
+  {
+   "type": "dps_station",
+   "name": "DPS Substation \u2013 USC Village",
+   "address": "USC Village",
+   "lat": 34.0256,
+   "lng": -118.2853,
+   "hours": "24/7"
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Jefferson & McClintock)",
+   "lat": 34.0254,
+   "lng": -118.2906,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Jefferson & Hoover)",
+   "lat": 34.0247,
+   "lng": -118.2838,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Jefferson & Figueroa)",
+   "lat": 34.0237,
+   "lng": -118.279,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Exposition & Vermont)",
+   "lat": 34.0185,
+   "lng": -118.2915,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Exposition & Trousdale)",
+   "lat": 34.0188,
+   "lng": -118.2856,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Exposition & Figueroa)",
+   "lat": 34.0193,
+   "lng": -118.281,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Vermont & 36th)",
+   "lat": 34.022,
+   "lng": -118.2915,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Figueroa & 35th)",
+   "lat": 34.0215,
+   "lng": -118.2798,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (McCarthy Quad)",
+   "lat": 34.0204,
+   "lng": -118.2862,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Trousdale & Childs Way)",
+   "lat": 34.0211,
+   "lng": -118.285,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Hoover & 28th)",
+   "lat": 34.0295,
+   "lng": -118.282,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Ellendale & 30th)",
+   "lat": 34.0278,
+   "lng": -118.2886,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Menlo & 28th)",
+   "lat": 34.03,
+   "lng": -118.2903,
+   "approximate": true
+  },
+  {
+   "type": "blue_phone",
+   "name": "Emergency phone (Adams & Figueroa)",
+   "lat": 34.0321,
+   "lng": -118.2745,
+   "approximate": true
+  },
+  {
+   "type": "service",
+   "name": "Campus Cruiser (free evening safe ride)",
+   "lat": 34.0204,
+   "lng": -118.2854,
+   "phone": "213-740-4911",
+   "hours": "Evenings (check current hours with DPS)"
+  }
+ ]
+}

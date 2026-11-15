@@ -6,10 +6,8 @@
          └─ Reciprocal Rank Fusion (k=60) → cross-encoder rerank of the top 20 → results
 """
 import json
-import re
 import threading
 import time
-from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
@@ -20,6 +18,7 @@ import Stemmer
 
 from app.config import settings
 from app.listings.models import Listing, doc_text
+from app.listings.query import SmartQuery, parse_rules, walk_minutes
 
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
@@ -48,41 +47,14 @@ def _embed(texts: list[str], query: bool = False) -> np.ndarray:
     return np.asarray(_embedder().encode(texts, normalize_embeddings=True, batch_size=32), dtype="float32")
 
 
-@dataclass
-class Filters:
-    maxRent: int | None = None
-    minRent: int | None = None
-    minBeds: int | None = None
-    maxBeds: int | None = None
-    inDps: bool | None = None
-    inFryft: bool | None = None
-    source: str | None = None
-
-    def ok(self, l: Listing) -> bool:
-        if self.maxRent is not None and (l.rent is None or l.rent > self.maxRent): return False
-        if self.minRent is not None and (l.rent is None or l.rent < self.minRent): return False
-        if self.minBeds is not None and ((l.bedsMax if l.bedsMax is not None else l.beds) or 0) < self.minBeds: return False
-        if self.maxBeds is not None and (l.beds or 0) > self.maxBeds: return False
-        if self.inDps is not None and l.inDps is not self.inDps: return False
-        if self.inFryft is not None and l.inFryft is not self.inFryft: return False
-        if self.source and l.source.lower() != self.source.lower(): return False
-        return True
+# Back-compat for callers that build filters directly (agent tools, tests)
+def Filters(**kw) -> SmartQuery:  # noqa: N802
+    return SmartQuery(**{k: v for k, v in kw.items() if v is not None and k in SmartQuery.__dataclass_fields__})
 
 
-def parse_query(q: str) -> tuple[str, Filters]:
-    """Pull hard constraints out of free text ("under $1,400 2 bed inside DPS") so they filter instead of fuzzily matching."""
-    f, t = Filters(), q.lower()
-    if m := re.search(r"(?:under|below|less than|max|<|up to)\s*\$?\s*([\d,]{3,6})", t):
-        f.maxRent = int(m.group(1).replace(",", ""))
-    if m := re.search(r"(\d+)\s*(?:\+\s*)?(?:bed|br|bd|bedroom)", t):
-        f.minBeds = int(m.group(1))
-    if "studio" in t:
-        f.minBeds, f.maxBeds = None, 0
-    if re.search(r"\b(?:inside|in|within)\s+(?:the\s+)?dps\b", t):
-        f.inDps = True
-    if re.search(r"\b(?:inside|in|within)\s+(?:the\s+)?(?:fryft|free lyft)\b", t):
-        f.inFryft = True
-    return q, f
+def parse_query(q: str) -> tuple[str, SmartQuery]:
+    sq = parse_rules(q)
+    return sq.text, sq
 
 
 class HybridIndex:
@@ -130,17 +102,41 @@ class HybridIndex:
         return True
 
     # ---------- search ----------
-    def search(self, query: str, filters: Filters | None = None, k: int = 10, rerank: bool = True) -> list[dict]:
-        filters = filters or Filters()
+    def search(self, query: str, filters: SmartQuery | None = None, k: int = 10, rerank: bool = True) -> list[dict]:
+        filters = filters or SmartQuery()
         with self._lock:
             listings, fi, bm = self.listings, self.faiss, self.bm25
-        allowed = np.array([i for i, l in enumerate(listings) if filters.ok(l)], dtype="int64")
+        matched: dict[int, list] = {}
+        for i, l in enumerate(listings):
+            m = filters.match(l)
+            if m is not None:
+                matched[i] = m
+        allowed = np.array(sorted(matched), dtype="int64")
         if not len(allowed):
             return []
+
+        def price(i):
+            units = matched[i] or listings[i].units
+            rents = [u.rent for u in units if u.rent] or ([listings[i].rent] if listings[i].rent else [])
+            return min(rents) if rents else 10**9
+
+        def walk(i):
+            return walk_minutes(listings[i], filters.nearBuildingId or 9)
+
+        def hit(i, score=None, d=None, b=None):
+            return {"listing": listings[i], "matchedUnits": matched[i], "score": score, "denseRank": d, "bm25Rank": b,
+                    "walkMin": round(walk(i)) if filters.nearBuildingId is not None else None}
+
         query = query.strip()
-        if not query:  # browse mode: just the filter, cheapest first
-            idx = sorted(allowed.tolist(), key=lambda i: (listings[i].rent is None, listings[i].rent or 0))
-            return [{"listing": listings[i], "score": None, "denseRank": None, "bm25Rank": None} for i in idx[:k]]
+        if not query or filters.sort:  # browse / explicit sort: filters decide membership, sort decides order
+            idx = allowed.tolist()
+            if query:  # keep relevance as a tiebreak by only sorting the relevant ones
+                idx = [h["_i"] for h in self._ranked(query, allowed, listings, fi, bm, rerank=False)] or idx
+            key = walk if filters.sort == "walk" else price
+            return [hit(i) for i in sorted(idx, key=key)[:k]]
+        return [hit(h["_i"], h["score"], h["d"], h["b"]) for h in self._ranked(query, allowed, listings, fi, bm, rerank)[:k]]
+
+    def _ranked(self, query, allowed, listings, fi, bm, rerank=True) -> list[dict]:
 
         n = min(CANDIDATES, len(allowed))
         # Dense: FAISS restricted to the pre-filtered ids
@@ -172,8 +168,7 @@ class HybridIndex:
             scores.update({i: float(s) for i, s in zip(top, sorted(ce, reverse=True))})
             order = top + order[RERANK_TOP:]
 
-        return [{"listing": listings[i], "score": round(scores[i], 4), "denseRank": d_rank.get(i), "bm25Rank": s_rank.get(i)}
-                for i in order[:k]]
+        return [{"_i": i, "score": round(scores[i], 4), "d": d_rank.get(i), "b": s_rank.get(i)} for i in order]
 
 
 INDEX = HybridIndex(Path(settings.index_dir))

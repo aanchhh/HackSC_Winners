@@ -7,12 +7,14 @@ import type { FeatureCollection, Polygon } from 'geojson'
 
 const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../data')
 
+export interface Unit { label: string; roomType: string; beds: number | null; baths: number | null; privateBath: boolean | null; rent: number | null; count: number }
 export interface Listing {
   id: string; source: string; url: string; name: string; address: string; lat: number; lng: number
   rent: number | null; rentMax?: number | null; priceUnit: string; callForPricing?: boolean
   beds: number | null; bedsMax?: number | null; baths?: number | null; availability?: string | null
   propertyTypes?: string[]; amenities?: string[]; photos?: string[]; description?: string
   utilitiesEst: number; distanceToCampusMi?: number | null; scrapedAt?: string
+  units?: Unit[]; roomTypes?: string[]; sampleData?: boolean
 }
 export interface Building { id: number; name: string; code: string; lat: number; lng: number }
 

@@ -1,51 +1,55 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { CircleMarker, MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
-import type { Zones } from '../api/types'
-import ZoneLayer from '../components/map/ZoneLayer'
+import ZoneArt, { type Pin } from '../components/landing/ZoneArt'
 import { money, timeAgo } from '../lib/format'
-import { USC } from './MapPage'
 
-const EXAMPLES = ['furnished room under $1,200', '2 bed inside DPS', 'studio near Figueroa', 'house with washer dryer']
+const EXAMPLES = ['private room with private bath under $1,200', '2B2B inside DPS', 'studio near Leavey', '3 bed 2 bath with parking']
 
-function ClickToCheck({ onPick }: { onPick: (p: [number, number]) => void }) {
-  useMapEvents({ click: (e) => onPick([e.latlng.lat, e.latlng.lng]) })
-  return null
-}
+function ZoneChecker() {
+  const [addr, setAddr] = useState('')
+  const [pin, setPin] = useState<Pin | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
 
-function PinChecker() {
-  const zones = useQuery({ queryKey: ['zones'], queryFn: api.zones })
-  const [pin, setPin] = useState<[number, number] | null>(null)
-  const [res, setRes] = useState<Zones | null>(null)
-  const pick = async (p: [number, number]) => { setPin(p); setRes(null); setRes(await api.zoneCheck(p[0], p[1])) }
+  const check = async (lat: number, lng: number, label?: string) => {
+    setErr('')
+    const z = await api.zoneCheck(lat, lng)
+    setPin({ lat, lng, inDps: z.inDps, label: label ?? `${lat.toFixed(4)}, ${lng.toFixed(4)}` })
+  }
+  const lookup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!addr.trim()) return
+    setBusy(true)
+    try { const g = await api.geocode(addr); await check(g.lat, g.lng, g.label.split(',').slice(0, 2).join(',')) }
+    catch (x) { setErr((x as Error).message) }
+    finally { setBusy(false) }
+  }
+
   return (
-    <div className="overflow-hidden rounded-3xl bg-white text-ink shadow-xl ring-1 ring-stone-200">
-      <div className="relative h-72 sm:h-80">
-        <MapContainer center={USC} zoom={14} className="h-full w-full" scrollWheelZoom={false} attributionControl={false}>
-          <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {zones.data && <ZoneLayer data={zones.data} visible={{ DPS: true, Fryft: false }} />}
-          <ClickToCheck onPick={pick} />
-          {pin && <CircleMarker center={pin} radius={9} pathOptions={{ color: '#fff', weight: 3, fillColor: '#990000', fillOpacity: 1 }} />}
-        </MapContainer>
-        {!pin && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-3 z-[500] mx-auto w-fit rounded-full bg-ink/85 px-4 py-1.5 text-sm font-medium text-white">
-            👆 Tap anywhere to check an address
-          </div>
-        )}
+    <div className="overflow-hidden rounded-3xl bg-[#120404] text-white shadow-2xl ring-1 ring-white/10">
+      <div className="relative aspect-[640/560] w-full">
+        <ZoneArt pin={pin} onPick={(la, lo) => check(la, lo)} />
+        <div className="pointer-events-none absolute bottom-3 right-3 flex flex-col gap-1 rounded-xl bg-black/50 px-3 py-2 text-[11px] backdrop-blur">
+          <span><span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-emerald-400" />Listing inside DPS</span>
+          <span><span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-violet-400" />Listing outside DPS</span>
+          <span><span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-red-500" />DPS unit (live, simulated)</span>
+        </div>
       </div>
-      <div className="flex min-h-16 items-center gap-3 px-5 py-3">
-        {!pin && <p className="text-sm text-stone-500">The red outline is the USC DPS patrol zone, traced from the DPS Crime Analysis Unit map.</p>}
-        {pin && !res && <p className="text-sm text-stone-500">Checking…</p>}
-        {res && (
-          <>
-            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg ${res.inDps ? 'bg-emerald-100' : 'bg-orange-100'}`}>{res.inDps ? '🛡' : '⚠'}</span>
-            <div>
-              <p className="font-semibold">{res.inDps ? 'Inside the DPS patrol zone' : 'Outside the DPS patrol zone'}</p>
-              <p className="text-xs text-stone-500">{res.inDps ? 'USC Public Safety patrols this block.' : 'DPS does not routinely patrol here, so factor that into late nights.'}</p>
-            </div>
-          </>
+      <form onSubmit={lookup} className="flex gap-2 border-t border-white/10 p-3">
+        <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="Type an address, or tap the map…"
+          className="min-w-0 flex-1 rounded-xl bg-white/10 px-3 py-2 text-sm text-white placeholder-white/50 outline-none ring-1 ring-white/10 focus:ring-gold" />
+        <button disabled={busy} className="rounded-xl bg-gold px-4 text-sm font-semibold text-ink disabled:opacity-60">{busy ? '…' : 'Check'}</button>
+      </form>
+      <div className="min-h-14 px-4 pb-4 text-sm">
+        {err && <p className="text-red-300">{err}</p>}
+        {!pin && !err && <p className="text-white/60">Is an apartment inside the USC DPS patrol zone? Check any address.</p>}
+        {pin && (
+          <p className="flex items-center gap-2">
+            <span className={`grid h-7 w-7 place-items-center rounded-full ${pin.inDps ? 'bg-emerald-500/20 text-emerald-300' : 'bg-violet-500/20 text-violet-300'}`}>{pin.inDps ? '✓' : '!'}</span>
+            <span><b>{pin.label}</b> is {pin.inDps ? 'inside' : 'outside'} the DPS patrol zone{pin.inDps ? ' and the Fryft area.' : ', so no DPS patrols or free Fryft rides.'}</span>
+          </p>
         )}
       </div>
     </div>
@@ -53,24 +57,27 @@ function PinChecker() {
 }
 
 const FEATURES = [
-  { to: '/map', icon: '🗺', title: 'Explore Map', body: 'Every live listing on one map with the DPS zone. Click a dot for its report; compare up to 3.' },
-  { to: '/search', icon: '🔎', title: 'Smart Search', body: 'Type it like you’d say it. Hybrid semantic + keyword search finds “furnished room near Figueroa”.' },
-  { to: '/ask', icon: '💬', title: 'Ask Scout', body: 'An AI agent that checks zones, commute and cost for you, and shows its work.' },
-  { to: '/true-cost', icon: '💸', title: 'True Trojan Cost', body: 'Rent is not the full bill. Add utilities, transit and late-night rides outside Fryft.' },
+  { to: '/map', icon: '🗺', title: 'Explore Map', body: 'Live listings, the DPS zone, reported incidents and DPS units. Click a dot for its report; compare side by side.' },
+  { to: '/map?mode=route', icon: '🛡', title: 'Safest Route', body: 'Walk routes that avoid blocks with recent LAPD-reported incidents, not just the fastest path.' },
+  { to: '/search', icon: '🔎', title: 'Smart Search', body: 'Type “2B2B under $3k near Viterbi”. It understands room types, baths, price, zones and walk time.' },
+  { to: '/ask', icon: '💬', title: 'Ask Scout', body: 'An AI agent that checks zones, commute and cost for each listing and shows its work.' },
+  { to: '/true-cost', icon: '💸', title: 'True Trojan Cost', body: 'Rent is not the bill. See every hidden cost, line by line, with the math.' },
+  { to: '/preferences', icon: '⚙️', title: 'Preferences', body: 'Your budget, class buildings and priorities. They personalize every score in the app.' },
 ]
 
 export default function HomePage() {
   const nav = useNavigate()
   const [q, setQ] = useState('')
   const meta = useQuery({ queryKey: ['meta'], queryFn: api.meta, refetchInterval: 60_000 })
+  const incidents = useQuery({ queryKey: ['incidents-meta'], queryFn: () => api.incidents(180) })
   const m = meta.data
 
   return (
     <div>
-      <section className="relative overflow-hidden bg-gradient-to-br from-cardinal via-cardinal to-cardinal-dark text-white">
+      <section className="relative overflow-clip bg-gradient-to-br from-cardinal via-cardinal to-cardinal-dark text-white">
         <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-gold/20 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
-          <div className="flex flex-col justify-center gap-6">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 md:grid-cols-[1.05fr_1fr] md:py-16">
+          <div className="flex flex-col gap-6">
             <span className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold ring-1 ring-white/20">
               <span className="mr-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
               {m ? `${m.count} live listings · updated ${timeAgo(m.scrapedAt)}` : 'Loading live listings…'}
@@ -79,31 +86,27 @@ export default function HomePage() {
               Off-campus housing that <span className="text-gold">actually works</span> for a Trojan.
             </h1>
             <p className="max-w-lg text-lg text-white/80">
-              Zillow tells you the rent. TrojanScout tells you if it’s inside the DPS zone, how long the walk to class really is, and what you’ll actually pay each month.
+              Zillow tells you the rent. TrojanScout tells you if it’s inside the DPS zone, the safest walk to class, and what you’ll actually pay each month.
             </p>
-            <form onSubmit={(e) => { e.preventDefault(); nav(`/search?q=${encodeURIComponent(q)}`) }}
-              className="flex max-w-lg gap-2 rounded-2xl bg-white p-1.5 shadow-lg">
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Try “furnished room under $1,200”"
-                className="min-w-0 flex-1 rounded-xl px-3 text-ink outline-none" />
+            <form onSubmit={(e) => { e.preventDefault(); nav(`/search?q=${encodeURIComponent(q)}`) }} className="flex max-w-lg gap-2 rounded-2xl bg-white p-1.5 shadow-lg">
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Try “2B2B under $3k near Viterbi”" className="min-w-0 flex-1 rounded-xl px-3 text-ink outline-none" />
               <button className="rounded-xl bg-gold px-4 py-2.5 font-semibold text-ink hover:brightness-95">Search</button>
             </form>
             <div className="flex flex-wrap gap-2">
               {EXAMPLES.map((e) => (
-                <button key={e} onClick={() => nav(`/search?q=${encodeURIComponent(e)}`)}
-                  className="rounded-full bg-white/10 px-3 py-1 text-xs ring-1 ring-white/20 hover:bg-white/20">{e}</button>
+                <button key={e} onClick={() => nav(`/search?q=${encodeURIComponent(e)}`)} className="rounded-full bg-white/10 px-3 py-1 text-xs ring-1 ring-white/20 hover:bg-white/20">{e}</button>
               ))}
             </div>
           </div>
-          <PinChecker />
+          <ZoneChecker />
         </div>
       </section>
 
-      <section className="mx-auto -mt-8 grid max-w-5xl grid-cols-2 gap-3 px-4 sm:grid-cols-4">
+      <section className="mx-auto -mt-8 grid max-w-4xl grid-cols-3 gap-3 px-4">
         {[
           [m?.count ?? '—', 'live listings'],
-          [m ? `${Math.round((m.inDps / Math.max(m.count, 1)) * 100)}%` : '—', 'inside DPS zone'],
-          [m?.medianRent ? money(m.medianRent) : '—', 'median listed price'],
-          [m ? Object.keys(m.sources).length : '—', 'sources scraped'],
+          [m ? `${Math.round((m.inDps / Math.max(m.count, 1)) * 100)}%` : '—', 'inside the DPS zone'],
+          [incidents.data ? incidents.data.count.toLocaleString() : '—', 'LAPD incidents mapped (6 mo)'],
         ].map(([v, l]) => (
           <div key={l as string} className="relative rounded-2xl bg-white p-4 text-center shadow-md ring-1 ring-stone-200">
             <div className="text-2xl font-extrabold text-cardinal">{v}</div>
@@ -114,34 +117,17 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 py-16">
         <h2 className="mb-2 text-center text-3xl font-extrabold tracking-tight">Everything a lease decision needs</h2>
-        <p className="mx-auto mb-10 max-w-2xl text-center text-stone-500">Official boundaries, live listings and real student context, cross-referenced in seconds.</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <p className="mx-auto mb-10 max-w-2xl text-center text-stone-500">Official boundaries, live listings, LAPD data and real costs, cross-referenced in seconds.</p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
-            <Link key={f.to} to={f.to} className="group rounded-2xl border border-stone-200 bg-white p-6 transition hover:-translate-y-1 hover:border-cardinal/30 hover:shadow-lg">
+            <Link key={f.title} to={f.to} className="group rounded-2xl border border-stone-200 bg-white p-6 transition hover:-translate-y-1 hover:border-cardinal/30 hover:shadow-lg">
               <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl bg-cardinal-50 text-2xl">{f.icon}</div>
               <h3 className="mb-1 font-bold group-hover:text-cardinal">{f.title} →</h3>
               <p className="text-sm text-stone-500">{f.body}</p>
             </Link>
           ))}
         </div>
-      </section>
-
-      <section className="border-t border-stone-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-3">
-          {[
-            ['1', 'Set your priorities', 'Budget, the buildings you have class in, and how many late nights you’re out.', '/preferences'],
-            ['2', 'Explore or ask', 'Browse the map, search in plain English, or let Scout do the cross-referencing.', '/map'],
-            ['3', 'Compare before you sign', 'Put up to 3 places side by side on True Cost, commute and zone coverage.', '/map'],
-          ].map(([n, t, b, to]) => (
-            <Link to={to} key={n} className="flex gap-4">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold font-extrabold">{n}</span>
-              <div><h3 className="font-bold">{t}</h3><p className="text-sm text-stone-500">{b}</p></div>
-            </Link>
-          ))}
-        </div>
-        <p className="pb-8 text-center text-xs text-stone-400">
-          Listings from {m ? Object.keys(m.sources).join(', ') : '…'} · safety shown as facts and zones, never labels · costs are estimates
-        </p>
+        {m?.medianRent && <p className="mt-8 text-center text-sm text-stone-500">Median listed price right now: <b className="text-ink">{money(m.medianRent)}</b>. Safety shown as facts, never labels. Costs are estimates.</p>}
       </section>
     </div>
   )
