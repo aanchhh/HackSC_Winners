@@ -17,6 +17,7 @@ import AuthDonePage from './pages/AuthDonePage'
 import WelcomeToast from './components/layout/WelcomeToast'
 import ScoutWidget from './components/chat/ScoutWidget'
 import Splash from './components/layout/Splash'
+import Tour from './components/layout/Tour'
 import ReportPage from './pages/ReportPage'
 import EmergencyPage from './pages/EmergencyPage'
 
@@ -29,6 +30,7 @@ export default function App() {
       <Navbar />
       <AlertBanner />
       <WelcomeToast />
+      <Tour />
       <main className="min-h-0 flex-1 overflow-y-auto">
         <PageTransition k={pathname}>
         <Routes location={location}>

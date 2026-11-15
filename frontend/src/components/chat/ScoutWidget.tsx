@@ -30,7 +30,7 @@ export default function ScoutWidget() {
           </motion.div>
         </AnimatePresence>
       )}
-      <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => { setStarted(true); setOpen(!open) }}
+      <motion.button data-tour="scout" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => { setStarted(true); setOpen(!open) }}
         className="btn-glow fixed bottom-4 right-4 z-[2600] flex items-center gap-2 rounded-full bg-gradient-to-r from-cardinal to-cardinal-dark py-2.5 pl-2.5 pr-4 font-semibold text-white ring-2 ring-white/80">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-ink"><MessageCircle size={16} /></span>{open ? 'Close Scout' : 'Ask Scout'}
       </motion.button>

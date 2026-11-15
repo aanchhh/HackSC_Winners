@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { motion } from 'motion/react'
-import { ArrowRight, Calculator, CalendarDays, Car, CheckCircle2, MapPinned, MessageCircle, Route, Search, Settings2, ShieldAlert, Sparkles } from 'lucide-react'
+import { ArrowRight, Calculator, Compass, CalendarDays, Car, CheckCircle2, MapPinned, MessageCircle, Route, Search, Settings2, ShieldAlert, Sparkles } from 'lucide-react'
 import { Aurora, CountUp, Reveal, Spotlight } from '../components/ui/fx'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import ZoneArt, { type Pin } from '../components/landing/ZoneArt'
 import { money, timeAgo } from '../lib/format'
+import { openTour } from '../components/layout/Tour'
 
 const EXAMPLES = ['private room with private bath under $1,200', '2B2B inside DPS', 'studio near Leavey', '3 bed 2 bath with parking']
 
@@ -40,7 +41,7 @@ function ZoneChecker() {
           <span><span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-red-500" />DPS unit (live, simulated)</span>
         </div>
       </div>
-      <form onSubmit={lookup} className="flex gap-2 border-t border-white/10 p-3">
+      <form data-tour="zone-check" onSubmit={lookup} className="flex gap-2 border-t border-white/10 p-3">
         <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="Type an address, or tap the map…"
           className="min-w-0 flex-1 rounded-xl bg-white/10 px-3 py-2 text-sm text-white placeholder-white/50 outline-none ring-1 ring-white/10 focus:ring-gold" />
         <button disabled={busy} className="rounded-xl bg-gold px-4 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(255,199,44,.7)] disabled:opacity-60">{busy ? '…' : 'Check'}</button>
@@ -120,10 +121,16 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(rgb(255_255_255)_1px,transparent_1px)] [background-size:22px_22px]" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 md:grid-cols-[1.05fr_1fr] md:py-20">
           <div className="flex flex-col gap-6">
-            <motion.span initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold ring-1 ring-white/20 backdrop-blur">
-              <span className="live-dot mr-1.5 inline-block h-2 w-2 rounded-full bg-gold" />
-              {m ? `${m.count} live listings · updated ${timeAgo(m.scrapedAt)}` : 'Loading live listings…'}
-            </motion.span>
+            <div className="flex flex-wrap items-center gap-2">
+              <motion.span initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold ring-1 ring-white/20 backdrop-blur">
+                <span className="live-dot mr-1.5 inline-block h-2 w-2 rounded-full bg-gold" />
+                {m ? `${m.count} live listings · updated ${timeAgo(m.scrapedAt)}` : 'Loading live listings…'}
+              </motion.span>
+              <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} onClick={openTour}
+                className="flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-xs font-bold text-ink shadow-[0_0_20px_-4px_rgba(255,199,44,.9)] transition hover:brightness-95">
+                <Compass size={13} />Take the tour
+              </motion.button>
+            </div>
             <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.6 }} className="text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl">
               Off-campus housing that <span className="font-display text-6xl font-normal italic text-gold sm:text-7xl">actually works</span> for a Trojan.
             </motion.h1>
@@ -131,7 +138,7 @@ export default function HomePage() {
               Zillow tells you the rent. TrojanScout tells you if USC has your back there: DPS patrols, free Lyft rides home, the safest walk to class, and what you’ll really pay.
             </motion.p>
             <motion.form initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, duration: 0.6 }}
-              onSubmit={(e) => { e.preventDefault(); nav(`/search?q=${encodeURIComponent(q)}`) }} className="flex max-w-lg gap-2 rounded-2xl bg-white/95 p-1.5 shadow-[0_20px_60px_-15px_rgba(0,0,0,.5)] ring-1 ring-white/40">
+              data-tour="home-search" onSubmit={(e) => { e.preventDefault(); nav(`/search?q=${encodeURIComponent(q)}`) }} className="flex max-w-lg gap-2 rounded-2xl bg-white/95 p-1.5 shadow-[0_20px_60px_-15px_rgba(0,0,0,.5)] ring-1 ring-white/40">
               <Search size={18} className="ml-2 self-center text-stone-400" />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Try “2B2B under $3k near Viterbi”" className="min-w-0 flex-1 rounded-xl px-1 text-ink outline-none" />
               <button className="rounded-xl bg-gold px-5 py-2.5 font-semibold text-ink shadow-[0_0_30px_-6px_rgba(255,199,44,.9)] transition hover:brightness-95">Search</button>
