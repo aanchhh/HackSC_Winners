@@ -31,13 +31,13 @@ export const api = {
   listings: (p: Params = {}) => get<ListingV2[]>('/api/listings', p),
   search: (p: Params) => get<SmartSearchResponse>('/api/search', p),
   report: (id: string, p: Profile) =>
-    get<ReportV2>(`/api/listings/${encodeURIComponent(id)}/report`, { buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, ...weights(p) }),
+    get<ReportV2>(`/api/listings/${encodeURIComponent(id)}/report`, { buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, sharing: p.sharing ?? 'private', ...weights(p) }),
   trueCost: (b: { listingId?: string; unitLabel?: string; rent?: number; utilities?: number; inFryft?: boolean; lateNights: number; needsMetro: boolean; roommates: number }) =>
     post<CostBreakdown>('/api/true-cost', b),
   /** Recommendation: cosine(preference vector, listing feature vector) blended with fit. `sims` = embedding cosine to the search text. */
   fitRank: (ids: string[], p: Profile, sims: (number | null)[] = []) =>
     get<Record<string, { match: number; cosine: number; fit: number; perPerson: number | null; longestWalkMin: number; parts: Record<string, number>; why: string[] }>>('/api/fit-rank', {
-      ids: ids.join(','), sim: sims.map((s) => (s == null ? '' : s)).join(','), buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, ...weights(p) }),
+      ids: ids.join(','), sim: sims.map((s) => (s == null ? '' : s)).join(','), buildings: p.buildingIds.join(','), lateNights: p.lateNights, budget: p.budget, sharing: p.sharing ?? 'private', ...weights(p) }),
   route: (from: [number, number], to: [number, number], at: Date, w: { incidents: number; dps: number; light: number; people: number }) =>
     get<RouteResult>('/api/route', { from: from.join(','), to: to.join(','), at: at.toISOString(), w: [w.incidents, w.dps, w.light, w.people].join(',') }),
   incidents: (days = 180) => get<IncidentsResponse>('/api/incidents', { days }),

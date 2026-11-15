@@ -37,7 +37,7 @@ export default function ListingPopup({ listing, onResize, onSafeRoute }: { listi
           <div className="text-xs text-stone-500">{listing.address}</div>
         </div>
         <div className="flex items-baseline justify-between">
-          <span className="text-lg font-extrabold text-cardinal">{priceLabel(listing)}</span>
+          <span className="text-lg font-extrabold text-cardinal">{priceLabel(listing, profile.sharing)}</span>
           {r && <span className="rounded-full bg-gold-50 px-2 py-0.5 text-xs font-bold ring-1 ring-gold">Fit {Math.round(r.fit.score * 100)} <InfoTip side="left">{EXPLAIN.fit}</InfoTip></span>}
         </div>
         <ZoneBadges inDps={r?.zones.inDps ?? listing.inDps} inFryft={r?.zones.inFryft ?? listing.inFryft} />

@@ -6,6 +6,8 @@ import { LayoutGroup, motion } from 'motion/react'
 import { CalendarClock, GraduationCap, LocateFixed, Radio, Search as SearchIcon } from 'lucide-react'
 import { Skeleton } from '../components/ui/fx'
 import { CATEGORY_ICON, searchFree, upcomingFree } from '../lib/free'
+import StickyBar from '../components/ui/StickyBar'
+import WakingNote from '../components/ui/WakingNote'
 
 const EXAMPLES = [
   'free ride home tonight', "I've been drinking and can't drive", 'someone is following me', 'my drink might be spiked',
@@ -45,18 +47,20 @@ export default function FreePage() {
 
       <p className="eyebrow">USC · Los Angeles · California</p>
       <h1 className="mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">Free <span className="font-display font-normal italic text-cardinal">&amp;</span> Safe</h1>
-      <p className="mb-5 max-w-3xl text-stone-500">
+      <p className="mb-2 max-w-3xl text-stone-500">
         Free rides, escorts, apps, money help and lesser-known programs from USC, LA, California and beyond, in one place. Describe your
         situation and we'll show what you can use right now, where you are, with the official source for each.
       </p>
 
-      <form onSubmit={(e) => { e.preventDefault(); setParams(draft ? { q: draft } : {}) }} className="glass sticky top-3 z-[50] flex gap-2 rounded-2xl p-1.5">
+      <StickyBar>
+      <form onSubmit={(e) => { e.preventDefault(); setParams(draft ? { q: draft } : {}) }} className="flex gap-2 p-1.5">
         <SearchIcon size={18} className="ml-2 self-center text-stone-400" />
         <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="What's going on? e.g. “need a free ride home tonight”"
           className="min-w-0 flex-1 bg-transparent px-2 py-2.5 outline-none" />
         <button className="btn-glow rounded-xl bg-gradient-to-r from-cardinal to-cardinal-dark px-6 font-semibold text-white">Search</button>
       </form>
-      <div className="mt-3 flex flex-wrap gap-2">
+      </StickyBar>
+      <div className="mt-1 flex flex-wrap gap-2">
         {EXAMPLES.map((e) => <button key={e} onClick={() => setParams({ q: e })} className="rounded-full bg-white/70 px-3 py-1 text-xs ring-1 ring-stone-200 transition hover:-translate-y-0.5 hover:ring-cardinal">{e}</button>)}
       </div>
 
@@ -92,6 +96,7 @@ export default function FreePage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_300px]">
         <LayoutGroup>
         <div className={`grid content-start gap-4 transition-opacity sm:grid-cols-2 ${res.isFetching ? 'opacity-70' : ''}`}>
+          <WakingNote active={res.isLoading} />
           {res.isLoading && [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-64 !rounded-3xl" />)}
           {res.isError && <p className="rounded-xl bg-red-50 p-4 text-sm text-red-700 sm:col-span-2">{(res.error as Error).message}</p>}
           {r && [...r.results.filter((p) => PINNED.includes(p.id)).sort((a, b) => PINNED.indexOf(a.id) - PINNED.indexOf(b.id)), ...r.results.filter((p) => !PINNED.includes(p.id))]
@@ -99,7 +104,7 @@ export default function FreePage() {
           {r?.count === 0 && <p className="text-stone-500 sm:col-span-2">Nothing matches that right now. Try turning off “Available right now”.</p>}
         </div>
         </LayoutGroup>
-        <aside className="space-y-3 lg:sticky lg:top-20 lg:self-start">
+        <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2a0606] to-[#130404] p-5 text-white shadow-[0_24px_60px_-24px_rgba(0,0,0,.6)]">
             <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-gold/25 blur-3xl" />
             <h2 className="relative mb-2 flex items-center gap-2 font-bold"><CalendarClock size={18} className="text-gold" />Coming up free</h2>

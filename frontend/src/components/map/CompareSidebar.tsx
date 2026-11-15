@@ -115,7 +115,7 @@ export default function CompareSidebar({ onFocus }: { onFocus: (id: string) => v
                 </div>
                 <button onClick={() => onFocus(id)} className="block w-full px-2 py-1.5 text-left" title="Show on map">
                   <div className="line-clamp-2 text-xs font-semibold leading-snug hover:text-cardinal">{l?.name ?? '…'}</div>
-                  <div className="mt-0.5 line-clamp-1 text-[11px] text-stone-500">{l ? priceLabel(l) : ''}</div>
+                  <div className="mt-0.5 line-clamp-1 text-[11px] text-stone-500">{l ? priceLabel(l, profile.sharing) : ''}</div>
                 </button>
               </div>
             )

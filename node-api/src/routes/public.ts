@@ -16,6 +16,15 @@ import { config } from '../config.js'
 
 export const publicRouter = Router()
 const ai = axios.create({ baseURL: config.aiServiceUrl, headers: { 'X-Internal-Key': config.internalKey }, timeout: 15000 })
+// On Render's free plan the AI service sleeps when idle and takes ~1–2 min to wake: user-facing calls wait that long
+const AI_WAKE_MS = 120_000
+
+/** Wake-up call: the site pings this when it loads, so both sleeping services start booting before the
+ *  visitor reaches a page that needs them. Answers at once; the AI service is poked in the background. */
+publicRouter.get('/warm', (_req, res) => {
+  ai.get('/health', { timeout: AI_WAKE_MS }).catch(() => { /* waking up is all we wanted */ })
+  res.json({ ok: true })
+})
 const bool = (v: unknown) => (v === 'true' ? true : v === 'false' ? false : undefined)
 
 publicRouter.get('/zones', (_req, res) => res.json(zones))
@@ -53,7 +62,7 @@ publicRouter.get('/listings', (req, res) => {
 // Hybrid (FAISS + BM25 + rerank) search lives in the AI service
 publicRouter.get('/search', async (req, res) => {
   try {
-    const { data } = await ai.get('/ai/listings/search', { params: req.query, timeout: 30000 })
+    const { data } = await ai.get('/ai/listings/search', { params: req.query, timeout: AI_WAKE_MS })
     res.json({ ...data, results: data.results.map((l: { lat: number; lng: number }) => ({ ...l, ...zoneCheck(l.lat, l.lng) })) })
   } catch {
     res.status(503).json({ error: 'Search is unavailable (AI service offline).' })
@@ -144,8 +153,8 @@ publicRouter.get('/listings/:id/report', async (req, res) => {
   } catch { /* LAPD facts above are enough */ }
 
   const longestWalkMin = Math.max(...commuteRes.map((c) => c.walk))
-  // A whole multi-bedroom unit is shared: compare each person's share with the (per-person) budget.
-  const people = listing.priceUnit === 'per unit' && (listing.beds ?? 0) >= 2 ? (listing.beds as number) : 1
+  // A whole unit is split by bedroom (1 per bedroom, or 2 when sharing): compare each person's share with the (per-person) budget.
+  const people = peopleFor(listing, req.query.sharing)
   const perPerson = { people, total: cost.rent == null ? null : Math.round((cost.rent + cost.utilities) / people + cost.transit + cost.rideshare) }
   const fit = fitBreakdown({ total: perPerson.total, budget, longestWalkMin, inFryft: zonesRes.inFryft, inDps: zonesRes.inDps, incidentsNorm: incidentsNorm(listing.lat, listing.lng) }, weightsFrom(req.query))
   res.json({ listing, zones: zonesRes, commute: commuteRes, longestWalkMin, block, cost, perPerson, fitScore: fit.score, fit, incidentFacts: facts })
@@ -171,18 +180,18 @@ publicRouter.get('/incidents', (req, res) => {
 
 // Free & Safe directory (search lives in ai-service; it embeds the programs for meaning-based search)
 publicRouter.get('/free/search', async (req, res) => {
-  try { res.json((await ai.get('/ai/free/search', { params: req.query, timeout: 30000 })).data) }
+  try { res.json((await ai.get('/ai/free/search', { params: req.query, timeout: AI_WAKE_MS })).data) }
   catch { res.status(503).json({ error: 'Free & Safe search is unavailable (AI service offline).' }) }
 })
 publicRouter.get('/free/alerts', async (req, res) => {
   try { res.json((await ai.get('/ai/free/alerts', { params: req.query, timeout: 15000 })).data) } catch { res.json([]) }
 })
 publicRouter.get('/free/trip', async (req, res) => {
-  try { res.json((await ai.get('/ai/free/trip', { params: req.query, timeout: 15000 })).data) }
+  try { res.json((await ai.get('/ai/free/trip', { params: req.query, timeout: AI_WAKE_MS })).data) }
   catch { res.status(503).json({ error: 'Trip options unavailable' }) }
 })
 publicRouter.get('/free/upcoming', async (req, res) => {
-  try { res.json((await ai.get('/ai/free/upcoming', { params: req.query, timeout: 15000 })).data) }
+  try { res.json((await ai.get('/ai/free/upcoming', { params: req.query, timeout: AI_WAKE_MS })).data) }
   catch { res.json([]) }
 })
 
@@ -222,6 +231,12 @@ publicRouter.post('/reports', async (req, res) => {
 //   Preference vector u = the student's priority weights on the same axes.
 //   cos(u, x) says how well a listing's strengths line up with what this student cares about. Cosine ignores magnitude,
 //   so it's blended with the absolute fit score: match = 70% cosine + 30% fit.
+/** People splitting a listing's price: rooms are per person; a whole unit is split 1 per bedroom, or 2 with sharing=shared. */
+function peopleFor(l: { priceUnit?: string; beds?: number | null }, sharing: unknown) {
+  if (l.priceUnit !== 'per unit') return 1
+  return Math.max(1, l.beds ?? 1) * (sharing === 'shared' ? 2 : 1)
+}
+
 const walkCache = new Map<string, number>()
 publicRouter.get('/fit-rank', (req, res) => {
   const ids = String(req.query.ids ?? '').split(',').filter(Boolean).slice(0, 200)
@@ -241,7 +256,7 @@ publicRouter.get('/fit-rank', (req, res) => {
     const longestWalkMin = walks.length ? Math.max(...walks) : 0
     const z = zoneCheck(l.lat, l.lng)
     const cost = trueCost(l, { lateNights })
-    const people = l.priceUnit === 'per unit' && (l.beds ?? 0) >= 2 ? (l.beds as number) : 1
+    const people = peopleFor(l, req.query.sharing)
     const perPerson = cost.rent == null ? null : Math.round((cost.rent + cost.utilities) / people + cost.transit + cost.rideshare)
     const inc = incidentsNorm(l.lat, l.lng)
     const f = fitBreakdown({ total: perPerson, budget, longestWalkMin, inFryft: z.inFryft, inDps: z.inDps, incidentsNorm: inc }, w)

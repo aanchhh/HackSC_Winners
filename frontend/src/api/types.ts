@@ -21,7 +21,9 @@ export interface Cost { rent: number | null; utilities: number; transit: number;
 export interface Report { listing: Listing; zones: Zones; commute: Commute[]; block: Block; cost: Cost; fitScore: number }
 
 export interface Priorities { cost: number; commute: number; zone: number; incidents: number }
-export interface Profile { budget: number; buildingIds: number[]; lateNights: number; priorities: Priorities }
+/** How a whole apartment's rent is split: one person per bedroom ('private') or two ('shared'). */
+export type Sharing = 'private' | 'shared'
+export interface Profile { budget: number; buildingIds: number[]; lateNights: number; priorities: Priorities; sharing?: Sharing }
 
 export type ChatEvent =
   | { event: 'step'; data: { label: string; status: 'running' | 'done' } }

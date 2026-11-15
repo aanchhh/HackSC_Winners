@@ -10,6 +10,8 @@ import { Skeleton } from '../components/ui/fx'
 import { useAppStore } from '../store/useAppStore'
 import { money } from '../lib/format'
 import type { Priorities } from '../api/types'
+import StickyBar from '../components/ui/StickyBar'
+import WakingNote from '../components/ui/WakingNote'
 
 const PRIO: { k: keyof Priorities; label: string }[] = [{ k: 'cost', label: 'Cost' }, { k: 'commute', label: 'Commute' }, { k: 'zone', label: 'DPS & free Lyft' }, { k: 'incidents', label: 'Fewer incidents' }]
 const TOP = 6
@@ -62,19 +64,17 @@ export default function SearchPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <p className="eyebrow">Live listings · ranked for you</p>
-      <h1 className="mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">Smart <span className="font-display font-normal italic text-cardinal">search</span></h1>
-      <p className="mb-5 max-w-3xl text-stone-500">
-        Write it the way you’d say it. TrojanScout reads price, room type (entire / private / shared), bedrooms & bathrooms (2B2B, 3 bed 2 bath),
-        private bathrooms, amenities, “inside DPS”, and walk time to a building, then ranks what’s left by meaning and keywords.
-      </p>
+      <h1 className="mb-2 mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">Smart <span className="font-display font-normal italic text-cardinal">search</span></h1>
 
-      <form onSubmit={(e) => { e.preventDefault(); go(draft) }} className="glass sticky top-3 z-[50] flex gap-2 rounded-2xl p-1.5">
+      <StickyBar>
+      <form onSubmit={(e) => { e.preventDefault(); go(draft) }} className="flex gap-2 p-1.5">
         <SearchIcon size={18} className="ml-2 self-center text-stone-400" />
         <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="e.g. furnished 2B2B under $3,200, 10 min walk to Viterbi, inside DPS"
           className="min-w-0 flex-1 rounded-xl bg-transparent px-2 py-2.5 outline-none" />
         <button className="btn-glow rounded-xl bg-gradient-to-r from-cardinal to-cardinal-dark px-6 font-semibold text-white">Search</button>
       </form>
-      <div className="mt-3 flex flex-wrap gap-2">
+      </StickyBar>
+      <div className="mt-1 flex flex-wrap gap-2">
         {EXAMPLES.map((e) => <button key={e} onClick={() => go(e)} className="rounded-full bg-white/70 px-3 py-1 text-xs ring-1 ring-stone-200 transition hover:-translate-y-0.5 hover:ring-cardinal">{e}</button>)}
       </div>
 
@@ -110,6 +110,15 @@ export default function SearchPage() {
         <select value={maxRent} onChange={(e) => setMaxRent(e.target.value)} className="rounded-lg border border-stone-300 bg-white px-2 py-1.5">
           <option value="">Any price</option>{[900, 1200, 1500, 2000, 3000, 4000].map((v) => <option key={v} value={v}>Under ${v.toLocaleString()}</option>)}
         </select>
+        <div className="flex items-center gap-1.5" title="Prices are per person. A whole apartment's rent is split by bedroom: e.g. a 2B2B is split 2 ways with your own bedroom, or 4 ways when you share bedrooms. Room listings are already per person.">
+          <span className="text-xs font-semibold text-stone-500">Split whole apartments:</span>
+          <div className="flex overflow-hidden rounded-lg ring-1 ring-stone-300">
+            {([['private', 'Own bedroom'], ['shared', 'Shared bedroom']] as const).map(([v, l]) => (
+              <button key={v} onClick={() => setProfile({ sharing: v })}
+                className={`px-2.5 py-1.5 text-xs font-semibold ${(profile.sharing ?? 'private') === v ? 'bg-cardinal text-white' : 'bg-white hover:bg-stone-50'}`}>{l}</button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {search.isError && <p className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-700">{(search.error as Error).message}</p>}
@@ -137,6 +146,7 @@ export default function SearchPage() {
           )}
         </div>
       )}
+      {search.isLoading && <div className="mt-4"><WakingNote active={search.isLoading} /></div>}
       {search.isLoading && <div className="mt-4 grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-96 !rounded-3xl" />)}</div>}
       <LayoutGroup>
       <div className={`mt-4 grid gap-4 transition-opacity sm:grid-cols-2 ${search.isFetching || fits.isFetching ? 'opacity-70' : ''}`}>
@@ -160,7 +170,7 @@ export default function SearchPage() {
 
       {/* True Trojan Cost for the selected listing */}
       {costId && (
-        <aside className="lg:sticky lg:top-4">
+        <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="glass overflow-hidden rounded-3xl">
             <div className="relative overflow-hidden border-b border-stone-900/10 bg-gradient-to-r from-cardinal to-cardinal-dark px-4 py-3 text-white">
               <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-gold/30 blur-2xl" />

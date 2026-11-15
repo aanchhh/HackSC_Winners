@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { Building2, Calculator, Check, Footprints, MapPin, Plus, Star } from 'lucide-react'
 import type { ListingV2, SmartHit } from '../../api/types'
-import { priceLabel } from '../../lib/format'
+import { perPersonLabel } from '../../lib/format'
 import { useAppStore } from '../../store/useAppStore'
 import ZoneBadges from './ZoneBadges'
 import FloorplanList from './FloorplanList'
@@ -12,6 +12,8 @@ export default function ListingCard({ listing, showRanks = false, match, why, ra
   listing: ListingV2 | SmartHit; showRanks?: boolean; match?: number; why?: string[]; rank?: number; costSelected?: boolean; onSelect?: () => void
 }) {
   const { compareIds, toggleCompare } = useAppStore()
+  const sharing = useAppStore((s) => s.profile.sharing ?? 'private')
+  const price = perPersonLabel(listing, sharing)
   const comparing = compareIds.includes(listing.id)
   const hit = listing as SmartHit
   const [imgOk, setImgOk] = useState(true)
@@ -45,7 +47,10 @@ export default function ListingCard({ listing, showRanks = false, match, why, ra
             </span>
           )}
         </div>
-        <p className="num text-xl font-bold text-cardinal">{priceLabel(listing)}</p>
+        <div>
+          <p className="num text-xl font-bold text-cardinal">{price.price}{price.price !== 'Call for pricing' && <span className="text-sm font-semibold text-cardinal/70"> /person · mo</span>}</p>
+          {price.note && <p className="text-[11px] text-stone-500">{price.note}{sharing === 'shared' ? ' (2 per bedroom)' : ' (1 per bedroom)'}</p>}
+        </div>
         <p className="text-xs text-stone-500">{[listing.distanceToCampusMi != null && `${listing.distanceToCampusMi} mi to campus`, listing.availability].filter(Boolean).join(' · ')}</p>
         <ZoneBadges inDps={listing.inDps} inFryft={listing.inFryft} />
         {!!why?.length && <div className="flex flex-wrap gap-1">{why.map((w) => <span key={w} className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800 ring-1 ring-emerald-200"><Check size={11} />{w}</span>)}</div>}

@@ -43,6 +43,8 @@ async def lifespan(_app: FastAPI):
             await asyncio.to_thread(INDEX.build, [Listing(**x) for x in rows])
             log.info("built search index from listings.json (%d listings)", len(rows))
     await asyncio.to_thread(warm)
+    from app.free.search import index as free_index
+    await asyncio.to_thread(free_index)  # embed the Free & Safe programs now, not on the first visitor's request
     task = asyncio.create_task(_refresh_loop()) if settings.refresh_minutes > 0 else None
     yield
     if task:

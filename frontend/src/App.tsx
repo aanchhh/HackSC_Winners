@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router'
+import { wakeBackend } from './components/ui/WakingNote'
 import PageTransition from './components/layout/PageTransition'
 import Navbar from './components/layout/Navbar'
 import { AlertBanner } from './components/free/Alerts'
@@ -21,6 +23,7 @@ import EmergencyPage from './pages/EmergencyPage'
 export default function App() {
   const location = useLocation()
   const { pathname } = location
+  useEffect(() => { wakeBackend() }, [])
   return (
     <div className="flex h-full flex-col">
       <Navbar />

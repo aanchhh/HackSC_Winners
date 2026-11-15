@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { ListingV2 } from '../api/types'
-import { money, priceLabel } from '../lib/format'
+import { money, peopleFor, priceLabel } from '../lib/format'
 import { useAppStore } from '../store/useAppStore'
 import { Link } from 'react-router'
 import { motion } from 'motion/react'
@@ -37,6 +37,10 @@ export default function CostPage({ fixedId, embedded = false }: { fixedId?: stri
   const pricedUnits = (picked?.units ?? []).filter((u) => u.rent)
   const unit = pricedUnits.find((u) => u.label === unitLabel) ?? pricedUnits[0]
   const canSplit = mode === 'custom' || unit?.roomType === 'entire'
+  // a whole apartment starts split by bedroom (1 or 2 per bedroom, from your Search setting); rooms are already per person
+  const sharing = profile.sharing ?? 'private'
+  useEffect(() => { if (mode === 'listing' && unit) setRoommates(peopleFor(unit, sharing)) }, [mode, picked?.id, unit?.label, sharing]) // eslint-disable-line react-hooks/exhaustive-deps
+  const maxPeople = Math.max(6, unit ? peopleFor(unit, 'shared') : 6)
 
   const body = mode === 'listing' && picked
     ? { listingId: picked.id, unitLabel: unit?.label, lateNights, needsMetro, roommates: canSplit ? roommates : 1 }
@@ -58,7 +62,7 @@ export default function CostPage({ fixedId, embedded = false }: { fixedId?: stri
         <div className="space-y-5">
           <section className="card p-5">
             <h2 className="mb-3 font-bold">1 · What are you renting?</h2>
-            {embedded && picked && <p className="mb-2 text-sm"><b>{picked.name}</b> <span className="text-stone-500">· {priceLabel(picked)}</span></p>}
+            {embedded && picked && <p className="mb-2 text-sm"><b>{picked.name}</b> <span className="text-stone-500">· {priceLabel(picked, sharing)}</span></p>}
             {!embedded && <div className="mb-3 grid grid-cols-2 rounded-xl bg-stone-100 p-1 text-sm font-medium">
               {(['listing', 'custom'] as const).map((m) => (
                 <button key={m} onClick={() => setMode(m)} className={`rounded-lg py-1.5 ${mode === m ? 'bg-white shadow' : 'text-stone-500'}`}>{m === 'listing' ? 'A live listing' : 'My own numbers'}</button>
@@ -73,7 +77,7 @@ export default function CostPage({ fixedId, embedded = false }: { fixedId?: stri
                       <button onClick={() => { setPicked(l); setUnitLabel('') }}
                         className={`flex w-full items-center gap-3 rounded-xl p-2 text-left text-sm ring-1 ${picked?.id === l.id ? 'bg-cardinal-50 ring-cardinal' : 'ring-transparent hover:bg-stone-50'}`}>
                         {l.photos?.[0] ? <img src={l.photos[0]} alt="" className="h-10 w-12 rounded-md object-cover" /> : <span className="grid h-10 w-12 place-items-center rounded-md bg-stone-100">🏢</span>}
-                        <span className="min-w-0 flex-1"><span className="block truncate font-medium">{l.name}</span><span className="block truncate text-xs text-stone-500">{priceLabel(l)} · {l.source}</span></span>
+                        <span className="min-w-0 flex-1"><span className="block truncate font-medium">{l.name}</span><span className="block truncate text-xs text-stone-500">{priceLabel(l, sharing)} · {l.source}</span></span>
                         <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${l.inDps ? 'bg-emerald-600' : 'bg-violet-600'}`} title={l.inDps ? 'Inside zone' : 'Outside zone'} />
                       </button>
                     </li>
@@ -104,7 +108,7 @@ export default function CostPage({ fixedId, embedded = false }: { fixedId?: stri
 
           <section className="space-y-4 card p-5">
             <h2 className="font-bold">2 · How will you live there?</h2>
-            {canSplit && <Slider label="People splitting rent & utilities" value={roommates} set={setRoommates} min={1} max={6} step={1} fmt={(v) => (v === 1 ? 'Just me' : `${v} people`)} />}
+            {canSplit && <Slider label="People splitting rent & utilities" value={roommates} set={setRoommates} min={1} max={maxPeople} step={1} fmt={(v) => (v === 1 ? 'Just me' : `${v} people`)} />}
             <Slider label="Late nights out per week" value={lateNights} set={setLateNights} min={0} max={7} step={1} fmt={(v) => `${v} night${v === 1 ? '' : 's'}`} />
             <p className="-mt-2 text-xs text-stone-500">Labs, library, work shifts: nights you’d need a ride home after dark.</p>
             <p className="text-xs text-stone-500">🚇 Metro and DASH: $0 extra. Your U-Pass is included in USC fees.</p>

@@ -35,8 +35,8 @@ services:
     runtime: python
     plan: free
     rootDir: .
-    # the embedding model is downloaded at build time, so a cold start doesn't re-download it
-    buildCommand: cd ai-service && pip install -r requirements-deploy.txt && python -c "from app.embeddings import embed; embed(['warm up'])"
+    # the embedding model and the search index are built at deploy time, so a cold start only loads them
+    buildCommand: cd ai-service && pip install -r requirements-deploy.txt && python -m app.prebuild
     startCommand: cd ai-service && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:

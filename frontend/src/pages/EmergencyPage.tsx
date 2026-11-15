@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { Check, Copy, MessageSquare, Phone, Search, ShieldAlert, Siren, UserPlus } from 'lucide-react'
 import { token, useMe } from '../lib/auth'
+import StickyBar from '../components/ui/StickyBar'
 
 interface Line { name: string; detail: string; call?: string; text?: { to: string; body?: string; label: string }; hours?: string }
 interface Group { title: string; icon: string; tone: string; lines: Line[] }
@@ -102,13 +103,13 @@ export default function EmergencyPage() {
         ) : <p className="mt-1 text-sm text-stone-500">{token() ? 'You haven’t added any yet.' : 'Sign in to keep your own emergency contacts here too.'}</p>}
       </section>
 
-      <div className="glass sticky top-3 z-[50] flex flex-wrap items-center gap-2 rounded-2xl p-2">
+      <StickyBar className="flex flex-wrap items-center gap-2 p-2">
         <div className="flex min-w-[14rem] flex-1 items-center gap-2 px-2"><Search size={16} className="text-stone-400" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search: crisis, poison, LAPD, 988…" className="min-w-0 flex-1 bg-transparent py-1.5 text-sm outline-none" /></div>
         <div className="flex flex-wrap gap-1">
-          {FILTERS.map((f) => <button key={f.k} onClick={() => setFilter(f.k)} className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${filter === f.k ? 'bg-ink text-white' : 'text-stone-600 hover:bg-white'}`}>{f.label}</button>)}
+          {FILTERS.map((f) => <button key={f.k} onClick={() => setFilter(f.k)} className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${filter === f.k ? 'bg-ink text-white' : 'text-stone-600 hover:bg-stone-100'}`}>{f.label}</button>)}
         </div>
-      </div>
+      </StickyBar>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {groups.map((g) => (
