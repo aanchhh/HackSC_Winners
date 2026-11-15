@@ -1,5 +1,6 @@
-// Shared rides: real-time ride requests, route matching, fare splitting, and a demo-demand simulator.
-// State is in memory (fine for a demo; move to Supabase for production). Every browser subscribes over SSE.
+// Shared rides: real-time ride requests, route matching and fare splitting between FRIENDS only.
+// Every rider is a signed-in account; nobody outside your friends (or the lists you pick) ever sees you.
+// State is in memory (move to Supabase for production). Every browser subscribes over SSE.
 import { friendIds, listMembers } from './users.js'
 import { EventEmitter } from 'node:events'
 import { randomUUID } from 'node:crypto'
@@ -21,15 +22,14 @@ export function soloQuote(p: LatLng, d: LatLng) {
 export interface Place { lat: number; lng: number; label: string }
 export interface RideRequest {
   id: string; userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number
-  createdAt: number; status: 'open' | 'matched' | 'cancelled' | 'expired'; demo: boolean; groupId?: string
+  createdAt: number; status: 'open' | 'matched' | 'cancelled' | 'expired'; groupId?: string
   share: Share
 }
-/** Who may see that you're riding their way: everyone, all your friends, or only people in chosen friend lists. */
-export interface Share { mode: 'everyone' | 'friends' | 'lists'; lists: string[] }
+/** Who may see that you're riding their way: all your friends, or only friends in lists you choose. Never strangers. */
+export interface Share { mode: 'friends' | 'lists'; lists: string[] }
 
 /** Can `viewerId` be told that `r` is travelling on their route? (Never where exactly: only after both accept.) */
 export function canSee(viewerId: string, r: RideRequest) {
-  if (r.demo || r.share.mode === 'everyone') return true
   if (r.share.mode === 'friends') return friendIds(r.userId).has(viewerId)
   return listMembers(r.userId, r.share.lists).has(viewerId)
 }
@@ -39,11 +39,11 @@ export interface Group { id: string; requestIds: string[]; createdAt: number }
 const requests = new Map<string, RideRequest>()
 const joins = new Map<string, JoinRequest>()
 const groups = new Map<string, Group>()
-const activity: { at: number; text: string; demo: boolean }[] = []
+const activity: { at: number; text: string; requestIds: string[] }[] = []
 export const bus = new EventEmitter()
 bus.setMaxListeners(500)
 const changed = () => bus.emit('change')
-const log = (text: string, demo: boolean) => { activity.unshift({ at: Date.now(), text, demo }); activity.length = Math.min(activity.length, 25) }
+const log = (text: string, ...rs: RideRequest[]) => { activity.unshift({ at: Date.now(), text, requestIds: rs.map((r) => r.id) }); activity.length = Math.min(activity.length, 25) }
 const short = (label: string) => label.split(',')[0]
 
 // ---------- matching ----------
@@ -137,7 +137,7 @@ export function matchesFor(me: RideRequest) {
     if (!ok) continue
     const mine = plan.riders.find((x) => x.requestId === me.id)!
     out.push({
-      requestId: other.id, name: other.name, demo: other.demo, friend: friends.has(other.userId), groupSize: riders.length - 1,
+      requestId: other.id, name: other.name, friend: friends.has(other.userId), groupSize: riders.length - 1,
       departAt: other.departAt, pickupArea: short(other.pickup.label), dropArea: short(other.drop.label),
       ...relation(me, other), you: mine, plan,
       pendingJoin: [...joins.values()].some((j) => j.fromRequestId === me.id && j.toRequestId === other.id && j.status === 'pending'),
@@ -147,15 +147,14 @@ export function matchesFor(me: RideRequest) {
 }
 
 // ---------- mutations ----------
-export function createRequest(b: { userId: string; name: string; pickup: Place; drop: Place; departAt?: number; seats?: number; share?: Share }, demo = false) {
+export function createRequest(b: { userId: string; name: string; pickup: Place; drop: Place; departAt?: number; seats?: number; share?: Share }) {
   const r: RideRequest = {
     id: randomUUID().slice(0, 8), userId: b.userId, name: b.name.slice(0, 30) || 'Trojan', pickup: b.pickup, drop: b.drop,
-    departAt: b.departAt ?? Date.now(), seats: Math.min(2, Math.max(1, b.seats ?? 1)), createdAt: Date.now(), status: 'open', demo,
-    share: demo ? { mode: 'everyone', lists: [] } : b.share ?? { mode: 'everyone', lists: [] },
+    departAt: b.departAt ?? Date.now(), seats: Math.min(2, Math.max(1, b.seats ?? 1)), createdAt: Date.now(), status: 'open',
+    share: b.share ?? { mode: 'friends', lists: [] },
   }
   requests.set(r.id, r)
-  log('A student booked a ride', demo)  // the public feed never says who or where
-  if (!demo) scheduleDemoNear(r)
+  log('A friend booked a ride', r)  // shown only to people this ride is shared with; never says where
   changed()
   return r
 }
@@ -183,8 +182,6 @@ export function requestJoin(fromRequestId: string, toRequestId: string, userId: 
   if (!matchesFor(from).some((m) => m.requestId === to.id)) throw new Error('No longer a compatible match')
   const j: JoinRequest = { id: randomUUID().slice(0, 8), fromRequestId, toRequestId, createdAt: Date.now(), status: 'pending' }
   joins.set(j.id, j)
-  log('Two students are talking about sharing a ride', from.demo && to.demo)
-  if (to.demo) setTimeout(() => respondJoin(j.id, true, to.userId), 2500 + Math.random() * 4000)  // demo riders accept
   changed()
   return j
 }
@@ -202,7 +199,7 @@ export function respondJoin(joinId: string, accept: boolean, userId: string) {
     groups.set(g.id, g)
     g.requestIds.push(from.id)
     for (const id of g.requestIds) { const r = requests.get(id)!; r.groupId = g.id; r.status = 'matched' }
-    log('Students just started sharing a ride 🎉', from.demo && to.demo)
+    log('Friends just started sharing a ride 🎉', from, to)
   }
   changed()
   return true
@@ -212,84 +209,41 @@ export function respondJoin(joinId: string, accept: boolean, userId: string) {
 // Privacy: until both riders accept, the other person only learns WHO (if you shared with them) and that you're on the
 // same route, when you leave and what they'd save. Pickups, drops, areas and the stop order are revealed only to a formed group.
 type Match = ReturnType<typeof matchesFor>[number]
-const publicMatch = (m: Match) => ({ requestId: m.requestId, name: m.name, demo: m.demo, friend: m.friend, groupSize: m.groupSize, departAt: m.departAt, you: m.you, pendingJoin: m.pendingJoin })
+const publicMatch = (m: Match) => ({ requestId: m.requestId, name: m.name, friend: m.friend, groupSize: m.groupSize, departAt: m.departAt, you: m.you, pendingJoin: m.pendingJoin })
 
-export const liveRides = () => [...requests.values()].filter((r) => r.status === 'open' || r.status === 'matched')
 
 export function stateFor(userId: string) {
   const friends = friendIds(userId)
   const mine = [...requests.values()].filter((r) => r.userId === userId && r.status !== 'cancelled' && r.status !== 'expired')
   const myIds = new Set(mine.map((r) => r.id))
-  const live = [...requests.values()].filter((r) => r.status === 'open' || r.status === 'matched')
+  // the live strip only counts rides this person is allowed to see (their own + friends who shared with them)
+  const visible = (r: RideRequest | undefined) => !!r && (r.userId === userId || canSee(userId, r))
+  const live = [...requests.values()].filter((r) => (r.status === 'open' || r.status === 'matched') && visible(r))
   return {
     now: Date.now(),
-    stats: { live: live.length, real: live.filter((r) => !r.demo).length, sharing: groups.size },
-    activity: activity.slice(0, 12),
+    stats: { live: live.length, sharing: [...groups.values()].filter((g) => g.requestIds.some((id) => visible(requests.get(id)))).length },
+    activity: activity.filter((a) => a.requestIds.every((id) => visible(requests.get(id)))).slice(0, 12).map(({ at, text }) => ({ at, text })),
     mine: mine.map((r) => ({
       ...r, solo: soloQuote([r.pickup.lat, r.pickup.lng], [r.drop.lat, r.drop.lng]),
       matches: matchesFor(r).map(publicMatch),
-      group: r.groupId ? (() => { const g = groups.get(r.groupId!)!; const riders = g.requestIds.map((id) => requests.get(id)!); return { id: g.id, plan: planGroup(riders), members: riders.map((x) => ({ requestId: x.id, name: x.name, demo: x.demo, pickup: x.pickup, drop: x.drop, departAt: x.departAt })) } })() : null,
+      group: r.groupId ? (() => { const g = groups.get(r.groupId!)!; const riders = g.requestIds.map((id) => requests.get(id)!); return { id: g.id, plan: planGroup(riders), members: riders.map((x) => ({ requestId: x.id, name: x.name, pickup: x.pickup, drop: x.drop, departAt: x.departAt })) } })() : null,
     })),
     incoming: [...joins.values()].filter((j) => j.status === 'pending' && myIds.has(j.toRequestId)).map((j) => {
       const from = requests.get(j.fromRequestId)!, to = requests.get(j.toRequestId)!
       const plan = planGroup([...ridersOf(to), from])
-      return { joinId: j.id, from: { name: from.name, demo: from.demo, friend: friends.has(from.userId), departAt: from.departAt }, toRequestId: to.id, you: plan.riders.find((x) => x.requestId === to.id) }
+      return { joinId: j.id, from: { name: from.name, friend: friends.has(from.userId), departAt: from.departAt }, toRequestId: to.id, you: plan.riders.find((x) => x.requestId === to.id) }
     }),
   }
 }
 
-// ---------- housekeeping + demo demand ----------
-const HOTSPOTS: Place[] = [
-  { lat: 34.0256, lng: -118.2853, label: 'USC Village' }, { lat: 34.0206, lng: -118.2854, label: 'Tommy Trojan, USC' },
-  { lat: 34.0287, lng: -118.2726, label: 'The Lorenzo' }, { lat: 34.0307, lng: -118.2883, label: 'Ellendale Pl' },
-  { lat: 34.0183, lng: -118.2915, label: 'Expo/Vermont Station' }, { lat: 34.0225, lng: -118.2780, label: 'Jefferson & Figueroa' },
-  { lat: 34.0280, lng: -118.2930, label: '28th St & Menlo' }, { lat: 34.0190, lng: -118.2856, label: 'Marshall (JKP)' },
-]
-const DESTINATIONS: Place[] = [
-  { lat: 34.0562, lng: -118.2365, label: 'Union Station' }, { lat: 34.0430, lng: -118.2673, label: 'Crypto.com Arena / LA Live' },
-  { lat: 34.0721, lng: -118.3576, label: 'The Grove' }, { lat: 34.0617, lng: -118.3005, label: 'Koreatown (Wilshire/Vermont)' },
-  { lat: 34.0407, lng: -118.2353, label: 'Arts District' }, { lat: 33.9416, lng: -118.4085, label: 'LAX' },
-  { lat: 34.1016, lng: -118.3387, label: 'Hollywood & Highland' }, { lat: 34.0497, lng: -118.2401, label: 'Little Tokyo' },
-  { lat: 34.0195, lng: -118.4912, label: 'Santa Monica Pier' }, { lat: 34.0689, lng: -118.4452, label: 'Westwood / UCLA' },
-]
-const NAMES = ['Priya S.', 'Marcus L.', 'Jenna K.', 'Diego R.', 'Aisha M.', 'Kevin T.', 'Sofia G.', 'Ethan W.', 'Hana Y.', 'Omar F.', 'Lily C.', 'Noah B.', 'Zara P.', 'Ryan H.', 'Mei L.', 'Arjun V.']
-const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
-const jitter = (p: Place, m: number): Place => ({ ...p, lat: p.lat + ((Math.random() - 0.5) * 2 * m) / 111000, lng: p.lng + ((Math.random() - 0.5) * 2 * m) / 92000 })
-let demoN = 0
-
-function demoRide(pickup: Place, drop: Place, departAt: number) {
-  return createRequest({ userId: `demo-${++demoN}`, name: pick(NAMES), pickup, drop, departAt, seats: Math.random() < 0.8 ? 1 : 2 }, true)
-}
-
-/** Someone just booked: within ~1–3 min, 1–2 demo riders book similar trips (near the pickup / on the way / near the drop). */
-function scheduleDemoNear(r: RideRequest) {
-  if (!SIM) return
-  const count = 1 + Math.round(Math.random())
-  for (let k = 0; k < count; k++) {
-    setTimeout(() => {
-      if (r.status !== 'open' && r.status !== 'matched') return
-      const t = Math.random()
-      const mid: Place = { lat: r.pickup.lat + (r.drop.lat - r.pickup.lat) * t * 0.5, lng: r.pickup.lng + (r.drop.lng - r.pickup.lng) * t * 0.5, label: 'on the way' }
-      const pickup = Math.random() < 0.6 ? jitter({ ...r.pickup, label: short(r.pickup.label) }, 350) : jitter({ ...mid, label: `${short(r.pickup.label)} area` }, 250)
-      const drop = Math.random() < 0.7 ? jitter({ ...r.drop, label: short(r.drop.label) }, 450) : jitter({ lat: r.pickup.lat + (r.drop.lat - r.pickup.lat) * 0.8, lng: r.pickup.lng + (r.drop.lng - r.pickup.lng) * 0.8, label: `near ${short(r.drop.label)}` }, 300)
-      demoRide(pickup, drop, r.departAt + (Math.random() - 0.5) * 10 * 60e3)
-    }, (40 + Math.random() * 130) * 1000 * (k + 1) * 0.8)
-  }
-}
-
-const SIM = process.env.RIDE_SIM !== '0'
+// ---------- housekeeping ----------
 export function startRides() {
   setInterval(() => {  // expire stale requests
     let dirty = false
     for (const r of requests.values()) {
-      const stale = r.status === 'open' && Date.now() > Math.max(r.departAt + 10 * 60e3, r.createdAt + (r.demo ? 18 : 45) * 60e3)
+      const stale = r.status === 'open' && Date.now() > Math.max(r.departAt + 10 * 60e3, r.createdAt + 45 * 60e3)
       if (stale) { r.status = 'expired'; dirty = true }
     }
     if (dirty) changed()
   }, 15_000)
-  if (!SIM) return
-  const spawn = () => demoRide(jitter(pick(HOTSPOTS), 250), jitter(pick(DESTINATIONS), 400), Date.now() + (3 + Math.random() * 25) * 60e3)
-  for (let i = 0; i < 7; i++) spawn()
-  const loop = () => { if ([...requests.values()].filter((r) => r.demo && r.status === 'open').length < 14) spawn(); setTimeout(loop, (20 + Math.random() * 20) * 1000) }
-  setTimeout(loop, 15_000)
 }

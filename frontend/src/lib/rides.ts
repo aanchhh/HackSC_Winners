@@ -2,7 +2,7 @@ import { API_URL } from '../api/client'
 import { authHeaders } from './auth'
 import { liveStream } from './liveStream'
 
-// Anonymous rider identity for this browser (no accounts). Two browsers = two riders.
+// Anonymous identity for this browser, used for anonymous safety reports (rides always use your signed-in account).
 export function identity() {
   let id = ''
   let name = ''
@@ -13,28 +13,29 @@ export function identity() {
   } catch { id = id || `u-${Math.random().toString(36).slice(2, 14)}` }
   return { id, name: name || `Trojan ${id.replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase()}` }
 }
-export function saveName(n: string) { try { localStorage.setItem('ts-name', n) } catch { /* ignore */ } }
 
 export interface Place { lat: number; lng: number; label: string }
 export interface Quote { miles: number; minutes: number; fare: number }
 export interface RiderCost { requestId: string; solo: Quote; share: number; saves: number; savesPct: number; detourMin: number }
 export interface Plan { stops: { kind: 'pickup' | 'drop'; requestId: string; name: string; lat: number; lng: number; label: string }[]; miles: number; minutes: number; totalFare: number; riders: RiderCost[] }
 /** Before both riders accept, a match says only who (if they shared with you), that they're on your route, when, and what you'd save. */
-export interface Match { requestId: string; name: string; demo: boolean; friend: boolean; groupSize: number; departAt: number; you: RiderCost; pendingJoin: boolean }
-export interface Share { mode: 'everyone' | 'friends' | 'lists'; lists: string[] }
+export interface Match { requestId: string; name: string; friend: boolean; groupSize: number; departAt: number; you: RiderCost; pendingJoin: boolean }
+/** Rides are shared with friends only: all of them, or just the friend lists you pick. */
+export interface Share { mode: 'friends' | 'lists'; lists: string[] }
 export interface MyRide {
   id: string; userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number; createdAt: number
-  status: 'open' | 'matched'; demo: boolean; share: Share; solo: Quote; matches: Match[]
-  group: null | { id: string; plan: Plan; members: { requestId: string; name: string; demo: boolean; pickup: Place; drop: Place; departAt: number }[] }
+  status: 'open' | 'matched'; share: Share; solo: Quote; matches: Match[]
+  group: null | { id: string; plan: Plan; members: { requestId: string; name: string; pickup: Place; drop: Place; departAt: number }[] }
 }
 export interface RidesState {
-  now: number; stats: { live: number; real: number; sharing: number }
-  activity: { at: number; text: string; demo: boolean }[]; mine: MyRide[]
-  incoming: { joinId: string; from: { name: string; demo: boolean; friend: boolean; departAt: number }; toRequestId: string; you: RiderCost }[]
+  now: number; stats: { live: number; sharing: number }
+  activity: { at: number; text: string }[]; mine: MyRide[]
+  incoming: { joinId: string; from: { name: string; friend: boolean; departAt: number }; toRequestId: string; you: RiderCost }[]
 }
 
-export function subscribeRides(userId: string, onState: (s: RidesState) => void, onStatus: (live: boolean) => void) {
-  return liveStream(`${API_URL}/api/rides/stream?userId=${encodeURIComponent(userId)}`,
+/** Live state for the signed-in rider. The stream URL carries a rides-only pass, never the session token. */
+export function subscribeRides(pass: string, onState: (s: RidesState) => void, onStatus: (live: boolean) => void) {
+  return liveStream(`${API_URL}/api/rides/stream?pass=${encodeURIComponent(pass)}`,
     { state: (d) => onState(d as RidesState) }, onStatus)
 }
 
@@ -46,10 +47,11 @@ async function call<T>(method: string, path: string, body?: unknown): Promise<T>
 }
 export const rides = {
   quote: (p: Place, d: Place) => call<Quote>('GET', `/quote?pickup=${p.lat},${p.lng}&drop=${d.lat},${d.lng}`),
-  book: (b: { userId: string; name: string; pickup: Place; drop: Place; departAt: number; seats: number; share: Share }) => call<{ id: string }>('POST', '', b),
-  cancel: (id: string, userId: string) => call('DELETE', `/${id}?userId=${encodeURIComponent(userId)}`),
-  join: (targetId: string, userId: string, myRequestId: string) => call('POST', `/${targetId}/join`, { userId, myRequestId }),
-  respond: (joinId: string, userId: string, accept: boolean) => call('POST', `/joins/${joinId}`, { userId, accept }),
+  pass: () => call<{ pass: string }>('POST', '/pass'),
+  book: (b: { pickup: Place; drop: Place; departAt: number; seats: number; share: Share }) => call<{ id: string }>('POST', '', b),
+  cancel: (id: string) => call('DELETE', `/${id}`),
+  join: (targetId: string, myRequestId: string) => call('POST', `/${targetId}/join`, { myRequestId }),
+  respond: (joinId: string, accept: boolean) => call('POST', `/joins/${joinId}`, { accept }),
 }
 
 export const QUICK_PICKUPS: Place[] = [

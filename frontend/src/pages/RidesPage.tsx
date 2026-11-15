@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { Route as RouteIcon, Users } from 'lucide-react'
@@ -14,7 +14,7 @@ import FreeNow from '../components/free/FreeNow'
 import TripOptions from '../components/free/TripOptions'
 import { googleMapsStops, uberLink } from '../lib/directions'
 import {
-  ago, identity, inMin, QUICK_DROPS, QUICK_PICKUPS, rides, saveName, subscribeRides,
+  ago, inMin, QUICK_DROPS, QUICK_PICKUPS, rides, subscribeRides,
   type Match, type MyRide, type Place, type Quote, type RidesState, type Share,
 } from '../lib/rides'
 
@@ -54,7 +54,6 @@ function MatchCard({ m, now, onJoin }: { m: Match; now: number; onJoin: () => vo
           <div className="flex items-center gap-1.5">
             <span className="font-semibold">{m.name}</span>
             {m.friend && <span className="rounded bg-pink-100 px-1 text-[10px] font-semibold text-pink-700">👋 Friend</span>}
-            {m.demo && <span className="rounded bg-stone-100 px-1 text-[10px] text-stone-500" title="Simulated rider so the demo has live demand">demo</span>}
             {m.groupSize > 1 && <span className="rounded bg-gold-50 px-1 text-[10px] text-amber-800">+{m.groupSize - 1} already sharing</span>}
             <span className="ml-auto text-xs text-stone-500">leaves {inMin(m.departAt, now)}</span>
           </div>
@@ -90,7 +89,7 @@ function GroupCard({ ride, now, onCancel }: { ride: MyRide; now: number; onCance
     <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="space-y-3 rounded-3xl bg-white p-4 shadow-[0_0_0_2px_#34d399,0_20px_50px_-20px_rgba(5,150,105,.45)]">
       <div>
         <div className="text-lg font-extrabold">🎉 You’re sharing a ride</div>
-        <div className="text-sm text-stone-500">with {g.members.filter((m) => m.requestId !== ride.id).map((m) => m.name + (m.demo ? ' (demo)' : '')).join(', ')} · leaves {inMin(ride.departAt, now)}</div>
+        <div className="text-sm text-stone-500">with {g.members.filter((m) => m.requestId !== ride.id).map((m) => m.name).join(', ')} · leaves {inMin(ride.departAt, now)}</div>
       </div>
       <ol className="space-y-1.5 text-sm">
         {g.plan.stops.map((s, i) => (
@@ -152,8 +151,6 @@ export default function RidesPage() {
   const [params] = useSearchParams()
   const account = useMe()
   const signedIn = !!token()
-  const me = useMemo(identity, [])
-  const [name, setName] = useState(me.name)
   const [state, setState] = useState<RidesState | null>(null)
   const [live, setLive] = useState(false)
   const [now, setNow] = useState(Date.now())
@@ -168,22 +165,28 @@ export default function RidesPage() {
   const [leaveIn, setLeaveIn] = useState(0)
   const [seats, setSeats] = useState(1)
   const [quote, setQuote] = useState<Quote | null>(null)
-  const [share, setShare] = useState<Share>({ mode: 'everyone', lists: [] })
+  const [share, setShare] = useState<Share>({ mode: 'friends', lists: [] })
   const [preview, setPreview] = useState<Place | null>(null)
   const [err, setErr] = useState('')
 
-  useEffect(() => subscribeRides(me.id, setState, setLive), [me.id])
+  // rides are friends-only, so the live feed exists only for a signed-in rider (it connects with a rides-only pass)
+  const accountId = account.data?.id
+  useEffect(() => {
+    if (!signedIn || !accountId) return
+    let stop = () => {}, cancelled = false
+    rides.pass().then(({ pass }) => { if (!cancelled) stop = subscribeRides(pass, setState, setLive) }).catch(() => setLive(false))
+    return () => { cancelled = true; stop() }
+  }, [signedIn, accountId])
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [])
   useEffect(() => { if (pickup && drop) rides.quote(pickup, drop).then(setQuote).catch(() => setQuote(null)); else setQuote(null) }, [pickup, drop])
 
   useEffect(() => { if (!pickup && account.data?.home) setPickup(account.data.home) }, [account.data?.home]) // eslint-disable-line react-hooks/exhaustive-deps
-  // signed in with friends: default to sharing with friends only
-  useEffect(() => { if (account.data?.friends.length) setShare((s) => (s.mode === 'everyone' ? { mode: 'friends', lists: [] } : s)) }, [account.data?.friends.length])
+  const hasFriends = !!account.data?.friends.length
   const ride = state?.mine.find((r) => r.status === 'open' || r.status === 'matched') ?? null
   const book = async () => {
     if (!pickup || !drop) return
-    setErr(''); saveName(name)
-    try { await rides.book({ userId: me.id, name, pickup, drop, departAt: Date.now() + leaveIn * 60e3, seats, share }) } catch (e) { setErr((e as Error).message) }
+    setErr('')
+    try { await rides.book({ pickup, drop, departAt: Date.now() + leaveIn * 60e3, seats, share }) } catch (e) { setErr((e as Error).message) }
   }
   const myPts: [number, number][] = ride ? [[ride.pickup.lat, ride.pickup.lng], [ride.drop.lat, ride.drop.lng]] : [pickup, drop].filter(Boolean).map((p) => [p!.lat, p!.lng])
   const plan = ride?.group?.plan  // other riders' stops appear only once you're both in the car
@@ -193,9 +196,10 @@ export default function RidesPage() {
       {/* live strip */}
       <div className="flex items-center gap-4 overflow-hidden border-b border-white/10 bg-gradient-to-r from-[#1a0a0a] via-ink to-[#1a0a0a] px-4 py-2 text-xs text-white">
         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 font-bold tracking-wider">
-          <span className={`h-2 w-2 rounded-full ${live ? 'live-dot bg-red-500' : 'bg-stone-500'}`} />{live ? 'LIVE' : 'connecting…'}
+          <span className={`h-2 w-2 rounded-full ${live ? 'live-dot bg-red-500' : 'bg-stone-500'}`} />{live ? 'LIVE' : signedIn ? 'connecting…' : 'OFFLINE'}
         </span>
-        {state && <span className="flex shrink-0 items-center gap-1.5"><Users size={13} /><b className="num">{state.stats.live}</b> booking now · <b className="num">{state.stats.sharing}</b> shared rides</span>}
+        {state ? <span className="flex shrink-0 items-center gap-1.5"><Users size={13} /><b className="num">{state.stats.live}</b> friends’ rides now · <b className="num">{state.stats.sharing}</b> shared</span>
+          : !signedIn && <span className="shrink-0 text-white/70">Sign in to see rides from your friends</span>}
         <div className="flex min-w-0 gap-6 truncate text-white/70">
           <AnimatePresence initial={false}>
             {state?.activity.slice(0, 3).map((a) => <motion.span key={a.at + a.text} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="truncate">{a.text} <span className="text-white/40">{ago(a.at, now)}</span></motion.span>)}
@@ -209,24 +213,29 @@ export default function RidesPage() {
           <div>
             <p className="eyebrow">Real-time · private until you both accept</p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Share a <span className="font-display font-normal italic text-cardinal">ride</span></h1>
-            <p className="text-sm text-stone-500">Book where you’re going. People you chose to share with who are heading the same way show up here live. Split the fare and save. Nobody sees your pickup or drop-off until you both accept. <InfoTip>{PRICING_NOTE}</InfoTip></p>
+            <p className="text-sm text-stone-500">Book where you’re going. Only your friends heading the same way show up here, live; strangers never see you and you never see them. Split the fare and save. Nobody sees your pickup or drop-off until you both accept. <InfoTip>{PRICING_NOTE}</InfoTip></p>
           </div>
 
-          {signedIn && !ride && account.data && account.data.friends.length === 0 && (
-            <a href="/profile" className="block rounded-xl bg-white p-3 text-xs text-stone-600 ring-1 ring-stone-200">Add friends and make lists in your profile to choose who sees you’re on their route →</a>
+          {!signedIn && (
+            <div className="card space-y-2 p-4 text-sm">
+              <div className="font-semibold">Rides are shared only with your friends</div>
+              <p className="text-stone-500">Sign in with your USC email, add friends, and you’ll see when one of them is heading your way.</p>
+              <button onClick={() => signIn('/rides')} className="w-full rounded-xl bg-cardinal py-2.5 font-semibold text-white hover:bg-cardinal-dark">Sign in to share rides</button>
+            </div>
           )}
 
-          {!ride && (
+          {signedIn && !ride && account.data && !hasFriends && (
+            <div className="card space-y-2 p-4 text-sm">
+              <div className="font-semibold">Add a friend first</div>
+              <p className="text-stone-500">Shared rides are only between friends. Add friends (and optional lists like “Roommates”) in your profile, then book here.</p>
+              <a href="/profile" className="block w-full rounded-xl bg-cardinal py-2.5 text-center font-semibold text-white hover:bg-cardinal-dark">Add friends →</a>
+            </div>
+          )}
+
+          {signedIn && hasFriends && !ride && (
             <div className="card space-y-4 p-4">
-              {signedIn && account.data ? (
+              {account.data && (
                 <div className="flex items-center gap-2 text-sm"><span className="grid h-7 w-7 place-items-center rounded-full bg-cardinal text-xs font-bold text-gold">{account.data.name[0]}</span>Riding as <b>{account.data.name}</b><span className="ml-auto text-xs text-stone-500">{account.data.friends.length} friends</span></div>
-              ) : (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-stone-500">Riding as
-                    <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm font-normal text-ink" />
-                  </label>
-                  <button onClick={() => signIn('/rides')} className="text-xs font-semibold text-cardinal">Sign in to ride with friends →</button>
-                </div>
               )}
               <PlaceInput label="Pickup" value={pickup} onChange={setPickup} quick={QUICK_PICKUPS} picking={picking === 'pickup'} onPickMap={() => setPicking(picking === 'pickup' ? null : 'pickup')} onPreview={setPreview} />
               <PlaceInput label="Drop-off" value={drop} onChange={setDrop} quick={QUICK_DROPS} picking={picking === 'drop'} onPickMap={() => setPicking(picking === 'drop' ? null : 'drop')} onPreview={setPreview} />
@@ -249,10 +258,10 @@ export default function RidesPage() {
               {pickup && drop && <TripOptions from={[pickup.lat, pickup.lng]} to={[drop.lat, drop.lng]} compact />}
               {pickup && !drop && <FreeNow at={[pickup.lat, pickup.lng]} title="Free rides from here" query="free ride home tonight" />}
               <div>
-                <div className="mb-1 text-xs font-semibold text-stone-500">Who can see you’re on their route</div>
+                <div className="mb-1 text-xs font-semibold text-stone-500">Which friends can see you’re on their route</div>
                 <div className="flex flex-wrap gap-1.5 text-xs font-semibold">
-                  {([['everyone', 'Everyone'], ['friends', 'All friends'], ['lists', 'Chosen lists']] as const).map(([k, l]) => (
-                    <button key={k} disabled={k !== 'everyone' && !signedIn} onClick={() => setShare({ mode: k, lists: k === 'lists' ? share.lists : [] })}
+                  {([['friends', 'All friends'], ['lists', 'Chosen lists']] as const).map(([k, l]) => (
+                    <button key={k} onClick={() => setShare({ mode: k, lists: k === 'lists' ? share.lists : [] })}
                       className={`rounded-full px-3 py-1 ring-1 disabled:opacity-40 ${share.mode === k ? 'bg-ink text-white ring-ink' : 'bg-white ring-stone-300'}`}>{l}</button>
                   ))}
                 </div>
@@ -268,8 +277,8 @@ export default function RidesPage() {
                   </div>
                 )}
                 <p className="mt-1 text-[11px] text-stone-500">
-                  {share.mode === 'everyone' ? 'Any student booking the same route sees your first name and that you’re on their route.' : share.mode === 'friends' ? 'Only your friends booking the same route will see you.' : 'Only people in the lists you pick will see you.'}
-                  {' '}They never see where you’re picked up or dropped off until you both accept.{!signedIn && ' Sign in to share with friends only.'}
+                  {share.mode === 'friends' ? 'Only your friends booking the same route will see you.' : 'Only friends in the lists you pick will see you.'}
+                  {' '}They never see where you’re picked up or dropped off until you both accept.
                 </p>
               </div>
               {err && <p className="text-xs text-red-600">{err}</p>}
@@ -282,46 +291,46 @@ export default function RidesPage() {
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-700"><span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />Wants to share with you</div>
               {state.incoming.map((j) => (
                 <div key={j.joinId} className="rounded-xl bg-gold-50 p-3 text-sm ring-1 ring-gold">
-                  <b>{j.from.name}</b>{j.from.friend ? ' 👋' : ''}{j.from.demo ? ' (demo)' : ''} is travelling on your route · leaves {inMin(j.from.departAt, now)}
+                  <b>{j.from.name}</b>{j.from.friend ? ' 👋' : ''} is travelling on your route · leaves {inMin(j.from.departAt, now)}
                   <div className="text-xs text-emerald-700">You’d pay {usd(j.you.share)} instead of {usd(j.you.solo.fare)} (save {usd(j.you.saves)}, {j.you.savesPct}%)</div>
                   <div className="mt-2 flex gap-2">
-                    <button onClick={() => rides.respond(j.joinId, me.id, true)} className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">Accept</button>
-                    <button onClick={() => rides.respond(j.joinId, me.id, false)} className="rounded-lg px-3 py-1 text-xs font-semibold ring-1 ring-stone-300">Decline</button>
+                    <button onClick={() => rides.respond(j.joinId, true)} className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">Accept</button>
+                    <button onClick={() => rides.respond(j.joinId, false)} className="rounded-lg px-3 py-1 text-xs font-semibold ring-1 ring-stone-300">Decline</button>
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {ride?.status === 'matched' && ride.group && <GroupCard ride={ride} now={now} onCancel={() => rides.cancel(ride.id, me.id)} />}
+          {ride?.status === 'matched' && ride.group && <GroupCard ride={ride} now={now} onCancel={() => rides.cancel(ride.id)} />}
 
           {ride?.status === 'open' && (
             <>
               <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 font-semibold"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" />Finding riders on your route</div>
-                  <button onClick={() => rides.cancel(ride.id, me.id)} className="text-xs text-stone-500 hover:text-cardinal">Cancel</button>
+                  <button onClick={() => rides.cancel(ride.id)} className="text-xs text-stone-500 hover:text-cardinal">Cancel</button>
                 </div>
                 <div className="mt-1 truncate text-sm">{ride.pickup.label} → {ride.drop.label}</div>
                 <div className="text-xs text-stone-500">booked {ago(ride.createdAt, now)} · leaves {inMin(ride.departAt, now)} · alone ≈ {usd(ride.solo.fare)}</div>
-                <div className="mt-1 text-xs text-stone-500">Visible to: <b>{ride.share.mode === 'everyone' ? 'everyone on your route' : ride.share.mode === 'friends' ? 'friends on your route' : `lists: ${account.data?.lists.filter((l) => ride.share.lists.includes(l.id)).map((l) => l.name).join(', ') || '…'}`}</b></div>
+                <div className="mt-1 text-xs text-stone-500">Visible to: <b>{ride.share.mode === 'friends' ? 'friends on your route' : `lists: ${account.data?.lists.filter((l) => ride.share.lists.includes(l.id)).map((l) => l.name).join(', ') || '…'}`}</b></div>
                 <a href={uberLink(ride.pickup, ride.drop)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-stone-500 hover:text-ink">Or ride alone now in Uber (prefilled) ↗</a>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="text-xs font-bold uppercase tracking-wide text-stone-500">Riders on your route ({ride.matches.length}{ride.matches.some((m) => m.friend) ? `, ${ride.matches.filter((m) => m.friend).length} friends` : ''})</div>
               </div>
-              {ride.matches.length === 0 && <p className="rounded-xl bg-white p-4 text-sm text-stone-500 ring-1 ring-stone-200">No one on your route yet. New bookings appear here live, usually within a few minutes.</p>}
+              {ride.matches.length === 0 && <p className="rounded-xl bg-white p-4 text-sm text-stone-500 ring-1 ring-stone-200">None of your friends are on your route yet. If a friend books a similar trip, they’ll appear here live.</p>}
               <div className="space-y-2">
                 <AnimatePresence>{ride.matches.map((m) => (
                   <MatchCard key={m.requestId} m={m} now={now}
-                    onJoin={() => rides.join(m.requestId, me.id, ride.id).catch((e) => setErr((e as Error).message))} />
+                    onJoin={() => rides.join(m.requestId, ride.id).catch((e) => setErr((e as Error).message))} />
                 ))}</AnimatePresence>
               </div>
               {err && <p className="text-xs text-red-600">{err}</p>}
             </>
           )}
-          <p className="text-[11px] text-stone-400">Pickups, drop-offs and the stop order are shared only after both riders accept. “demo” riders are simulated (they share with everyone) so the demo has demand.</p>
+          <p className="text-[11px] text-stone-400">Only friends can see each other here. Pickups, drop-offs and the stop order are shared only after both riders accept.</p>
         </aside>
 
         <div ref={mapBox} className={`relative h-[65vh] min-h-[320px] shrink-0 md:h-auto md:flex-1 md:shrink ${picking ? 'cursor-crosshair' : ''}`}>

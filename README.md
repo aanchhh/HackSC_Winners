@@ -64,15 +64,16 @@ Alternatives via `LLM_PROVIDER`: `google` (free AI Studio key), `anthropic`, `gr
 
 ## Shared rides (Book Ride page)
 
-- `POST /api/rides` books a trip; `GET /api/rides/stream?userId=…` (SSE) pushes each browser its matches, incoming share requests,
-  the live board and an activity feed. State is in memory in node-api (`src/services/rides.ts`).
+- Rides are **friends only**: you must be signed in and have at least one friend. Your trip is shown only to your friends (or the
+  friend lists you pick), and you only see friends who shared with you. There are no simulated riders.
+- `POST /api/rides` books a trip as the signed-in account; `POST /api/rides/pass` gives a rides-only pass, and
+  `GET /api/rides/stream?pass=…` (SSE) pushes that rider their matches, incoming share requests and their friends' activity. State is in memory in node-api (`src/services/rides.ts`).
 - Matching: departures within 20 min; best pickup/drop order for up to 3 riders; shown only if every rider saves money and nobody's
   detour exceeds ~6 min (or 40% of their trip). Tags explain the fit: pickup near yours / on your way, drop near yours / on your way.
 - Pricing (estimate): $1.25 base + $3.10 fee + $1.15/mi + $0.30/min (min $8.50); the shared fare is split in proportion to each rider's
   solo fare. Matched groups get "Book in Uber" (pickup → final drop deep link) and a Google Maps route with all stops.
-- Demo demand: the server adds labelled **demo** riders on common USC trips, and after a real booking 1–2 demo riders book similar
-  trips within ~1–3 min. `RIDE_SIM=0` turns this off. Real riders = anyone else using the app (open a second browser to try it).
-- Privacy: other riders see your pickup/drop at ~100 m precision until you match.
+- Privacy: friends see only your name, that you're on their route and when you leave; pickup, drop-off and stop order are revealed
+  only after both riders accept. To try it, sign in with two accounts in two browsers and add each other as friends.
 
 ## Safety: incidents, safest route, DPS units
 
