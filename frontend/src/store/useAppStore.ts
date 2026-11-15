@@ -28,7 +28,7 @@ export const useAppStore = create<AppState>()(
       compareIds: [],
       highlightedIds: [],
       compareWidth: 400,
-      compareRows: ['price', 'trueCost', 'longestWalk', 'incidents', 'dps', 'floorplans', 'fit'],
+      compareRows: ['price', 'trueCost', 'perPerson', 'longestWalk', 'incidents', 'dps', 'floorplans', 'fit'],
       setProfile: (p) => set((s) => ({ profile: { ...s.profile, ...p } })),
       toggleCompare: (id) =>
         set((s) => ({ compareIds: s.compareIds.includes(id) ? s.compareIds.filter((x) => x !== id) : [...s.compareIds, id].slice(-MAX_COMPARE) })),

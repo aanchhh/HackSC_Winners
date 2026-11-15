@@ -134,8 +134,11 @@ publicRouter.get('/listings/:id/report', async (req, res) => {
   } catch { /* LAPD facts above are enough */ }
 
   const longestWalkMin = Math.max(...commuteRes.map((c) => c.walk))
-  const fit = fitBreakdown({ total: cost.total, budget, longestWalkMin, inFryft: zonesRes.inFryft, inDps: zonesRes.inDps, incidentsNorm: incidentsNorm(listing.lat, listing.lng) }, weightsFrom(req.query))
-  res.json({ listing, zones: zonesRes, commute: commuteRes, longestWalkMin, block, cost, fitScore: fit.score, fit, incidentFacts: facts })
+  // A whole multi-bedroom unit is shared: compare each person's share with the (per-person) budget.
+  const people = listing.priceUnit === 'per unit' && (listing.beds ?? 0) >= 2 ? (listing.beds as number) : 1
+  const perPerson = { people, total: Math.round((cost.rent + cost.utilities) / people + cost.transit + cost.rideshare) }
+  const fit = fitBreakdown({ total: perPerson.total, budget, longestWalkMin, inFryft: zonesRes.inFryft, inDps: zonesRes.inDps, incidentsNorm: incidentsNorm(listing.lat, listing.lng) }, weightsFrom(req.query))
+  res.json({ listing, zones: zonesRes, commute: commuteRes, longestWalkMin, block, cost, perPerson, fitScore: fit.score, fit, incidentFacts: facts })
 })
 
 // ---------- Safety ----------

@@ -8,12 +8,14 @@ import { MAX_COMPARE, useAppStore } from '../../store/useAppStore'
 import ZoneBadges from '../listing/ZoneBadges'
 import FloorplanList from '../listing/FloorplanList'
 import InfoTip from '../ui/InfoTip'
+import { googleMapsDirections } from '../../lib/directions'
 
 // Report Card content, shown in a popup right next to the dot.
 export default function ListingPopup({ listing, onResize, onSafeRoute }: { listing: ListingV2; onResize: () => void; onSafeRoute: (l: ListingV2) => void }) {
   const profile = useAppStore((s) => s.profile)
   const { compareIds, toggleCompare } = useAppStore()
   const q = useQuery({ queryKey: ['report', listing.id, profile], queryFn: () => api.report(listing.id, profile) })
+  const buildings = useQuery({ queryKey: ['buildings'], queryFn: api.buildings })
   useEffect(() => { onResize() }, [q.status, onResize])
   const comparing = compareIds.includes(listing.id)
   const full = !comparing && compareIds.length >= MAX_COMPARE
@@ -21,7 +23,12 @@ export default function ListingPopup({ listing, onResize, onSafeRoute }: { listi
 
   return (
     <div className="text-ink">
-      {listing.photos?.[0] && <img src={listing.photos[0]} alt="" className="h-28 w-full object-cover" onLoad={onResize} />}
+      {listing.photos?.[0] && (
+        <div className="relative">
+          <img src={listing.photos[0]} alt="" className="h-28 w-full object-cover" onLoad={onResize} />
+          {listing.photoCredit && <span className="absolute inset-x-0 bottom-0 truncate bg-black/55 px-2 py-0.5 text-[9px] text-white" title={listing.photoCredit}>{listing.photoCredit}</span>}
+        </div>
+      )}
       <div className="max-h-[52vh] space-y-3 overflow-y-auto p-4">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wide text-stone-400">{listing.source}</div>
@@ -41,10 +48,15 @@ export default function ListingPopup({ listing, onResize, onSafeRoute }: { listi
             <div>
               <div className="mb-1 flex items-center gap-1 text-xs font-semibold text-stone-500">🚶 Door-to-desk · longest {r.longestWalkMin} min <InfoTip side="left">{EXPLAIN.longestWalk}</InfoTip></div>
               <ul className="space-y-0.5 text-xs">
-                {r.commute.map((c) => (
-                  <li key={c.building} className="flex justify-between"><span>{c.building}</span>
-                    <span className="text-stone-600">🚶 {c.walk}m · 🚲 {c.bike}m{c.tram != null && <> · 🚋 {c.tram}m</>}</span></li>
-                ))}
+                {r.commute.map((c) => {
+                  const b = buildings.data?.find((x) => x.name === c.building)
+                  return (
+                    <li key={c.building} className="flex items-center justify-between gap-2"><span className="truncate">{c.building}</span>
+                      <span className="flex shrink-0 items-center gap-2 text-stone-600">🚶 {c.walk}m · 🚲 {c.bike}m
+                        {b && <a href={googleMapsDirections([listing.lat, listing.lng], [b.lat, b.lng], 'walking')} target="_blank" rel="noreferrer" title="Directions in Google Maps" className="rounded bg-stone-100 px-1 !text-stone-700 hover:bg-stone-200">🧭</a>}
+                      </span></li>
+                  )
+                })}
               </ul>
             </div>
             <div className="rounded-xl bg-stone-50 p-2.5">
@@ -57,9 +69,11 @@ export default function ListingPopup({ listing, onResize, onSafeRoute }: { listi
             </div>
           </>
         )}
-        <button onClick={() => onSafeRoute(listing)} className="w-full rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
-          🛡 Safest walk to class
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => onSafeRoute(listing)} className="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700">🛡 Safest walk to class</button>
+          <a href={googleMapsDirections([listing.lat, listing.lng], [34.0206, -118.2854], 'walking')} target="_blank" rel="noreferrer"
+            className="rounded-lg px-3 py-2 text-sm font-semibold !text-stone-700 ring-1 ring-stone-300 hover:bg-stone-50" title="Walking directions to campus in Google Maps">🧭 Maps</a>
+        </div>
         <div className="flex gap-2">
           <button disabled={full} onClick={() => toggleCompare(listing.id)}
             className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-40 ${comparing ? 'bg-gold text-ink' : 'bg-cardinal text-white hover:bg-cardinal-dark'}`}>

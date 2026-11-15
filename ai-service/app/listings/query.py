@@ -142,10 +142,14 @@ def walk_minutes(l: Listing, building_id: int) -> float:
 # ---------- rule-based parser ----------
 def _money(s: str) -> int:
     s = s.lower().replace(",", "").replace("$", "").strip()
-    return int(float(s[:-1]) * 1000) if s.endswith("k") else int(float(s))
+    thousands = s.endswith("k") or s.endswith("grand")
+    v = float(s.replace("grand", "").replace("k", "").strip())
+    if thousands or v < 10:  # "3k", "3 grand", "under 3" all mean $3,000
+        v *= 1000
+    return int(v)
 
 
-MONEY = r"\$?\s*(\d+(?:[.,]\d+)?\s*k?)"
+MONEY = r"\$?\s*(\d+(?:[.,]\d+)?\s*(?:k|grand)?)"
 
 
 def parse_rules(q: str) -> SmartQuery:
@@ -190,6 +194,8 @@ def parse_rules(q: str) -> SmartQuery:
     elif m := re.search(r"\b(?:entire|whole|full)\s+(?:unit|apartment|apt|place|house)|\bmy own (?:place|apartment)\b", t):
         take(m); sq.roomType = "entire"
     if m := re.search(r"\b(?:private|own|ensuite|en-suite)\s+(?:bath(?:room)?|toilet)\b|\bensuite\b", t):
+        take(m); sq.privateBath = True
+    elif m := re.search(r"\b(?:don'?t|do not|never|no|not)\s+(?:want to\s+)?shar(?:e|ing)\s+(?:a|the|my)?\s*(?:bath(?:room)?|toilet|restroom)\b|\bno shared bath(?:room)?\b", t):
         take(m); sq.privateBath = True
     elif m := re.search(r"\bshared\s+bath(?:room)?\b", t):
         take(m); sq.privateBath = False

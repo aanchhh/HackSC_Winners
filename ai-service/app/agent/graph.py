@@ -103,7 +103,17 @@ async def explain(state: AgentState, config: RunnableConfig):
     ranked = state.get("ranked", [])
     llm = get_llm()
     if llm:
-        msgs = [SystemMessage(prompts.EXPLAIN), HumanMessage(f"Question: {_last_user_text(state)}\nResults: {ranked}")]
+        # Compact facts only (local models are much faster with a short context)
+        facts = []
+        for i, l in enumerate(ranked[:5], 1):
+            cost, zones = l.get("cost") or {}, l.get("zones") or {}
+            walk = ", ".join(f"{c['building']} {c['walk']} min" for c in (l.get("commute") or []) if isinstance(c, dict))
+            units = ", ".join(u["label"] for u in (l.get("units") or [])[:4])
+            facts.append(f"[{i}] {l.get('name')} | {l.get('rent')} {l.get('priceUnit')} | {units} | "
+                         f"{'inside' if zones.get('inDps') else 'outside'} DPS | walk: {walk} | True Cost ${cost.get('total', '?')}/mo | "
+                         f"fit {l.get('fitScore')} | {(l.get('block') or {}).get('summary', '')[:160]}")
+        msgs = [SystemMessage(prompts.EXPLAIN + " Keep it under 150 words: a one-line recommendation, then the top 3 as short bullets."),
+                HumanMessage(f"Question: {_last_user_text(state)}\nRanked listings (best first):\n" + "\n".join(facts))]
         async for chunk in llm.astream(msgs):
             if chunk.text and emit:
                 await emit("token", {"text": chunk.text})

@@ -14,6 +14,7 @@ langchain-core
 langchain-anthropic   # LLM providers: pick one with LLM_PROVIDER (app/llm.py)
 langchain-google-genai  # Gemini (free tier via Google AI Studio)
 langchain-groq
+langchain-ollama        # local models via Ollama (default)
 langsmith             # optional tracing
 
 # --- RAG / embeddings ---

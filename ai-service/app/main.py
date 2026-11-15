@@ -54,8 +54,8 @@ def _check_key(key: str | None):
 
 @app.get("/health")
 async def health():
-    from app.llm import model_name, provider
-    return {"ok": True, "service": "ai-service", "llm": bool(settings.llm_api_key), "provider": provider(), "model": model_name()}
+    from app.llm import get_llm, model_name, provider
+    return {"ok": True, "service": "ai-service", "llm": get_llm() is not None, "provider": provider(), "model": model_name()}
 
 
 @app.get("/ai/listings/search")

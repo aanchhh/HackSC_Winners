@@ -1,4 +1,5 @@
 import type { Building, RouteLeg, RouteResult } from '../../api/types'
+import { googleMapsForRoute } from '../../lib/directions'
 
 interface Props {
   buildings: Building[]; startLabel: string | null; destId: number; setDestId: (id: number) => void
@@ -22,6 +23,10 @@ function Leg({ title, leg, tone }: { title: string; leg: RouteLeg; tone: 'safe' 
         <span>{leg.emergencyPhones.length} emergency phones</span>
       </div>
       {leg.streets.length > 0 && <div className="mt-1 truncate text-[11px] text-stone-500">via {leg.streets.slice(0, 4).join(' → ')}</div>}
+      <a href={googleMapsForRoute(leg.coords)} target="_blank" rel="noreferrer"
+        className={`mt-2 flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${tone === 'safe' ? 'bg-emerald-600 !text-white hover:bg-emerald-700' : 'bg-white !text-stone-700 ring-1 ring-stone-300 hover:bg-stone-50'}`}>
+        🧭 Get directions in Google Maps ↗
+      </a>
     </div>
   )
 }

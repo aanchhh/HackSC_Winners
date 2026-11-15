@@ -60,6 +60,7 @@ class Listing(BaseModel):
     propertyTypes: list[str] = Field(default_factory=list)
     amenities: list[str] = Field(default_factory=list)
     photos: list[str] = Field(default_factory=list)
+    photoCredit: str = ""                    # attribution, e.g. "Representative photo · Jane Doe, CC BY-SA 4.0 (Wikimedia Commons)"
     description: str = ""
     sampleData: bool = False                 # True = curated demo record, prices are illustrative
     utilitiesEst: int = 90                   # estimate, shown as such in the UI

@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = ""
-    llm_provider: str = "google"       # google (free tier) | anthropic | groq
+    llm_provider: str = "ollama"       # ollama (local) | google (free tier) | anthropic | groq
+    ollama_url: str = "http://localhost:11434"
     llm_api_key: str = ""
     llm_model: str = ""                 # empty = provider default (see app/llm.py)
     node_internal_url: str = "http://localhost:4000"

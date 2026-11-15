@@ -13,7 +13,7 @@ type Row = { label: string; tip?: string; get: (r: ReportV2) => number | string 
 const ROWS: Record<CompareRow, Row> = {
   price: { label: 'Listed price', get: (r) => r.listing.rent, best: 'min', fmt: money },
   trueCost: { label: 'True Trojan Cost', tip: EXPLAIN.trueCost, get: (r) => r.cost.total, best: 'min', fmt: (v) => `${money(v)}/mo` },
-  perPerson: { label: 'Price unit', get: (r) => r.listing.priceUnit },
+  perPerson: { label: 'Your share / mo', tip: 'True Cost per person. A whole unit is assumed split evenly, one person per bedroom; rooms are already per person. This is the number the fit score compares with your budget.', get: (r) => r.perPerson.total, best: 'min', fmt: money },
   rideshare: { label: 'Late-night rides', get: (r) => r.cost.rideshare, best: 'min', fmt: money },
   longestWalk: { label: 'Longest walk', tip: EXPLAIN.longestWalk, get: (r) => r.longestWalkMin, best: 'min', fmt: (v) => `${v} min` },
   incidents: { label: 'Incidents ≤150 m', tip: EXPLAIN.incidents, get: (r) => r.incidentFacts.total, best: 'min', fmt: (v) => `${v} (6 mo)` },
@@ -23,8 +23,11 @@ const ROWS: Record<CompareRow, Row> = {
   fit: { label: 'Fit score', tip: EXPLAIN.fit, get: (r) => Math.round(r.fit.score * 100), best: 'max', fmt: (v) => `${v}/100` },
 }
 
+export const COMPARE_SIZES = [380, 560, 760]
+
 export default function CompareSidebar({ onFocus }: { onFocus: (id: string) => void }) {
-  const { compareIds, toggleCompare, clearCompare, profile, compareRows, toggleCompareRow } = useAppStore()
+  const { compareIds, toggleCompare, clearCompare, profile, compareRows, toggleCompareRow, compareWidth, setCompareWidth } = useAppStore()
+  const sizeIdx = COMPARE_SIZES.reduce((best, w, i) => (Math.abs(w - compareWidth) < Math.abs(COMPARE_SIZES[best] - compareWidth) ? i : best), 0)
   const [customize, setCustomize] = useState(false)
   const [showFit, setShowFit] = useState(false)
   const listings = useQuery({ queryKey: ['listings'], queryFn: () => api.listings() })
@@ -57,7 +60,12 @@ export default function CompareSidebar({ onFocus }: { onFocus: (id: string) => v
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b border-stone-200 px-4 py-3">
         <h2 className="font-bold">Compare <span className="text-stone-400">({compareIds.length}/{MAX_COMPARE})</span></h2>
-        <div className="flex gap-3 text-xs font-medium">
+        <div className="flex items-center gap-3 text-xs font-medium">
+          <div className="hidden overflow-hidden rounded-md ring-1 ring-stone-300 md:flex" title="Panel width">
+            {['S', 'M', 'L'].map((l, i) => (
+              <button key={l} onClick={() => setCompareWidth(COMPARE_SIZES[i])} className={`px-1.5 py-0.5 ${sizeIdx === i ? 'bg-cardinal text-white' : 'hover:bg-stone-100'}`}>{l}</button>
+            ))}
+          </div>
           <button onClick={() => setCustomize(!customize)} className={customize ? 'text-cardinal' : 'text-stone-500 hover:text-cardinal'}>⚙ Rows</button>
           <button onClick={clearCompare} className="text-stone-500 hover:text-cardinal">Clear</button>
         </div>
@@ -73,49 +81,57 @@ export default function CompareSidebar({ onFocus }: { onFocus: (id: string) => v
         </div>
       )}
       <div className="min-h-0 flex-1 overflow-auto">
-        <div className="grid gap-2 p-3" style={{ gridTemplateColumns: `repeat(${compareIds.length}, minmax(0, 1fr))` }}>
-          {compareIds.map((id, i) => {
-            const l = reports[i].data?.listing ?? listings.data?.find((x) => x.id === id)
-            return (
-              <div key={id} className="overflow-hidden rounded-xl border border-stone-200 bg-white">
-                <div className="relative h-16 bg-stone-100">
-                  {l?.photos?.[0] && <img src={l.photos[0]} alt="" className="h-full w-full object-cover" />}
-                  <button onClick={() => toggleCompare(id)} aria-label="Remove" className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-white/90 text-xs">✕</button>
-                </div>
-                <button onClick={() => onFocus(id)} className="block w-full p-2 text-left">
-                  <div className="line-clamp-2 text-xs font-semibold leading-tight hover:text-cardinal">{l?.name ?? '…'}</div>
-                  <div className="text-[11px] text-stone-500">{l ? priceLabel(l) : ''}</div>
-                </button>
-              </div>
-            )
-          })}
+        <div className="mx-auto p-3" style={{ maxWidth: 120 + compareIds.length * 240 }}>
+          <table className="w-full table-fixed border-separate border-spacing-0 text-xs">
+            <colgroup><col style={{ width: 112 }} />{compareIds.map((id) => <col key={id} />)}</colgroup>
+            <thead>
+              <tr>
+                <th />
+                {compareIds.map((id, i) => {
+                  const l = reports[i].data?.listing ?? listings.data?.find((x) => x.id === id)
+                  return (
+                    <th key={id} className="px-1 pb-2 align-top font-normal">
+                      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white text-left">
+                        <div className="relative aspect-[16/10] bg-stone-100">
+                          {l?.photos?.[0] ? <img src={l.photos[0]} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-2xl">🏢</div>}
+                          <button onClick={() => toggleCompare(id)} aria-label="Remove" className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-white/90 text-xs shadow">✕</button>
+                        </div>
+                        <button onClick={() => onFocus(id)} className="block w-full p-2 text-left">
+                          <div className="line-clamp-2 font-semibold leading-tight hover:text-cardinal">{l?.name ?? '…'}</div>
+                          <div className="truncate text-[11px] text-stone-500">{l ? priceLabel(l) : ''}</div>
+                        </button>
+                      </div>
+                    </th>
+                  )
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {compareRows.map((key) => {
+                const row = ROWS[key]
+                const best = bestOf(row)
+                return (
+                  <tr key={key}>
+                    <th className="border-t border-stone-100 bg-stone-50 px-2 py-2 text-left font-medium text-stone-500">
+                      <span className="inline-flex items-center gap-1">{row.label}{row.tip && <InfoTip>{row.tip}</InfoTip>}</span>
+                    </th>
+                    {reports.map((q, i) => {
+                      const v = q.data ? row.get(q.data) : null
+                      const isBest = best !== null && v === best
+                      return (
+                        <td key={compareIds[i]} className={`border-t border-stone-100 px-2 py-2 text-center break-words ${isBest ? 'bg-emerald-50 font-bold text-emerald-700' : ''}`}>
+                          {q.isLoading ? <span className="inline-block h-3 w-10 animate-pulse rounded bg-stone-200" />
+                            : v == null ? '—' : typeof v === 'number' && row.fmt ? row.fmt(v) : String(v)}
+                          {isBest && ' ★'}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
-        <table className="w-full text-xs">
-          <tbody>
-            {compareRows.map((key) => {
-              const row = ROWS[key]
-              const best = bestOf(row)
-              return (
-                <tr key={key} className="border-t border-stone-100">
-                  <th className="w-28 bg-stone-50 px-3 py-2 text-left font-medium text-stone-500">
-                    {row.label} {row.tip && <InfoTip>{row.tip}</InfoTip>}
-                  </th>
-                  {reports.map((q, i) => {
-                    const v = q.data ? row.get(q.data) : null
-                    const isBest = best !== null && v === best
-                    return (
-                      <td key={compareIds[i]} className={`px-2 py-2 text-center ${isBest ? 'font-bold text-emerald-700' : ''}`}>
-                        {q.isLoading ? <span className="inline-block h-3 w-10 animate-pulse rounded bg-stone-200" />
-                          : v == null ? '—' : typeof v === 'number' && row.fmt ? row.fmt(v) : String(v)}
-                        {isBest && ' ★'}
-                      </td>
-                    )
-                  })}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
         {compareRows.includes('fit') && ready.length > 0 && (
           <div className="border-t border-stone-100 p-3">
             <button onClick={() => setShowFit(!showFit)} className="text-xs font-semibold text-cardinal">{showFit ? '▾' : '▸'} How the fit scores were calculated</button>

@@ -10,7 +10,7 @@ const clamp = (x: number) => Math.max(0, Math.min(1, x))
 
 export function fitBreakdown(i: ScoreInput, w: Weights = DEFAULT_WEIGHTS) {
   const parts = {
-    cost: { value: clamp((i.budget - i.total) / i.budget + 0.5), explain: `True Cost $${Math.round(i.total)} vs budget $${i.budget}` },
+    cost: { value: clamp((i.budget - i.total) / i.budget + 0.5), explain: `Your share of True Cost $${Math.round(i.total)} vs budget $${i.budget}` },
     commute: { value: clamp(1 - i.longestWalkMin / 30), explain: `Longest walk ${i.longestWalkMin} min (0 points at 30+ min)` },
     zone: { value: (+i.inFryft + +i.inDps) / 2, explain: `${i.inDps ? 'Inside' : 'Outside'} DPS, ${i.inFryft ? 'inside' : 'outside'} Fryft` },
     incidents: { value: clamp(1 - i.incidentsNorm), explain: 'Reported incidents within 150 m vs other listings' },

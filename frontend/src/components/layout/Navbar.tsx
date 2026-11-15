@@ -6,6 +6,7 @@ const LINKS = [
   { to: '/map', label: 'Explore Map' },
   { to: '/search', label: 'Search' },
   { to: '/ask', label: 'Ask Scout' },
+  { to: '/rides', label: 'Book Ride' },
   { to: '/true-cost', label: 'True Cost' },
   { to: '/preferences', label: 'Preferences' },
 ]

@@ -15,6 +15,7 @@ export default function ListingCard({ listing, showRanks = false }: { listing: L
         {listing.photos?.[0] ? <img src={listing.photos[0]} alt="" loading="lazy" className="h-full w-full object-cover" />
           : <div className="grid h-full place-items-center bg-gradient-to-br from-cardinal-50 to-gold-50 text-4xl">🏢</div>}
         <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold">{listing.source}</span>
+        {listing.photoCredit && <span className="absolute inset-x-0 bottom-0 truncate bg-black/55 px-2 py-0.5 text-[10px] text-white" title={listing.photoCredit}>{listing.photoCredit}</span>}
         {hit.walkMin != null && <span className="absolute right-2 top-2 rounded-full bg-ink/80 px-2 py-0.5 text-xs font-semibold text-white">🚶 {hit.walkMin} min</span>}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">

@@ -6,6 +6,7 @@ import SearchPage from './pages/SearchPage'
 import ChatPage from './pages/ChatPage'
 import CostPage from './pages/CostPage'
 import PreferencesPage from './pages/PreferencesPage'
+import RidesPage from './pages/RidesPage'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/ask" element={<ChatPage />} />
           <Route path="/true-cost" element={<CostPage />} />
           <Route path="/preferences" element={<PreferencesPage />} />
+          <Route path="/rides" element={<RidesPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>

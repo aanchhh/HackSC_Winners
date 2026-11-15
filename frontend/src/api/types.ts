@@ -31,7 +31,7 @@ export type ChatEvent =
 
 // ---- v2: floorplans, smart search, safety ----
 export interface Unit { label: string; roomType: 'entire' | 'private_room' | 'shared_room'; beds: number | null; baths: number | null; privateBath: boolean | null; rent: number | null; count: number }
-export interface ListingV2 extends Listing { units?: Unit[]; roomTypes?: string[]; sampleData?: boolean }
+export interface ListingV2 extends Listing { units?: Unit[]; roomTypes?: string[]; sampleData?: boolean; photoCredit?: string }
 export interface Chip { key: string; label: string }
 export interface SmartHit extends ListingV2 { matchedUnits: Unit[]; walkMin: number | null; score: number | null; denseRank: number | null; bm25Rank: number | null }
 export interface SmartSearchResponse {
@@ -41,6 +41,7 @@ export interface SmartSearchResponse {
 export interface FitPart { value: number; weight: number; explain: string }
 export interface ReportV2 extends Report {
   listing: ListingV2; longestWalkMin: number
+  perPerson: { people: number; total: number }
   fit: { score: number; parts: Record<'cost' | 'commute' | 'zone' | 'incidents', FitPart> }
   incidentFacts: { total: number; againstPerson: number; byCategory: Record<string, number> }
 }

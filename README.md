@@ -32,13 +32,28 @@ React (Vite) :5173 ──REST+SSE──► Node+Express :4000 ──► OpenRout
 | `/ask` | Ask Scout (LangGraph agent, streamed steps + result cards) |
 | `/true-cost` | True Trojan Cost calculator (live listing or custom numbers) |
 | `/preferences` | Budget, class buildings, late nights, priority weights (saved in the browser) |
+| `/rides` | Book Ride: real-time shared rides with live matching and fare savings |
 
-## LLM key (free option)
+## LLM (local by default)
 
-Mock mode works with no key. For real answers, the best free option is a **Google AI Studio** key (Gemini API free tier,
-no card): create one at aistudio.google.com/apikey, then in `ai-service/.env` set `LLM_PROVIDER=google` and `LLM_API_KEY=...`.
-`LLM_PROVIDER=anthropic` (Claude, paid) and `groq` (free tier, set `LLM_MODEL` from console.groq.com/docs/models) also work.
-With a key, smart search also uses the LLM to read queries the rules miss.
+The AI service uses a **local model through Ollama**: free, private, no API key.
+1. Install Ollama (ollama.com) and start it.
+2. `ollama pull qwen2.5:7b` (~4.7 GB; good structured output + tool calling on a 16 GB Mac).
+3. `LLM_PROVIDER=ollama` in `ai-service/.env` (the default). `/health` shows `"llm": true` once the model is reachable.
+
+Alternatives via `LLM_PROVIDER`: `google` (free AI Studio key), `anthropic`, `groq`. If no model is reachable the app runs in mock mode.
+
+## Shared rides (Book Ride page)
+
+- `POST /api/rides` books a trip; `GET /api/rides/stream?userId=…` (SSE) pushes each browser its matches, incoming share requests,
+  the live board and an activity feed. State is in memory in node-api (`src/services/rides.ts`).
+- Matching: departures within 20 min; best pickup/drop order for up to 3 riders; shown only if every rider saves money and nobody's
+  detour exceeds ~6 min (or 40% of their trip). Tags explain the fit: pickup near yours / on your way, drop near yours / on your way.
+- Pricing (estimate): $1.25 base + $3.10 fee + $1.15/mi + $0.30/min (min $8.50); the shared fare is split in proportion to each rider's
+  solo fare. Matched groups get "Book in Uber" (pickup → final drop deep link) and a Google Maps route with all stops.
+- Demo demand: the server adds labelled **demo** riders on common USC trips, and after a real booking 1–2 demo riders book similar
+  trips within ~1–3 min. `RIDE_SIM=0` turns this off. Real riders = anyone else using the app (open a second browser to try it).
+- Privacy: other riders see your pickup/drop at ~100 m precision until you match.
 
 ## Safety: incidents, safest route, DPS units
 

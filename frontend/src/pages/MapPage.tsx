@@ -8,7 +8,7 @@ import { useAppStore } from '../store/useAppStore'
 import ZoneLayer from '../components/map/ZoneLayer'
 import ListingMarker from '../components/map/ListingMarker'
 import BuildingMarker from '../components/map/BuildingMarker'
-import CompareSidebar from '../components/map/CompareSidebar'
+import CompareSidebar, { COMPARE_SIZES } from '../components/map/CompareSidebar'
 import RoutePanel from '../components/map/RoutePanel'
 import FlyTo from '../components/map/FitBounds'
 import { ClickToPick, COLORS, DpsUnitsLayer, IncidentLayer, RouteLayer, SafetyLayer } from '../components/map/layers'
@@ -56,10 +56,17 @@ export default function MapPage() {
 
   // drag the compare panel's left edge to resize
   const dragging = useRef(false)
+  const [dragW, setDragW] = useState<number | null>(null)
   const onDrag = (e: React.PointerEvent) => {
     dragging.current = true
-    const move = (ev: PointerEvent) => dragging.current && setCompareWidth(window.innerWidth - ev.clientX)
-    const up = () => { dragging.current = false; window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
+    const move = (ev: PointerEvent) => { if (dragging.current) setDragW(Math.min(760, Math.max(340, window.innerWidth - ev.clientX))) }
+    const up = (ev: PointerEvent) => {
+      dragging.current = false
+      const w = window.innerWidth - ev.clientX  // snap to the nearest size so the table always lays out cleanly
+      setCompareWidth(COMPARE_SIZES.reduce((a, b) => (Math.abs(b - w) < Math.abs(a - w) ? b : a)))
+      setDragW(null)
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up)
+    }
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up)
     e.preventDefault()
   }
@@ -135,10 +142,12 @@ export default function MapPage() {
 
       {sidebarOpen && (
         <aside className="absolute inset-x-0 bottom-0 z-[600] h-[55%] border-t border-stone-200 bg-white shadow-2xl md:relative md:h-auto md:border-l md:border-t-0 md:shadow-none"
-          style={{ width: window.innerWidth >= 768 ? compareWidth : undefined }}>
-          <div onPointerDown={onDrag} title="Drag to resize"
-            className="absolute -left-1.5 top-0 z-10 hidden h-full w-3 cursor-col-resize md:block">
-            <div className="mx-auto mt-[45vh] h-10 w-1.5 rounded-full bg-stone-300 hover:bg-cardinal" />
+          style={{ width: window.innerWidth >= 768 ? (dragW ?? compareWidth) : undefined, transition: dragW ? 'none' : 'width 180ms ease' }}>
+          <div onPointerDown={onDrag} onDoubleClick={() => setCompareWidth(COMPARE_SIZES[0])} title="Drag to resize (snaps to S / M / L) · double-click to reset"
+            className="group absolute -left-2 top-0 z-10 hidden h-full w-4 cursor-col-resize md:block">
+            <div className={`mx-auto h-full w-px ${dragW ? 'bg-cardinal' : 'bg-stone-200 group-hover:bg-cardinal'}`} />
+            <div className={`absolute left-1/2 top-1/2 grid h-12 w-4 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border bg-white text-[9px] leading-none shadow-sm ${dragW ? 'border-cardinal text-cardinal' : 'border-stone-300 text-stone-400 group-hover:border-cardinal group-hover:text-cardinal'}`}>⋮</div>
+            {dragW && <div className="absolute left-5 top-1/2 rounded bg-ink px-1.5 py-0.5 text-[10px] text-white">{Math.round(dragW)}px</div>}
           </div>
           <CompareSidebar onFocus={(id) => setParams({ focus: id })} />
         </aside>
