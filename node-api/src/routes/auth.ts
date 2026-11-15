@@ -48,6 +48,11 @@ async function discover() {
 const pending = new Map<string, { nonce: string; verifier: string; ret: string; exp: number }>()
 const safeReturn = (r: unknown) => (typeof r === 'string' && /^\/[\w\-/?=&%.]*$/.test(r) ? r : '/')
 
+// Shown on the code page while no email service is configured. Render sets RENDER=true on its servers.
+const NO_MAIL_NOTE = process.env.RENDER
+  ? '<div class="dev"><b>Email isn’t set up on this server yet.</b> The code is in the Render dashboard: <b>trojanscout-api → Logs</b>, on the line starting with ✉️ <b>[dev] TrojanScout sign-in code</b>. To email codes, add BREVO_API_KEY and MAIL_FROM under trojanscout-api → Environment.</div>'
+  : '<div class="dev"><b>No email is sent in development mode.</b> Your code is in the terminal running <code>npm run dev</code>, on the line starting with ✉️ <b>[dev] TrojanScout sign-in code</b>. Add BREVO_API_KEY + MAIL_FROM to node-api/.env to email it instead.</div>'
+
 authRouter.get('/config', (_req, res) => res.json({ issuer: OIDC.issuer, builtIn: OIDC.issuer === LOCAL_ISSUER, domains: DOMAINS, emailDelivery: mailConfigured ? 'email' : 'server-console' }))
 
 authRouter.get('/login', async (req, res, next) => {
@@ -126,7 +131,7 @@ ${err ? `<div class="err">${esc(err)}</div>` : ''}<form method="post" action="${
 <label for="name">Name <span style="font-weight:400;color:#a8a29e">(new accounts)</span></label><input id="name" type="text" name="name" maxlength="40" placeholder="First L.">
 <button>Send code</button></form>`)
 const codeForm = (q: Params, email: string, name: string, err = '') => page(`<h1>Check your email</h1><p>We sent a 6-digit code to <b>${esc(email)}</b>. It expires in 10 minutes.</p>
-${mailConfigured ? '' : '<div class="dev"><b>No email is sent in development mode.</b> Your code is in the terminal running <code>npm run dev</code>, on the line starting with ✉️ <b>[dev] TrojanScout sign-in code</b>. Add BREVO_API_KEY + MAIL_FROM to node-api/.env to email it instead.</div>'}
+${mailConfigured ? '' : NO_MAIL_NOTE}
 ${err ? `<div class="err">${esc(err)}</div>` : ''}<form method="post" action="${LOCAL_ISSUER}/authorize/verify">${hidden(q)}
 <input type="hidden" name="email" value="${esc(email)}"><input type="hidden" name="name" value="${esc(name)}">
 <input class="code" type="text" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required autofocus placeholder="••••••">
