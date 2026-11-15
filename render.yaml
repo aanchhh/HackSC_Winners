@@ -1,0 +1,30 @@
+# Render Blueprint: the Node API (Express gateway). Render → New → Blueprint → pick this repo.
+# The frontend goes on Vercel; the AI service runs on a free Hugging Face Space (see DEPLOY.md).
+services:
+  - type: web
+    name: trojanscout-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: cd node-api && npm ci && npm run build
+    startCommand: cd node-api && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: CORS_ORIGIN          # your Vercel URL, e.g. https://trojanscout.vercel.app
+        sync: false
+      - key: PUBLIC_API_URL       # this service's own URL, e.g. https://trojanscout-api.onrender.com
+        sync: false
+      - key: AI_SERVICE_URL       # your Hugging Face Space URL, e.g. https://<user>-trojanscout-ai.hf.space
+        sync: false
+      - key: INTERNAL_KEY         # shared secret with the AI service: copy this value into the Space's secrets
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ALLOWED_EMAIL_DOMAINS
+        value: usc.edu
+      - key: BREVO_API_KEY        # optional: email sign-in codes (otherwise they appear in Render logs)
+        sync: false
+      - key: MAIL_FROM
+        sync: false

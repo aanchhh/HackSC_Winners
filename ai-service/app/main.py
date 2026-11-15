@@ -35,7 +35,13 @@ async def _refresh_loop():
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    INDEX.load()
+    if not INDEX.load():  # fresh deploy: build the search index from the committed data/listings.json (no scraping needed)
+        listings_file = Path(settings.data_dir) / "listings.json"
+        if listings_file.exists():
+            from app.listings.models import Listing
+            rows = json.loads(listings_file.read_text()).get("listings", [])
+            await asyncio.to_thread(INDEX.build, [Listing(**x) for x in rows])
+            log.info("built search index from listings.json (%d listings)", len(rows))
     await asyncio.to_thread(warm)
     task = asyncio.create_task(_refresh_loop()) if settings.refresh_minutes > 0 else None
     yield

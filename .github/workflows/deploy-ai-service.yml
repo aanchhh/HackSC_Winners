@@ -1,0 +1,29 @@
+# Pushes the AI service (plus data/) to a Hugging Face Space, which builds and runs it with Docker.
+# Repo secrets needed: HF_TOKEN (a Hugging Face "write" token) and HF_SPACE (e.g. yourname/trojanscout-ai).
+name: Deploy AI service to Hugging Face
+on:
+  push:
+    branches: [main]
+    paths: ["ai-service/**", "data/**", "deploy/hf-space/**", ".github/workflows/deploy-ai-service.yml"]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the Space
+        run: |
+          mkdir space
+          cp deploy/hf-space/Dockerfile deploy/hf-space/README.md space/
+          rsync -a --exclude .venv --exclude .index --exclude __pycache__ --exclude .env --exclude tests ai-service space/
+          rsync -a --exclude users.json --exclude reports.json data space/
+      - name: Push to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ secrets.HF_SPACE }}
+        run: |
+          cd space
+          git init -q -b main
+          git config user.email "actions@github.com" && git config user.name "github-actions"
+          git add -A && git commit -qm "Deploy from ${GITHUB_SHA::7}"
+          git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" main
