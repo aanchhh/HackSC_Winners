@@ -13,10 +13,10 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "24"
-      - key: CORS_ORIGIN          # your Vercel URL, e.g. https://trojanscout.vercel.app
-        sync: false
-      - key: AI_SERVICE_URL       # the AI service's URL below, e.g. https://trojanscout-ai.onrender.com
-        sync: false
+      - key: CORS_ORIGIN          # the Vercel site allowed to call this API (comma-separate to add more)
+        value: https://hack-sc-winners.vercel.app
+      - key: AI_SERVICE_URL       # the AI service below
+        value: https://trojanscout-ai.onrender.com
       - key: INTERNAL_KEY         # shared secret; the AI service copies it automatically
         generateValue: true
       - key: SESSION_SECRET
@@ -48,8 +48,8 @@ services:
         value: groq
       - key: LLM_API_KEY          # your Groq key (console.groq.com → API Keys)
         sync: false
-      - key: NODE_INTERNAL_URL    # the Node API's URL above, e.g. https://trojanscout-api.onrender.com
-        sync: false
+      - key: NODE_INTERNAL_URL    # the Node API above
+        value: https://trojanscout-api.onrender.com
       - key: INTERNAL_KEY
         fromService:
           type: web
