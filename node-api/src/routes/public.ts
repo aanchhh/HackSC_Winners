@@ -19,6 +19,25 @@ const ai = axios.create({ baseURL: config.aiServiceUrl, headers: { 'X-Internal-K
 // On Render's free plan the AI service sleeps when idle and takes ~1–2 min to wake: user-facing calls wait that long
 const AI_WAKE_MS = 120_000
 
+// While it wakes, Render answers 502/503/504 (or drops the connection) straight away instead of holding the
+// request. Retry those every 3 s until the request's own time limit, so a cold start is a wait, not an error.
+const WAKING_STATUS = new Set([502, 503, 504])
+const WAKING_CODES = new Set(['ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN', 'EPIPE'])
+ai.interceptors.request.use((cfg) => {
+  const c = cfg as typeof cfg & { wakeDeadline?: number }
+  c.wakeDeadline ??= Date.now() + (cfg.timeout || 15_000)
+  return cfg
+})
+ai.interceptors.response.use(undefined, async (err) => {
+  const cfg = err?.config as (Parameters<typeof ai.request>[0] & { wakeDeadline?: number }) | undefined
+  const waking = WAKING_STATUS.has(err?.response?.status) || WAKING_CODES.has(err?.code)
+  if (!cfg || !waking || !cfg.wakeDeadline || cfg.url?.includes('/refresh')) throw err
+  const left = cfg.wakeDeadline - Date.now()
+  if (left < 3_500) throw err
+  await new Promise((r) => setTimeout(r, 3_000))
+  return ai.request({ ...cfg, timeout: Math.max(1_000, left - 3_000) })
+})
+
 /** Wake-up call: the site pings this when it loads, so both sleeping services start booting before the
  *  visitor reaches a page that needs them. Answers at once; the AI service is poked in the background. */
 publicRouter.get('/warm', (_req, res) => {
